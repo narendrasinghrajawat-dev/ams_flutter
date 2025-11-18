@@ -1,7 +1,8 @@
 import 'package:get/get.dart';
-import '../../data/models/user.dart';
-import '../../data/services/storage_service.dart';
-import 'auth_repo.dart';
+
+import '../models/user.dart';
+import '../repos/auth_repo.dart';
+import '../services/storage_service.dart';
 
 class AuthController extends GetxController {
   final AuthRepo _repo = AuthRepo();

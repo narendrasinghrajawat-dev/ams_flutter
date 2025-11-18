@@ -1,10 +1,10 @@
+import 'package:attedance_management_system/views/admin/user_form_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../controller/admin_controller.dart';
+import '../../controller/auth_controller.dart';
 import '../../core/constants/app_theme_colors.dart';
 import '../../widgets/app_text_type.dart';
-import '../../modules/auth/auth_controller.dart';
-import 'user_form.dart';
-import 'admin_controller.dart';
 
 class AdminDashboard extends StatelessWidget {
   AdminDashboard({Key? key}) : super(key: key);

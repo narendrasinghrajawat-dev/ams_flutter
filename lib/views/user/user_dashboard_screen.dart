@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../modules/auth/auth_controller.dart';
+
+import '../../controller/auth_controller.dart';
 
 class UserDashboard extends StatelessWidget {
   final AuthController _auth = Get.find<AuthController>();

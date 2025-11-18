@@ -1,6 +1,7 @@
 import 'package:attedance_management_system/core/constants/api_endpoints.dart';
 
-import '../../data/services/api_service.dart';
+import '../services/api_service.dart';
+
 
 class AuthRepo {
   final ApiService apiService;

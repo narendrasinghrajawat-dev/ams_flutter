@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import '../modules/auth/auth_controller.dart';
-import '../screens/admin/admin_dashboard.dart';
-import '../screens/auth/login_screen.dart';
-import '../screens/user/user_dashboard.dart';
+import '../controller/auth_controller.dart';
+import '../views/admin/admin_dashboard_screen.dart';
+import '../views/auth/login_screen.dart';
+import '../views/user/user_dashboard_screen.dart';
 import 'app_routes.dart';
 
 class RoleMiddleware extends GetMiddleware {

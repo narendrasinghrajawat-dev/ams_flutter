@@ -1,13 +1,11 @@
-import 'package:attedance_management_system/screens/admin/admin_dashboard.dart';
-import 'package:attedance_management_system/screens/user/user_dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-
+import '../../controller/auth_controller.dart';
 import '../../core/constants/app_theme_colors.dart';
 import '../../core/constants/text_styles.dart';
 import '../../widgets/app_text_type.dart';
-import '../../modules/auth/auth_controller.dart';
+import '../admin/admin_dashboard_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);

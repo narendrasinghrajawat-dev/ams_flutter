@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
-import '../../data/models/leave_request.dart';
-import '../../data/models/user.dart';
+
+import '../models/leave_request.dart';
+import '../models/user.dart';
 
 class AdminController extends GetxController {
   final RxList<User> users = <User>[].obs;
