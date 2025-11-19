@@ -16,42 +16,62 @@ class EnvConfig {
   }
 
   static bool get isProd => _env == AppEnvironment.production;
-  static bool get isStaging => _env == AppEnvironment.test;
+  static bool get isTest => _env == AppEnvironment.test;
   static bool get isDev => _env == AppEnvironment.development;
 }
 
-/// Handles LIGHT / DARK and PROD / TEST / DEV color variations.
-/// Clean naming like scaffoldBackgroundColor, textPrimaryColor, primaryDarkColor, etc.
+
+
 class AppThemeColors {
   static bool get isDark => Get.isDarkMode;
+
+  static const Color primaryProdColor = Color(0xFF009688);
+  static const Color primaryTestColor = Color(0xFF7E57C2);
+  static const Color primaryDevColor = Color(0xFF42A5F5);
+
+
+  static const Color primaryLightProdColor = Color(0xFF009688);
+  static const Color primaryLightTestColor = Color(0xFF7E57C2);
+  static const Color primaryLightDevColor = Color(0xFF42A5F5);
+
+
+
+  static const Color primaryDarkProdColor = Color(0xFF002171);
+  static const Color primaryDarkTestColor = Color(0xFF0B3A87);
+  static const Color primaryDarkDevColor = Color(0xFF0059B2);
 
   // ============================================================
   // ENVIRONMENT-BASED PRIMARY COLORS
   // ============================================================
 
   static Color get primaryColor {
-    if (EnvConfig.isProd) return const Color(0xFF1E88E5); // Blue
-    if (EnvConfig.isStaging) return const Color(0xFF1565C0); // Darker Blue
-    return const Color(0xFF42A5F5); // Dev/Test - Lighter Blue
+    if (EnvConfig.isProd) return primaryProdColor; // Blue
+    if (EnvConfig.isTest) return primaryTestColor; // Darker Blue
+    return primaryDevColor; // Dev/Test - Lighter Blue
   }
 
   static Color get primaryDarkColor {
-    if (EnvConfig.isProd) return const Color(0xFF002171);
-    if (EnvConfig.isStaging) return const Color(0xFF0B3A87);
-    return const Color(0xFF0059B2);
+    if (EnvConfig.isProd) return primaryDarkProdColor;
+    if (EnvConfig.isTest) return primaryDarkTestColor;
+    return primaryDarkDevColor;
   }
 
   static Color get primaryLightColor {
-    if (EnvConfig.isProd) return const Color(0xFFBBDEFB);
-    if (EnvConfig.isStaging) return const Color(0xFF90CAF9);
-    return const Color(0xFFE3F2FD);
+    if (EnvConfig.isProd) return primaryLightProdColor;
+    if (EnvConfig.isTest) return primaryLightTestColor;
+    return primaryLightDevColor;
   }
 
-  // ============================================================
-  // BACKGROUND COLORS
-  // ============================================================
 
-  static Color get scaffoldBackgroundColor => isDark ? const Color(0xFF0D0D0D) : const Color(0xFFFFFFFF);
+
+
+  // dependent colors on primary colors list
+
+  static Color get scaffoldBackgroundColor => isDark ? primaryDarkColor : primaryLightColor;
+
+  static Color get appbarBackgroundColor => isDark ? primaryDarkColor : primaryLightColor;
+
+  static Color get buttonBgColor => isDark ? primaryDarkColor : primaryLightColor;
 
   static Color get cardBackgroundColor => isDark ? const Color(0xFF1C1C1C) : const Color(0xFFFFFFFF);
 
@@ -69,7 +89,6 @@ class AppThemeColors {
   // BUTTON COLORS
   // ============================================================
 
-  static Color get buttonColor => primaryColor;
 
   static Color get buttonTextColor => isDark ? Colors.white : Colors.white;
 
@@ -132,8 +151,65 @@ class AppThemeColors {
 
 
 
-  static Color get muted =>
-      isDark ? const Color(0xFFB0BEC5) : const Color(0xFF90A4AE);
+  static Color get muted => isDark ? const Color(0xFFB0BEC5) : const Color(0xFF90A4AE);
+
+
+  // Form Colors
+
+  /// Color for icons inside the suffix position (often focus color).
+  static Color get suffixIconColor => Get.isDarkMode ? const Color(0xFF81D4FA) : const Color(0xFF1565C0);
+  /// Color for icons inside the prefix position (more subtle).
+  static Color get prefixIconColor => Get.isDarkMode ? const Color(0xFFB0BEC5) : const Color(0xFF90A4AE);
+  /// Color for the border when the field is enabled but not focused.
+  static Color get enableBorderColor => Get.isDarkMode ? const Color(0xFF455A64) : const Color(0xFFCFD8DC);
+  /// Color for the border when the field is actively focused.
+  static Color get focusBorderColor => Get.isDarkMode ? const Color(0xFF42A5F5) : const Color(0xFF1976D2);
+  /// Color for the border when a validation error occurs.
+  static Color get errorBorderColor => Get.isDarkMode ? const Color(0xFFEF5350) : const Color(0xFFD32F2F);
+  /// Color for the border when the field is explicitly disabled.
+  static Color get disableBorderColor => Get.isDarkMode ? const Color(0xFF616161) : const Color(0xFFBDBDBD);
+  /// Color for the label/hint text when the field is disabled.
+  static Color get disableLabelColor => Get.isDarkMode ? const Color(0xFF757575) : const Color(0xFF9E9E9E);
+
+
+  static Color get datePickerBackgroundColor => Get.isDarkMode ? const Color(0xFF757575) :  Color(0xFFFFFFFF);
+  static Color get dropDownBackgroundColor => Get.isDarkMode ? const Color(0xFF757575) :  Color(0xFFFFFFFF);
+  static Color get sliderActiveColor => Get.isDarkMode ? const Color(0xFF757575) :  Color(0xFF1E88E5);
+  static Color get sliderInActiveColor => Get.isDarkMode ? const Color(0xFF757575) :  Color(0xFFBBDEFB);
+  static Color get inactiveTrackColor => Get.isDarkMode ? const Color(0xFF757575) :  Color(0xFFFFFFFF);
+
+
+  static List<Color>  get splashGradientColors => Get.isDarkMode ? [primaryDarkColor, primaryDarkColor] : [primaryLightColor, primaryLightColor];
+
+  // static List<Color> get splashGradientColors {
+  //   if (EnvConfig.isDev) {
+  //     return [Color(0xFF5E92F3), Color(0xFF42A5F5)]; // dev blue-ish
+  //   }
+  //   if (EnvConfig.isTest) {
+  //     return [Color(0xFF6A1B9A), Color(0xFF8E24AA)]; // staging purple-ish
+  //   }
+  //
+  //   if (EnvConfig.isProd) {
+  //     return [Color(0xFF00ACC1), Color(0xFF4DD0E1)]; // staging purple-ish
+  //   }
+  //
+  //   // production default (blue -> indigo)
+  //   return isDark
+  //       ? [Color(0xFF1A237E), Color(0xFF283593)]
+  //       : [Color(0xFF1976D2), Color(0xFF42A5F5)];
+  // }
+
+  /// Splash icon background (circle behind icon)
+  static Color get splashIconBg => isDark ? primaryLightColor.withOpacity(0.12) : primaryLightColor.withOpacity(0.25);
+
+  /// Splash text color (usually white on gradient)
+  static Color get splashTextColor => Colors.white;
+
+  /// Progress bar color on splash
+  static Color get splashProgressColor => Colors.white;
+
+  static Color get whiteColor => Colors.white;
+
 
 
 }

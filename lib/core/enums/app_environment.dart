@@ -1,2 +1,2 @@
 
-enum AppEnvironment { production, test, development }
+enum AppEnvironment { production, test, development}

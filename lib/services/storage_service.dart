@@ -5,6 +5,8 @@ import 'package:get_storage/get_storage.dart';
 class StorageService {
   final _box = GetStorage();
 
+  void deleteCompleteBox() => _box.erase();
+
   void saveString(String key, String value) => _box.write(key, value);
 
   String? readString(String key) => _box.read(key);
@@ -13,8 +15,8 @@ class StorageService {
 
   void saveMap(String key, Map<String, dynamic> map) => _box.write(key, map);
 
-  Map<String, dynamic>? readMap(String key) =>
-      _box.read(key)?.cast<String, dynamic>();
+  Map<String, dynamic>? readMap(String key) => _box.read(key)?.cast<String, dynamic>();
+
 }
 
 

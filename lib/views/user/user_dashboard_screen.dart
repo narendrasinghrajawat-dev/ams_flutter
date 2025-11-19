@@ -15,7 +15,7 @@ class UserDashboard extends StatelessWidget {
         title: Text('user_dashboard'.tr),
         actions: [IconButton(onPressed: _auth.logout, icon: Icon(Icons.logout))],
       ),
-      body: Center(child: Text('Welcome, ${_auth.currentUser.value?.name ?? ''}')),
+      body: Center(child: Text('Welcome, ${_auth.currentUser.value?.firstName ?? ''}')),
     );
   }
 }
