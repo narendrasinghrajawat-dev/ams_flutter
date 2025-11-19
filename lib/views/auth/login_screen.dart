@@ -1,3 +1,5 @@
+import 'package:attedance_management_system/core/constants/const_strings.dart';
+import 'package:attedance_management_system/widgets/form_widgets/text_field_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -53,28 +55,28 @@ class _LoginScreenState extends State<LoginScreen> {
 
     // persist remember me choice
     if (rememberMe.value) {
-      _box.write('remember_me', true);
-      _box.write('saved_email', emailC.text.trim());
+      _box.write(AppStrings.rememberMe, true);
+      _box.write(AppStrings.savedEmail, emailC.text.trim());
     } else {
-      _box.remove('remember_me');
-      _box.remove('saved_email');
+      _box.remove(AppStrings.rememberMe);
+      _box.remove(AppStrings.savedEmail);
     }
 
     // call auth
-    // await _auth.login(emailC.text.trim(), passC.text.trim());
-    Get.to(AdminDashboard());
+    await _auth.login(emailC.text.trim(), passC.text.trim());
+    // Get.to(AdminDashboard());
 
     // handle login failure (AuthController shows snackbar on error already,
     // but you can add extra checks here)
-    // if (!_auth.isLoggedIn && !_auth.loading.value) {
-    //   Get.snackbar('Login failed', 'Please check credentials', snackPosition: SnackPosition.BOTTOM);
-    // }
+    if (!_auth.isLoggedIn && !_auth.loading.value) {
+      Get.snackbar('Login failed', 'Please check credentials', snackPosition: SnackPosition.BOTTOM);
+    }
   }
+
 
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    final cardPadding = EdgeInsets.symmetric(horizontal: 18.0, vertical: 20.0);
 
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
@@ -100,13 +102,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       AppTextWidget.veryLarge(
                         'Welcome',
                         align: TextAlign.center,
-                        color: AppThemeColors.textPrimaryColor,
+                        color: AppThemeColors.whiteColor,
                       ),
                       const SizedBox(height: 4),
                       AppTextWidget.medium(
                         '${'login'.tr} to continue',
                         align: TextAlign.center,
-                        color: AppThemeColors.textSecondaryColor,
+                        color: AppThemeColors.whiteColor,
                       ),
                     ],
                   ),
@@ -120,82 +122,46 @@ class _LoginScreenState extends State<LoginScreen> {
                   color: AppThemeColors.cardBackgroundColor,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   child: Padding(
-                    padding: cardPadding,
+                    padding: EdgeInsets.only(top: 20, right: 18, left: 18, bottom: 5),
                     child: Form(
                       key: _formKey,
                       child: Column(
                         children: [
                           // Email
-                          TextFormField(
-                            controller: emailC,
-                            keyboardType: TextInputType.emailAddress,
-                            autofillHints: const [AutofillHints.email],
-                            textInputAction: TextInputAction.next,
-                            decoration: InputDecoration(
-                              prefixIcon: Icon(Icons.email_outlined, color: AppThemeColors.iconColor),
-                              label: AppTextWidget.small('email'.tr, color: AppThemeColors.textSecondaryColor),
-                              filled: true,
-                              fillColor: AppThemeColors.containerBackgroundColor,
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: AppThemeColors.borderColor),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: AppThemeColors.primaryColor),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            style: AppStyles.medium,
-                            validator: (v) {
-                              if (v == null || v.trim().isEmpty) return 'Please enter email';
-                              if (!GetUtils.isEmail(v.trim())) return 'Enter a valid email';
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 14),
 
-                          // Password with visibility toggle
-                          Obx(() {
-                            return TextFormField(
-                              controller: passC,
-                              obscureText: obscure.value,
-                              autofillHints: const [AutofillHints.password],
-                              textInputAction: TextInputAction.done,
-                              decoration: InputDecoration(
-                                prefixIcon: Icon(Icons.lock_outline, color: AppThemeColors.iconColor),
-                                label: AppTextWidget.small('password'.tr, color: AppThemeColors.textSecondaryColor),
-                                filled: true,
-                                fillColor: AppThemeColors.containerBackgroundColor,
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: AppThemeColors.borderColor),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: AppThemeColors.primaryColor),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                suffixIcon: IconButton(
-                                  splashRadius: 20,
-                                  icon: Icon(
-                                    obscure.value ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                                    color: AppThemeColors.iconColor,
-                                  ),
-                                  onPressed: () => obscure.value = !obscure.value,
-                                ),
-                              ),
-                              style: AppStyles.medium,
+                           TextFieldWidget(
+                              controller: emailC,
+                              keyboardInputType: TextInputType.emailAddress,
+                              labelText: 'Email',
+                              hintText: "abc@gmail.com",
                               validator: (v) {
-                                if (v == null || v.trim().isEmpty) return 'Please enter password';
-                                if (v.trim().length < 4) return 'Password too short';
+                                if (v == null || v.trim().isEmpty) return 'Please enter email';
+                                if (!GetUtils.isEmail(v.trim())) return 'Enter a valid email';
                                 return null;
                               },
-                              onFieldSubmitted: (_) => _submit(),
-                            );
-                          }),
+                            ),
 
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 5),
+                          TextFieldWidget(
+                              controller: passC,
+                              keyboardInputType: TextInputType.emailAddress,
+                              labelText: 'Password',
+                              validator: (v) {
+                                if (v == null || v
+                                    .trim()
+                                    .isEmpty) {
+                                  return 'Please enter password';
+                                }
+                                if (v
+                                    .trim()
+                                    .length < 4) {
+                                  return 'Password too short';
+                                }
+                                return null;
+                              },
+                            ),
 
-                          // Remember + Forgot
+
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -243,7 +209,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               child: ElevatedButton(
                                 onPressed: _submit,
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppThemeColors.buttonColor,
+                                  backgroundColor: AppThemeColors.buttonBgColor,
                                   foregroundColor: AppThemeColors.buttonTextColor,
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                   elevation: 1.5,
@@ -281,7 +247,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 20),
 
                 // Footer or version
-                AppTextWidget.verySmall('Version 1.0.0', color: AppThemeColors.muted, align: TextAlign.center),
+                AppTextWidget.verySmall('Version 1.0.0', color: AppThemeColors.whiteColor, align: TextAlign.center),
               ],
             ).marginAll(10),
           )        ),

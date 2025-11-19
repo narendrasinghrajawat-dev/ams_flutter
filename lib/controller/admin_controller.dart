@@ -1,66 +1,67 @@
+import 'package:attedance_management_system/data/utils/app_helper.dart';
+import 'package:attedance_management_system/services/admin/admin_services.dart';
 import 'package:get/get.dart';
-
 import '../models/leave_request.dart';
 import '../models/user.dart';
 
 class AdminController extends GetxController {
-  final RxList<User> users = <User>[].obs;
+  RxList<User> users = <User>[].obs;
   final RxList<LeaveRequest> leaveRequests = <LeaveRequest>[].obs;
+  final AdminServices _adminServices = AdminServices();
 
   final RxBool loading = false.obs;
-  final RxString search = ''.obs;
+
 
   @override
   void onInit() {
     super.onInit();
-    _loadMockData();
+    // _loadMockData();
+    _loadUsersList();
+
   }
 
-  void _loadMockData() {
-    // Replace with actual repo calls later.
-    users.addAll([
-      User(id: '1', name: 'Amit Sharma', email: 'amit@example.com', role: 'user', deptId: 'D1'),
-      User(id: '3', name: 'Rahul Jain', email: 'rahul@example.com', role: 'admin', deptId: 'D1'),
-    ]);
 
+  _loadUsersList() async {
+    final List<Map<String, dynamic>> res = await _adminServices.fetchUsersList();
+    print('fech users list si teh ');
+    print(res);
+
+    if(!AppHelper.isEmptyOrNull(res)){
+      for(var item in res){
+        User user = User.fromJson(item);
+        users.add(user);
+      }
+    }
+  }
+
+  // Assuming this function is inside a class with access to 'users' and 'leaveRequests' (RxList).
+// The User and Address models must be imported.
+
+  void _loadMockData() {
     leaveRequests.addAll([
       LeaveRequest(
         id: 'L1',
         userId: '1',
-        userName: 'Amit Sharma',
-        from: DateTime.now().subtract(Duration(days: 1)),
-        to: DateTime.now().add(Duration(days: 1)),
+        userName: 'Amit Sharma', // Corrected field name
+        from: DateTime.now().subtract(const Duration(days: 1)),
+        to: DateTime.now().add(const Duration(days: 1)),
         status: 'pending',
-        reason: 'Medical',
+        reason: "Due to Fever"
       ),
       LeaveRequest(
         id: 'L2',
         userId: '2',
-        userName: 'Priya Singh',
-        from: DateTime.now().add(Duration(days: 5)),
-        to: DateTime.now().add(Duration(days: 7)),
+        userName: 'Priya Singh', // Corrected field name
+        from: DateTime.now().add(const Duration(days: 5)),
+        to: DateTime.now().add(const Duration(days: 7)),
         status: 'approved',
-        reason: 'Personal',
+        reason: "Due to Fever"
+
       ),
     ]);
   }
 
-  List<User> get filteredUsers {
-    final q = search.value.trim().toLowerCase();
-    if (q.isEmpty) return users;
-    return users.where((u) => u.name.toLowerCase().contains(q) || u.email.toLowerCase().contains(q)).toList();
-  }
-
-  void addUser({required String name, required String email, String role = 'user', String? deptId}) {
-    final newUser = User(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      name: name,
-      email: email,
-      role: role,
-      deptId: deptId,
-    );
-    users.insert(0, newUser);
-  }
+  List<User> get filteredUsers => users;
 
   void approveLeave(String id) {
     final idx = leaveRequests.indexWhere((l) => l.id == id);
