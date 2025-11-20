@@ -1,3 +1,5 @@
+import 'package:attedance_management_system/widgets/app_icons_type.dart';
+import 'package:attedance_management_system/widgets/card/common_card.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -66,60 +68,24 @@ class AdminHomePage extends StatelessWidget {
           value: '48',
           subtitle: '+2 this week',
           icon: Icons.people_alt_rounded,
-          color: AppThemeColors.primaryColor,
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              AppThemeColors.primaryColor.withOpacity(0.8),
-              AppThemeColors.primaryColor,
-            ],
-          ),
         ),
         _StatCard(
           title: 'Present Today',
           value: '42',
           subtitle: '87.5% attendance',
           icon: Icons.check_circle_rounded,
-          color: Colors.green,
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Colors.green.withOpacity(0.8),
-              Colors.green,
-            ],
-          ),
         ),
         _StatCard(
           title: 'On Leave',
           value: '4',
           subtitle: '2 pending approval',
           icon: Icons.beach_access_rounded,
-          color: AppThemeColors.warningColor,
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              AppThemeColors.warningColor.withOpacity(0.8),
-              AppThemeColors.warningColor,
-            ],
-          ),
         ),
         _StatCard(
           title: 'Late Arrivals',
           value: '2',
           subtitle: '-50% from last week',
           icon: Icons.schedule_rounded,
-          color: Colors.orange,
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Colors.orange.withOpacity(0.8),
-              Colors.orange,
-            ],
-          ),
         ),
       ],
     );
@@ -183,7 +149,7 @@ class AdminHomePage extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            AppTextWidget.large(
+            AppTextWidget.medium(
               'Recent Activity',
               color: AppThemeColors.textPrimaryColor,
             ),
@@ -196,21 +162,8 @@ class AdminHomePage extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 16),
         Expanded(
-          child: Container(
-            decoration: BoxDecoration(
-              color: AppThemeColors.cardBackgroundColor,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: ListView(
+          child:  ListView(
               children: [
                 _ActivityItem(
                   icon: Icons.login_rounded,
@@ -218,6 +171,8 @@ class AdminHomePage extends StatelessWidget {
                   subtitle: 'Today at 08:45 AM',
                   color: Colors.green,
                 ),
+
+
                 _ActivityItem(
                   icon: Icons.logout_rounded,
                   title: 'Jane Smith checked out',
@@ -245,7 +200,6 @@ class AdminHomePage extends StatelessWidget {
               ],
             ),
           ),
-        ),
       ],
     );
   }
@@ -256,35 +210,21 @@ class _StatCard extends StatelessWidget {
   final String value;
   final String subtitle;
   final IconData icon;
-  final Color color;
-  final Gradient gradient;
 
   const _StatCard({
     required this.title,
     required this.value,
     required this.subtitle,
     required this.icon,
-    required this.color,
-    required this.gradient,
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: gradient,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: color.withOpacity(0.2),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
+    return CommonCardWidget(
+      color: AppThemeColors.dashboardCardBackgroundColor,
+      child : Padding(
+        padding: const EdgeInsets.all(0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -298,26 +238,22 @@ class _StatCard extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Icon(icon, color: Colors.white, size: 20),
+                      child: AppIconWidget.large(icon),
                     ),
                     AppTextWidget.veryLarge(
                       value,
-                      color: Colors.white,
                     ),
                   ],
                 ),
                 const SizedBox(height: 4),
                 AppTextWidget.small(
                   title,
-                  color: Colors.white.withOpacity(0.9),
                 ),
                 const SizedBox(height: 2),
                 AppTextWidget.verySmall(
                   subtitle,
-                  color: Colors.white,
                 ),
               ],
             ),
@@ -409,16 +345,8 @@ class _ActivityItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Colors.grey.withOpacity(0.1),
-        ),
-      ),
+    return CommonCardWidget(
+      color: AppThemeColors.cardBackgroundColor,
       child: Row(
         children: [
           Container(
@@ -452,6 +380,6 @@ class _ActivityItem extends StatelessWidget {
           ),
         ],
       ),
-    );
+    ).marginOnly(bottom: 5);
   }
 }

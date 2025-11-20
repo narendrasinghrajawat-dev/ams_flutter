@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import '../enums/app_environment.dart';
 
-/// Define which environment app is running in.
 
-/// Set environment before runApp()
+
+
 class EnvConfig {
   static AppEnvironment _env = AppEnvironment.production;
 
@@ -14,6 +13,11 @@ class EnvConfig {
   static void setEnvironment(AppEnvironment env) {
     _env = env;
   }
+
+  static AppEnvironment getEnvironment() {
+   return _env;
+  }
+
 
   static bool get isProd => _env == AppEnvironment.production;
   static bool get isTest => _env == AppEnvironment.test;
@@ -24,6 +28,7 @@ class EnvConfig {
 
 class AppThemeColors {
   static bool get isDark => Get.isDarkMode;
+
 
   static const Color primaryProdColor = Color(0xFF009688);
   static const Color primaryTestColor = Color(0xFF7E57C2);
@@ -73,7 +78,6 @@ class AppThemeColors {
 
   static Color get buttonBgColor => isDark ? primaryDarkColor : primaryLightColor;
 
-  static Color get cardBackgroundColor => isDark ? const Color(0xFF1C1C1C) : const Color(0xFFFFFFFF);
 
   static Color get containerBackgroundColor => isDark ? const Color(0xFF121212) : const Color(0xFFF5F5F5);
 
@@ -113,10 +117,25 @@ class AppThemeColors {
   static Color get textSmallColor => isDark ? Colors.white54 : const Color(0x8A000000);
 
   // ============================================================
+  // CARD COLORS
+  // ============================================================
+  static Color get dashboardCardBackgroundColor => isDark ? primaryDarkColor : primaryLightColor.withOpacity(.15);
+
+  static Color get cardBackgroundColor => isDark ? primaryDarkColor : primaryLightColor.withOpacity(.05);
+
+  static Color get cardBorderColor => isDark ? primaryDarkColor : primaryLightColor.withOpacity(.2);
+
+  // ============================================================
+  // Container COLORS
+  // ============================================================
+  static Color get containerBgColor => isDark ? Colors.white70 : Colors.white70;
+
+
+  // ============================================================
   // ICON COLORS
   // ============================================================
 
-  static Color get iconColor => isDark ? Colors.white70 : Colors.black54;
+  static Color get iconColor => isDark ? primaryDarkColor : primaryLightColor;
 
   static Color get iconActiveColor => primaryColor;
 
@@ -211,5 +230,12 @@ class AppThemeColors {
   static Color get whiteColor => Colors.white;
 
 
+
+//   other common widgets
+  static Color get popupBackgroundColor => isDark ? primaryDarkColor : primaryLightColor.withOpacity(.7);
+
+  static Color get editIconColors => isDark ? primaryDarkColor : primaryLightColor;
+
+  static Color get deleteIconColor => isDark ? primaryDarkColor : Colors.red;
 
 }

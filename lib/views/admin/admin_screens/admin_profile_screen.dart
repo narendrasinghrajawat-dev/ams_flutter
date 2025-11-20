@@ -1,5 +1,7 @@
 // lib/views/admin/admin_profile_screen.dart
 import 'dart:io';
+import 'package:attedance_management_system/widgets/card/common_card.dart';
+import 'package:attedance_management_system/widgets/container/common_container.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../controller/auth_controller.dart';
@@ -14,15 +16,13 @@ class AdminProfileScreen extends StatefulWidget {
 }
 
 class _AdminProfileScreenState extends State<AdminProfileScreen> {
-  final AuthController _auth = Get.find<AuthController>();
-
+  final AuthController _auth = Get.find();
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _firstNameC;
   late final TextEditingController _lastNameC;
   late final TextEditingController _emailC;
   late final TextEditingController _phoneC;
   late final TextEditingController _deptC;
-
   final RxBool _editMode = false.obs;
   final RxBool _saving = false.obs;
   File? _pickedImage;
@@ -62,7 +62,7 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     _saving.value = true;
-    await Future.delayed(const Duration(seconds: 2)); // Simulate API call
+    await Future.delayed(const Duration(seconds: 2));
 
     Get.snackbar(
       'Success',
@@ -91,334 +91,261 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final user = _auth.currentUser.value;
+    return  Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        child:  CustomScrollView(
+      physics: const BouncingScrollPhysics(),
+      slivers: [
+        _buildSliverAppBar(),
+        SliverToBoxAdapter(
 
-    return Scaffold(
-      backgroundColor: AppThemeColors.scaffoldBackgroundColor,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Custom App Bar
-            _buildAppBar(),
-
-            // Scrollable Content
-            Expanded(
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                child: Column(
+          child: Column(
+            children: [
+              const SizedBox(height: 20),
+              _buildStatisticsRow(),
+              const SizedBox(height: 24),
+             Column(
                   children: [
-                    const SizedBox(height: 12),
-
-                    // Profile Header Card
-                    // _buildProfileHeader(user),
-
-
-                    // Statistics Cards
-                    _buildStatisticsRow(),
-
-                    const SizedBox(height: 24),
-
-                    // Personal Information Card
                     _buildPersonalInfoCard(),
-
                     const SizedBox(height: 16),
-
-
-                    // Account Settings Card
                     _buildAccountSettingsCard(),
-
                     const SizedBox(height: 24),
                   ],
-                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
+      ],
+    )
     );
   }
 
-  Widget _buildAppBar() {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
-      decoration: BoxDecoration(
-        color: AppThemeColors.cardBackgroundColor,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+  Widget _buildSliverAppBar() {
+    final user = _auth.currentUser.value;
+
+    return SliverAppBar(
+      expandedHeight: 280,
+      pinned: true,
+      elevation: 0,
+      flexibleSpace: FlexibleSpaceBar(
+        background: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                AppThemeColors.containerBackgroundColor,
+                AppThemeColors.primaryLightColor,
+              ],
+            ),
           ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Expanded(
+          child: SafeArea(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                AppTextWidget.large(
-                  'My Profile',
-                  color: AppThemeColors.textPrimaryColor,
+                const SizedBox(height: 20),
+                // Profile Image with Edit Button
+                Stack(
+                  children: [
+                    Hero(
+                      tag: 'profile_image',
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.white,
+                            width: 4,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.2),
+                              blurRadius: 20,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
+                        ),
+                        child: CircleAvatar(
+                          radius: 60,
+                          backgroundColor: Colors.white,
+                          child: _pickedImage == null
+                              ? Text(
+                            (user?.firstName?.isNotEmpty == true
+                                ? user!.firstName![0]
+                                : 'A')
+                                .toUpperCase(),
+                            style: TextStyle(
+                              fontSize: 48,
+                              color: AppThemeColors.primaryColor,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          )
+                              : ClipOval(
+                            child: Image.file(
+                              _pickedImage!,
+                              width: 120,
+                              height: 120,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Obx(() {
+                      if (!_editMode.value) return const SizedBox.shrink();
+                      return Positioned(
+                        bottom: 4,
+                        right: 4,
+                        child: GestureDetector(
+                          onTap: _pickImage,
+                          child: Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.2),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              Icons.camera_alt_rounded,
+                              color: AppThemeColors.primaryColor,
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+                  ],
                 ),
-                const SizedBox(height: 4),
-                AppTextWidget.small(
-                  'Manage your account settings',
-                  color: AppThemeColors.textSecondaryColor,
+                const SizedBox(height: 16),
+                // Name
+                Text(
+                  '${user?.firstName ?? ''} ${user?.lastName ?? ''}',
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                // Email
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.email_outlined,
+                      size: 16,
+                      color: Colors.white70,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      user?.email ?? '',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.white70,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                // Role Badge
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.3),
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.admin_panel_settings_rounded,
+                        size: 18,
+                        color: Colors.white,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        user?.role ?? 'Admin',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
-          Obx(() => Container(
-            decoration: BoxDecoration(
-              color: _editMode.value
-                  ? AppThemeColors.errorColor.withOpacity(0.1)
-                  : AppThemeColors.primaryColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+      actions: [
+        Obx(() => Container(
+          margin: const EdgeInsets.only(right: 12),
+          decoration: BoxDecoration(
+            color: _editMode.value
+                ? Colors.white.withOpacity(0.2)
+                : Colors.white.withOpacity(0.2),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: IconButton(
+            onPressed: () {
+              if (_editMode.value) {
+                _cancelEdit();
+              } else {
+                _editMode.toggle();
+              }
+            },
+            icon: Icon(
+              _editMode.value ? Icons.close_rounded : Icons.edit_rounded,
+              color: Colors.white,
+              size: 22,
             ),
-            child: IconButton(
-              onPressed: () {
-                if (_editMode.value) {
-                  _cancelEdit();
-                } else {
-                  _editMode.toggle();
-                }
-              },
-              icon: Icon(
-                _editMode.value ? Icons.close_rounded : Icons.edit_rounded,
-                color: _editMode.value
-                    ? AppThemeColors.errorColor
-                    : AppThemeColors.primaryColor,
-                size: 22,
-              ),
-              tooltip: _editMode.value ? 'Cancel' : 'Edit Profile',
-            ),
-          )),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildProfileHeader(user) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppThemeColors.primaryColor.withOpacity(0.1),
-            AppThemeColors.primaryLightColor.withOpacity(0.05),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: AppThemeColors.primaryColor.withOpacity(0.1),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        children: [
-          // Avatar with edit button
-          Stack(
-            children: [
-              GestureDetector(
-                onTap: () {
-                  if (_editMode.value) _pickImage();
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      colors: [
-                        AppThemeColors.primaryColor,
-                        AppThemeColors.primaryLightColor,
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppThemeColors.primaryColor.withOpacity(0.3),
-                        blurRadius: 20,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
-                  ),
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: AppThemeColors.scaffoldBackgroundColor,
-                    ),
-                    child: CircleAvatar(
-                      radius: 50,
-                      backgroundColor: AppThemeColors.cardBackgroundColor,
-                      child: _pickedImage == null
-                          ? Text(
-                        (user?.firstName?.isNotEmpty == true
-                            ? user!.firstName![0]
-                            : 'A')
-                            .toUpperCase(),
-                        style: TextStyle(
-                          fontSize: 36,
-                          color: AppThemeColors.primaryColor,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      )
-                          : ClipOval(
-                        child: Image.file(
-                          _pickedImage!,
-                          width: 100,
-                          height: 100,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Obx(() {
-                if (!_editMode.value) return const SizedBox.shrink();
-                return Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child: GestureDetector(
-                    onTap: _pickImage,
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppThemeColors.primaryColor,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppThemeColors.primaryColor.withOpacity(0.4),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.camera_alt_rounded,
-                        color: Colors.white,
-                        size: 18,
-                      ),
-                    ),
-                  ),
-                );
-              }),
-            ],
+            tooltip: _editMode.value ? 'Cancel' : 'Edit Profile',
           ),
-
-          const SizedBox(height: 16),
-
-          // Name
-          AppTextWidget.large(
-            '${user?.firstName ?? ''} ${user?.lastName ?? ''}',
-            color: AppThemeColors.textPrimaryColor,
-          ),
-
-          const SizedBox(height: 6),
-
-          // Email
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.email_outlined,
-                size: 16,
-                color: AppThemeColors.textSecondaryColor,
-              ),
-              const SizedBox(width: 6),
-              AppTextWidget.small(
-                user?.email ?? '',
-                color: AppThemeColors.textSecondaryColor,
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 12),
-
-          // Role and Department badges
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _buildBadge(
-                icon: Icons.admin_panel_settings_rounded,
-                label: user?.role ?? 'Admin',
-                color: AppThemeColors.primaryColor,
-              ),
-              const SizedBox(width: 12),
-              _buildBadge(
-                icon: Icons.business_rounded,
-                label: user?.departmentId ?? 'N/A',
-                color: AppThemeColors.successColor,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBadge({
-    required IconData icon,
-    required String label,
-    required Color color,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: color.withOpacity(0.3),
-          width: 1,
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 16, color: color),
-          const SizedBox(width: 6),
-          AppTextWidget.small(label, color: color),
-        ],
-      ),
+        )),
+      ],
     );
   }
 
   Widget _buildStatisticsRow() {
     return Row(
-      children: [
-        Expanded(
-          child: _buildStatCard(
-            icon: Icons.calendar_today_rounded,
-            title: 'Attendance',
-            value: '98.5%',
-            color: AppThemeColors.successColor,
+        children: [
+          Expanded(
+            child: _buildStatCard(
+              icon: Icons.calendar_today_rounded,
+              title: 'Attendance',
+              value: '98.5%',
+              color: AppThemeColors.successColor,
+            ),
           ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _buildStatCard(
-            icon: Icons.access_time_rounded,
-            title: 'Hours',
-            value: '185',
-            color: AppThemeColors.primaryColor,
+          const SizedBox(width: 12),
+          Expanded(
+            child: _buildStatCard(
+              icon: Icons.access_time_rounded,
+              title: 'Hours',
+              value: '185',
+              color: AppThemeColors.primaryColor,
+            ),
           ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _buildStatCard(
-            icon: Icons.event_available_rounded,
-            title: 'Leaves',
-            value: '12',
-            color: AppThemeColors.warningColor,
+          const SizedBox(width: 12),
+          Expanded(
+            child: _buildStatCard(
+              icon: Icons.event_available_rounded,
+              title: 'Leaves',
+              value: '12',
+              color: AppThemeColors.warningColor,
+            ),
           ),
-        ),
-      ],
+        ],
     );
   }
 
@@ -428,57 +355,41 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
     required String value,
     required Color color,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppThemeColors.cardBackgroundColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: color.withOpacity(0.2),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: color.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+    return CommonCardWidget(
       child: Column(
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: color.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: color, size: 24),
+            child: Icon(icon, color: color, size: 26),
           ),
-          const SizedBox(height: 10),
-          AppTextWidget.verySmall(title, color: AppThemeColors.textSecondaryColor),
+          const SizedBox(height: 12),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: AppThemeColors.textPrimaryColor,
+            ),
+          ),
           const SizedBox(height: 4),
-          AppTextWidget.medium(value, color: AppThemeColors.textPrimaryColor),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 12,
+              color: AppThemeColors.textSecondaryColor,
+            ),
+          ),
         ],
       ),
     );
   }
 
   Widget _buildPersonalInfoCard() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppThemeColors.cardBackgroundColor,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Form(
+    return CommonContainerWidget(child: Form(
         key: _formKey,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -486,28 +397,29 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: AppThemeColors.primaryColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
                     Icons.person_outline_rounded,
                     color: AppThemeColors.primaryColor,
-                    size: 20,
+                    size: 22,
                   ),
                 ),
                 const SizedBox(width: 12),
-                AppTextWidget.medium(
+                Text(
                   'Personal Information',
-                  color: AppThemeColors.textPrimaryColor,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: AppThemeColors.textPrimaryColor,
+                  ),
                 ),
               ],
             ),
-
-            const SizedBox(height: 20),
-
-            // First Name & Last Name
+            const SizedBox(height: 24),
             Row(
               children: [
                 Expanded(
@@ -531,10 +443,7 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
                 ),
               ],
             ),
-
             const SizedBox(height: 16),
-
-            // Email
             _buildModernTextField(
               controller: _emailC,
               label: 'Email Address',
@@ -547,10 +456,7 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
                 return null;
               },
             ),
-
             const SizedBox(height: 16),
-
-            // Phone
             _buildModernTextField(
               controller: _phoneC,
               label: 'Phone Number',
@@ -562,32 +468,25 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
                 return null;
               },
             ),
-
             const SizedBox(height: 16),
-
-            // Department
             _buildModernTextField(
               controller: _deptC,
               label: 'Department',
               icon: Icons.business_outlined,
               enabled: _editMode.value,
             ),
-
-            const SizedBox(height: 20),
-
-            // Save/Cancel Buttons
             Obx(() {
               if (!_editMode.value) return const SizedBox.shrink();
-
               return Column(
                 children: [
-                  const Divider(height: 1),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 24),
                   Row(
                     children: [
                       Expanded(
-                        child: OutlinedButton(
+                        child: OutlinedButton.icon(
                           onPressed: _saving.value ? null : _cancelEdit,
+                          icon: const Icon(Icons.close_rounded, size: 20),
+                          label: const Text('Cancel'),
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
@@ -596,38 +495,35 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
                             side: BorderSide(
                               color: AppThemeColors.borderColor,
                             ),
-                          ),
-                          child: AppTextWidget.medium(
-                            'Cancel',
-                            color: AppThemeColors.textPrimaryColor,
+                            foregroundColor: AppThemeColors.textPrimaryColor,
                           ),
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: ElevatedButton(
+                        flex: 2,
+                        child: ElevatedButton.icon(
                           onPressed: _saving.value ? null : _saveProfile,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppThemeColors.primaryColor,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 0,
-                          ),
-                          child: _saving.value
+                          icon: _saving.value
                               ? const SizedBox(
                             height: 20,
                             width: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                  Colors.white),
+                              valueColor:
+                              AlwaysStoppedAnimation(Colors.white),
                             ),
                           )
-                              : AppTextWidget.medium(
-                            'Save Changes',
-                            color: Colors.white,
+                              : const Icon(Icons.check_rounded, size: 20),
+                          label: Text(_saving.value ? 'Saving...' : 'Save Changes'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppThemeColors.primaryColor,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 0,
                           ),
                         ),
                       ),
@@ -642,46 +538,37 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
     );
   }
 
-
   Widget _buildAccountSettingsCard() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppThemeColors.cardBackgroundColor,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+    return CommonContainerWidget(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: AppThemeColors.errorColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(10),
+                  color: AppThemeColors.primaryColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
                   Icons.settings_rounded,
-                  color: AppThemeColors.errorColor,
-                  size: 20,
+                  color: AppThemeColors.primaryColor,
+                  size: 22,
                 ),
               ),
               const SizedBox(width: 12),
-              AppTextWidget.medium(
+              Text(
                 'Account Settings',
-                color: AppThemeColors.textPrimaryColor,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: AppThemeColors.textPrimaryColor,
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           _buildActionTile(
             icon: Icons.lock_outline_rounded,
             title: 'Change Password',
@@ -699,6 +586,16 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
             color: AppThemeColors.warningColor,
             onTap: () {
               Get.snackbar('Info', 'Navigate to Notification Settings');
+            },
+          ),
+          const SizedBox(height: 12),
+          _buildActionTile(
+            icon: Icons.help_outline_rounded,
+            title: 'Help & Support',
+            subtitle: 'Get help with your account',
+            color: Colors.blue,
+            onTap: () {
+              Get.snackbar('Info', 'Navigate to Help & Support');
             },
           ),
           const SizedBox(height: 12),
@@ -748,7 +645,7 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Container(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: color.withOpacity(0.05),
           borderRadius: BorderRadius.circular(12),
@@ -772,9 +669,22 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  AppTextWidget.medium(title, color: AppThemeColors.textPrimaryColor),
-                  const SizedBox(height: 2),
-                  AppTextWidget.verySmall(subtitle, color: AppThemeColors.textSecondaryColor),
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: AppThemeColors.textPrimaryColor,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: AppThemeColors.textSecondaryColor,
+                    ),
+                  ),
                 ],
               ),
             ),

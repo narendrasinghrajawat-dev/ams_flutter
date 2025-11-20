@@ -1,8 +1,13 @@
+import 'package:attedance_management_system/core/constants/app_icons.dart';
+import 'package:attedance_management_system/widgets/app_icon_button.dart';
+import 'package:attedance_management_system/widgets/card/common_card.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../controller/admin_controller.dart';
 import '../../../core/constants/app_theme_colors.dart';
+import '../../../models/user.dart';
 import '../../../widgets/app_text_type.dart';
+import '../user_form_screen.dart';
 
 class AdminEmployeesList extends StatelessWidget {
   AdminEmployeesList({Key? key}) : super(key: key);
@@ -11,11 +16,6 @@ class AdminEmployeesList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 18),
-      child: Card(
-        color: AppThemeColors.cardBackgroundColor,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: Padding(
           padding: const EdgeInsets.all(12),
           child: SingleChildScrollView(
             child: Column(
@@ -34,7 +34,7 @@ class AdminEmployeesList extends StatelessWidget {
                     physics: const NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
                     itemCount: list.length,
-                    separatorBuilder: (_, __) => Divider(color: AppThemeColors.dividerColor),
+                    separatorBuilder: (_, __) => SizedBox(height: 10,),
                     itemBuilder: (_, idx) {
                       final u = list[idx];
                       return _UserTile(user: u);
@@ -44,32 +44,25 @@ class AdminEmployeesList extends StatelessWidget {
               ],
             ),
           )
-        ),
-      ),
-    );
+        );
   }
 }
 
 class _UserTile extends StatelessWidget {
-  final dynamic user;
-  const _UserTile({required this.user, Key? key}) : super(key: key);
+  final User user;
+  _UserTile({required this.user, Key? key}) : super(key: key);
+
+  AdminController _adminController = Get.find<AdminController>();
 
   @override
   Widget build(BuildContext context) {
+
     final name = (user.firstName ?? '') + (user.lastName != null ? ' ${user.lastName}' : '');
     final email = user.email ?? '';
-    final role = user.role ?? 'user';
     final dept = user.departmentId ?? '-';
     final joined = DateTime.now();
 
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 6),
-      padding: const EdgeInsets.all(5),
-      decoration: BoxDecoration(
-        color: AppThemeColors.cardBackgroundColor,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppThemeColors.borderColor),
-      ),
+    return CommonCardWidget(
       child: Row(
         children: [
           CircleAvatar(
@@ -77,18 +70,19 @@ class _UserTile extends StatelessWidget {
             backgroundColor: AppThemeColors.primaryLightColor.withOpacity(0.3),
             child: Text(name.isNotEmpty ? name[0].toUpperCase() : 'U', style: TextStyle(color: AppThemeColors.primaryColor)),
           ),
+
           const SizedBox(width: 12),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               AppTextWidget.medium(name, color: AppThemeColors.textPrimaryColor),
               const SizedBox(height: 4),
               Row(
-                  children:
-              [
+                  children: [
                 Icon(Icons.email_outlined, size: 14, color: AppThemeColors.iconColor),
                 const SizedBox(width: 6),
                 AppTextWidget.small(email, color: AppThemeColors.muted),
-              ]),
+              ]
+              ),
               const SizedBox(height: 8),
               Row(children: [
                 Icon(Icons.business_outlined, size: 14, color: AppThemeColors.iconColor),
@@ -101,17 +95,26 @@ class _UserTile extends StatelessWidget {
               ]),
             ]),
           ),
-          PopupMenuButton<String>(
-            onSelected: (v) {
-              if (v == 'edit') Get.snackbar('Edit', 'Edit ${user.firstName}');
-              if (v == 'delete') Get.snackbar('Delete', 'Delete ${user.firstName}');
-            },
-            icon: Icon(Icons.more_vert, color: AppThemeColors.iconColor),
-            itemBuilder: (_) => [
-              PopupMenuItem(value: 'edit', child: AppTextWidget.small('Edit', color: AppThemeColors.textPrimaryColor)),
-              PopupMenuItem(value: 'delete', child: AppTextWidget.small('Delete', color: AppThemeColors.textPrimaryColor)),
+
+          Column(
+            children: [
+              AppIconButtonWidget.medium(icon: AppConstIcons.editIcon, color: AppThemeColors.editIconColors, onPressed: (){
+
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (_) => UserForm(
+                    initialData: user,
+                  ),
+                );
+
+              }).marginOnly(bottom: 5),
+              AppIconButtonWidget.medium(icon: AppConstIcons.deleteIcon, color: AppThemeColors.deleteIconColor, onPressed: (){
+                _adminController.deleteUser(user.key!);
+              }),
             ],
-          ),
+          )
         ],
       ),
     );

@@ -1,4 +1,6 @@
 import 'package:attedance_management_system/core/constants/const_strings.dart';
+import 'package:attedance_management_system/widgets/card/common_card.dart';
+import 'package:attedance_management_system/widgets/container/common_container.dart';
 import 'package:attedance_management_system/widgets/form_widgets/text_field_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -76,8 +78,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
@@ -117,10 +117,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 22),
 
                 // Card with form
-                Card(
-                  elevation: 4,
-                  color: AppThemeColors.cardBackgroundColor,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                CommonContainerWidget(
                   child: Padding(
                     padding: EdgeInsets.only(top: 20, right: 18, left: 18, bottom: 5),
                     child: Form(

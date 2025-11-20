@@ -46,7 +46,7 @@ class User {
       // Database fields (using original JSON keys for mapping)
       key: json['_key'] ?? "",
       rev: json['_rev'] ?? "",
-      id: json['id'] ?? "",
+      id: json['_id'] ?? "",
 
       firstName: json['firstName'] ?? "",
       middleName: json['middleName'] ?? "",

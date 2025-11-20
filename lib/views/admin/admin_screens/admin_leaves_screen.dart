@@ -1,8 +1,10 @@
+import 'package:attedance_management_system/widgets/container/common_container.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../controller/admin_controller.dart';
 import '../../../core/constants/app_theme_colors.dart';
 import '../../../widgets/app_text_type.dart';
+import '../../../widgets/card/common_card.dart';
 
 class AdminLeavesScreen extends StatelessWidget {
   AdminLeavesScreen({Key? key}) : super(key: key);
@@ -10,12 +12,7 @@ class AdminLeavesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-      child: Card(
-        color: AppThemeColors.cardBackgroundColor,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: Padding(
+    return CommonCardWidget(child:  Padding(
           padding: const EdgeInsets.all(12),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             AppTextWidget.medium('Leave Requests'.tr, color: AppThemeColors.textPrimaryColor),
@@ -50,7 +47,6 @@ class AdminLeavesScreen extends StatelessWidget {
             }),
           ]),
         ),
-      ),
     );
   }
 }
