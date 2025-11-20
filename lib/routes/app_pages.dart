@@ -1,4 +1,5 @@
 import 'package:attedance_management_system/views/splash_screen.dart';
+import 'package:attedance_management_system/views/settings_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import '../controller/auth_controller.dart';
@@ -22,6 +23,7 @@ class AppPages {
   static final pages = [
     GetPage(name: AppRoutes.login, page: () => LoginScreen()),
     GetPage(name: AppRoutes.splashScreen, page: () => SplashScreen()),
+    GetPage(name: AppRoutes.settingsScreen, page: () => SettingsScreen(), middlewares: [RoleMiddleware()]),
     GetPage(name: AppRoutes.adminDashboard, page: () => AdminDashboardScreen(), middlewares: [RoleMiddleware()]),
     GetPage(name: AppRoutes.userDashboard, page: () => UserDashboard(), middlewares: [RoleMiddleware()]),
 

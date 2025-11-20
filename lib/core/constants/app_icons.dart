@@ -5,5 +5,11 @@ class AppConstIcons{
 
   static const appStaticIcon = Icons.fingerprint;
 
+  static const settingsIcon = Icons.settings;
+
+
+  static const addIcon = Icons.add;
+  static const editIcon = Icons.edit;
+  static const deleteIcon = Icons.delete;
 
 }

@@ -1,9 +1,13 @@
+import 'package:attedance_management_system/core/constants/app_icons.dart';
 import 'package:attedance_management_system/views/admin/admin_screens/admin_profile_screen.dart';
+import 'package:attedance_management_system/widgets/app_icon_button.dart';
+import 'package:attedance_management_system/widgets/app_icons_type.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../controller/admin_controller.dart';
 import '../../controller/auth_controller.dart';
 import '../../core/constants/app_theme_colors.dart';
+import '../../routes/app_routes.dart';
 import '../../widgets/app_text_type.dart';
 import 'admin_screens/admin_employees_list.dart';
 import 'admin_screens/admin_home_page.dart';
@@ -54,17 +58,29 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         centerTitle: true,
         backgroundColor: AppThemeColors.appbarBackgroundColor,
         title: AppTextWidget.large(_titles[_currentIndex], color: AppThemeColors.whiteColor,),
+        actions: [
+             AppIconButtonWidget.large(icon: AppConstIcons.settingsIcon, color: Colors.white, onPressed: (){
+               WidgetsBinding.instance.addPostFrameCallback((_) {
+                 Get.toNamed(AppRoutes.settingsScreen);
+               });
+             }).marginOnly(right: 10),
+
+        ],
       ),
       body: IndexedStack(
         index: _currentIndex,
         children: _pages,
       ),
+
       floatingActionButton: showFab
-          ? FloatingActionButton.extended(
-        onPressed: _openAddUser,
+          ? FloatingActionButton(
+        shape: CircleBorder(
+            side: BorderSide(color: AppThemeColors.primaryColor)
+        ),
         backgroundColor: AppThemeColors.primaryColor,
-        icon: Icon(Icons.person_add, color: Colors.white),
-        label: AppTextWidget.medium('Add User', color: Colors.white),
+        onPressed: _openAddUser,
+        child: AppIconWidget.large(AppConstIcons.addIcon, color: AppThemeColors.whiteColor,),
+        
       )
           : null,
       bottomNavigationBar: BottomNavigationBar(

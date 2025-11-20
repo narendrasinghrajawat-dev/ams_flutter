@@ -1,107 +1,125 @@
+// lib/services/api_service.dart
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'dart:async';
 import 'package:http/http.dart' as http;
-
-import '../../core/constants/api_endpoints.dart';
-
-
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import '../services/storage_service.dart';
+import '../core/constants/const_strings.dart';
 
 class ApiService {
+  final StorageService _storage = StorageService();
 
-  String baseUrl = "${dotenv.env['baseURL']}";
-  String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyNDI1MDIxMjM4OSIsInJvbGUiOiJhZG1pbiIsImVtYWlsIjoibnNyQGdtYWlsLmNvbSIsImlhdCI6MTc2MzU0NzM1MCwiZXhwIjoxNzYzNTgzMzUwfQ.gRiEPYxmzROUEnxTdRFWZJleNyUCsjwQSE3KjX1nFhU";
+  final String baseUrl = dotenv.env['baseURL'] ?? '';
 
+  final Duration timeout = const Duration(seconds: 15);
 
-  Future<Map<String, dynamic>> post(String path, Map<String, dynamic> body,{String acceptLanguage = 'en'}) async {
-    final uri = Uri.parse('$baseUrl$path');
+  // -----------------------------
+  // COMMON HEADERS
+  // -----------------------------
+  Map<String, String> _headers({String acceptLanguage = "en"}) {
+    final token = _storage.readString(AppStrings.token);
 
-    // Define headers including the Accept-Language header
-    Map<String, String> headers = {
-      'Content-Type': 'application/json',
-      'Accept-Language': acceptLanguage,
-      "Authorization": "Bearer $token"
+    return {
+      "Content-Type": "application/json",
+      "Accept-Language": acceptLanguage,
+      if (token != null && token.isNotEmpty) "Authorization": "Bearer $token"
     };
-
-
-    final resp = await http.post(uri, body: jsonEncode(body), headers: headers);
-
-    print('post response is the ');
-    print(resp.statusCode);
-    print(resp.body);
-
-    return _processResponse(resp);
   }
 
-  Future<dynamic> get(String path,{String acceptLanguage = 'en'}) async {
+  // -----------------------------
+  // GET METHOD
+  // -----------------------------
+  Future<dynamic> get(String path) async {
+    final url = Uri.parse("$baseUrl$path");
 
-    print('get start isteh ');
-    print(path);
+    try {
+      final response = await http.get(url, headers: _headers()).timeout(timeout);
 
-    final uri = Uri.parse('$baseUrl$path');
-    Map<String, String> headers = {
-      'Content-Type': 'application/json',
-      'Accept-Language': acceptLanguage,
-      "Authorization": "Bearer $token"
-    };
-
-
-
-    final resp = await http.get(uri, headers: headers);
-
-    print('get res is teh ');
-    print(resp.statusCode);
-    print(resp.body);
-
-
-    return _processResponse(resp);
-  }
-
-  dynamic _processResponse( http.Response response) {
-    switch (response.statusCode) {
-      case 200:
-        var responseJson = jsonDecode(response.body)["data"];
-        return responseJson;
-      case 201:
-        var responseJson = jsonDecode(response.body)["data"];
-        return responseJson;
-      // case 400:
-      //   hideLoadingDialog(context);
-      //   showToast(context, apiErrorMessage);
-      //   throw BadRequestException(response.body.toString());
-      // case 401:
-      //   hideLoadingDialog(context);
-      //   showToast(context, jsonDecode(response.body)["responseMessage"]);
-      //   throw UnauthorisedException(jsonDecode(response.body)["responseMessage"]);
-      // case 403:
-      //   hideLoadingDialog(context);
-      //   showToast(context, apiErrorMessage);
-      //   throw UnauthorisedException(response.body.toString());
-      // case 404:
-      //   hideLoadingDialog(context);
-      //   showToast(context, jsonDecode(response.body)["responseMessage"]);
-      //   break;
-      // case 500:
-      //   hideLoadingDialog(context);
-      //   showToast(context, jsonDecode(response.body)["errorMessage"]);
-      //   break;
-      // case 501:
-      //   hideLoadingDialog(context);
-      //   showToast(context, jsonDecode(response.body)["responseMessage"]);
-      //   break;
-      default:
-        throw 'Error occured while Communication with Server with StatusCode : ${response.statusCode}';
+      return _handleResponse(response);
+    } catch (e) {
+      throw Exception("GET error: $e");
     }
   }
 
+  // -----------------------------
+  // POST METHOD
+  // -----------------------------
+  Future<dynamic> post(String path, Map<String, dynamic> body) async {
+    final url = Uri.parse("$baseUrl$path");
+   print('post url is teh $url');
+   print(_headers());
 
-  // Map<String, dynamic> _processResponse(http.Response resp) {
-  //   final code = resp.statusCode;
-  //   final body = resp.body.isNotEmpty ? jsonDecode(resp.body) : {};
-  //   if (code >= 200 && code < 300) {
-  //     return {'status': true, 'data': body};
-  //   } else {
-  //     return {'status': false, 'message': body.toString(), 'code': code};
-  //   }
-  // }
+
+    try {
+      final response = await http
+          .post(url, headers: _headers(), body: jsonEncode(body))
+          .timeout(timeout);
+
+      return _handleResponse(response);
+    } catch (e) {
+      throw Exception("POST error: $e");
+    }
+  }
+
+  // -----------------------------
+  // PUT METHOD
+  // -----------------------------
+  Future<dynamic> update(String path, Map<String, dynamic> body) async {
+    final url = Uri.parse("$baseUrl$path");
+
+    print('update start is teh $url');
+    print(body);
+
+    try {
+      final response = await http
+          .patch(url, headers: _headers(), body: jsonEncode(body))
+          .timeout(timeout);
+
+      print('update resaponse iteh $response');
+      print(response.statusCode);
+      print(response.body);
+
+      return _handleResponse(response);
+    } catch (e) {
+      throw Exception("PUT error: $e");
+    }
+  }
+
+  // -----------------------------
+  // DELETE METHOD
+  // -----------------------------
+  Future<dynamic> delete(String path) async {
+    final url = Uri.parse("$baseUrl$path");
+
+    try {
+      final response =
+      await http.delete(url, headers: _headers()).timeout(timeout);
+
+      return _handleResponse(response);
+    } catch (e) {
+      throw Exception("DELETE error: $e");
+    }
+  }
+
+  // -----------------------------
+  // HANDLE API RESPONSE
+  // -----------------------------
+  dynamic _handleResponse(http.Response response) {
+    final status = response.statusCode;
+
+    // decode body
+    final body = response.body.isNotEmpty ? jsonDecode(response.body) : null;
+
+    if (status == 200 || status == 201) {
+      return body?['data'] ?? body;
+    }
+
+    if (status == 400) throw Exception(body?['message'] ?? "Bad Request");
+    if (status == 401) throw Exception("Unauthorized");
+    if (status == 403) throw Exception("Forbidden");
+    if (status == 404) throw Exception("Not Found");
+    if (status == 500) throw Exception("Server Error");
+
+    throw Exception("Error ${response.statusCode}: ${response.body}");
+  }
 }
