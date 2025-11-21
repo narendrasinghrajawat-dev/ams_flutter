@@ -1,6 +1,12 @@
 
+import 'package:attedance_management_system/core/constants/const_strings.dart';
+import 'package:attedance_management_system/services/storage_service.dart';
+
+import '../../models/user.dart';
+
 class AppHelper {
 
+  static StorageService storageService = StorageService();
 
   static bool isEmptyOrNull(dynamic value) {
     if (value == null) {
@@ -18,4 +24,12 @@ class AppHelper {
     }
     return false;
   }
+
+  static User getProfileUser(){
+    return User.fromJson(storageService.readMap(AppStrings.profileJson)!);
+  }
+
+
+
+
 }
