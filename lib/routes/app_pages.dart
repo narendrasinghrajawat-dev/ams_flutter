@@ -25,7 +25,7 @@ class AppPages {
     GetPage(name: AppRoutes.splashScreen, page: () => SplashScreen()),
     GetPage(name: AppRoutes.settingsScreen, page: () => SettingsScreen(), middlewares: [RoleMiddleware()]),
     GetPage(name: AppRoutes.adminDashboard, page: () => AdminDashboardScreen(), middlewares: [RoleMiddleware()]),
-    GetPage(name: AppRoutes.userDashboard, page: () => UserDashboard(), middlewares: [RoleMiddleware()]),
+    GetPage(name: AppRoutes.userDashboard, page: () => UserDashboardScreen(), middlewares: [RoleMiddleware()]),
 
 
   ];

@@ -238,4 +238,8 @@ class AppThemeColors {
 
   static Color get deleteIconColor => isDark ? primaryDarkColor : Colors.red;
 
+
+
+
+
 }

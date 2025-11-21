@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import '../../controller/auth_controller.dart';
 import '../../controller/settings_controller.dart';
+import '../../controller/user_controller.dart';
 
 
 class AppBinding extends Bindings {
@@ -11,5 +12,7 @@ class AppBinding extends Bindings {
     Get.put(AuthController(), permanent: true);
     Get.put(AdminController(), permanent: true);
     Get.put(SettingsController(), permanent: true);
+    Get.put(UserController(), permanent: true);
+
   }
 }

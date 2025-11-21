@@ -55,6 +55,11 @@ class ApiService {
           .post(url, headers: _headers(), body: jsonEncode(body))
           .timeout(timeout);
 
+      print('post response is teh ');
+      print(response.statusCode);
+      print(response.body);
+
+
       return _handleResponse(response);
     } catch (e) {
       throw Exception("POST error: $e");

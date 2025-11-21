@@ -16,4 +16,11 @@ class ApiEndpoints {
   static const updateUser = 'auth/update-user/';
   static const deleteUser = 'auth/delete-user/';
 
+
+
+  // user apis
+  static const punch = 'attendance/punch';
+
+
+
 }

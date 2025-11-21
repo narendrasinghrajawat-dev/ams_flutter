@@ -18,6 +18,8 @@ class User {
   final String role;
   final String roleId;
   final String password;
+  final String? profileImageS3Key;
+  final String? profileImageNetworkKey;
   final Address? address;
 
   User({
@@ -38,6 +40,8 @@ class User {
     required this.roleId,
     required this.password,
     this.address,
+    this.profileImageS3Key,
+    this.profileImageNetworkKey,
   });
 
   /// Factory method to create a [User] object from a JSON map.
@@ -46,7 +50,7 @@ class User {
       // Database fields (using original JSON keys for mapping)
       key: json['_key'] ?? "",
       rev: json['_rev'] ?? "",
-      id: json['_id'] ?? "",
+      id: json['id'] ?? "",
 
       firstName: json['firstName'] ?? "",
       middleName: json['middleName'] ?? "",
@@ -61,6 +65,8 @@ class User {
       role: json['role'] ?? "",
       roleId: json['roleId'] ?? "",
       password: json['password'] ?? "",
+      profileImageS3Key: json['profileImageS3Key'] ?? "",
+      profileImageNetworkKey: json['profileImageNetworkKey'] ?? "",
 
       // Nested model instantiation
       address: json['address'] != null ? Address.fromJson(json['address']) : null,
