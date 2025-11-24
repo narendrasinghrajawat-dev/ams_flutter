@@ -1,10 +1,10 @@
 // lib/services/api_service.dart
 import 'dart:convert';
 import 'dart:async';
+import 'package:attedance_management_system/services/common/storage_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import '../services/storage_service.dart';
-import '../core/constants/const_strings.dart';
+import '../../core/constants/const_strings.dart';
 
 class ApiService {
   final StorageService _storage = StorageService();
@@ -32,8 +32,16 @@ class ApiService {
   Future<dynamic> get(String path) async {
     final url = Uri.parse("$baseUrl$path");
 
+    print('get start is teh ');
+    print(path);
+
+
     try {
       final response = await http.get(url, headers: _headers()).timeout(timeout);
+
+      print('get response is teh ');
+      print(response.statusCode);
+      print(response.body);
 
       return _handleResponse(response);
     } catch (e) {
@@ -48,6 +56,7 @@ class ApiService {
     final url = Uri.parse("$baseUrl$path");
    print('post url is teh $url');
    print(_headers());
+    print('body is teh $body');
 
 
     try {

@@ -1,6 +1,4 @@
 import 'package:attedance_management_system/controller/admin_controller.dart';
-import 'package:attedance_management_system/core/constants/api_endpoints.dart';
-import 'package:attedance_management_system/services/api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../core/constants/app_theme_colors.dart';

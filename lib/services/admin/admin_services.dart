@@ -1,5 +1,5 @@
 import 'package:attedance_management_system/core/constants/api_endpoints.dart';
-import '../api_service.dart';
+import '../common/api_service.dart';
 
 class AdminServices {
   final ApiService apiService;

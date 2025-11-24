@@ -19,5 +19,7 @@ class AppStrings {
   static const String savedEmail = "saved_email";
 
 
+  static const String loginLat = "login_lat";
+  static const String loginLong = "login_long";
 
 }

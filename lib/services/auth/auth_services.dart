@@ -1,5 +1,6 @@
 import 'package:attedance_management_system/core/constants/api_endpoints.dart';
-import '../api_service.dart';
+import '../../models/login.dart';
+import '../common/api_service.dart';
 
 
 class AuthServices {
@@ -7,8 +8,10 @@ class AuthServices {
 
   AuthServices({ApiService? api}) : apiService = api ?? ApiService();
 
-  Future<Map<String, dynamic>> login(String email, String password) async {
-    final resp = await apiService.post(ApiEndpoints.login, {'email': email, 'password': password});
+// Change the signature to accept the Map payload
+  Future<Map<String, dynamic>> login(Login loginPayload) async {
+    // Use the payload directly in the post request body
+    final resp = await apiService.post(ApiEndpoints.login, loginPayload.toJson());
     return resp;
   }
 

@@ -18,6 +18,7 @@ class AdminController extends GetxController {
   }
 
   _loadUsersList() async {
+
     loading.value = true;
     try {
       final List<Map<String, dynamic>> res = await _adminServices.fetchUsersList();

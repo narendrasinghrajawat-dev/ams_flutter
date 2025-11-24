@@ -2,8 +2,9 @@ import 'package:attedance_management_system/core/constants/const_strings.dart';
 import 'package:attedance_management_system/routes/app_routes.dart';
 import 'package:attedance_management_system/services/auth/auth_services.dart';
 import 'package:get/get.dart';
+import '../models/login.dart';
 import '../models/user.dart';
-import '../services/storage_service.dart';
+import '../services/common/storage_service.dart';
 
 class AuthController extends GetxController {
   final AuthServices _authServices = AuthServices();
@@ -15,17 +16,22 @@ class AuthController extends GetxController {
   bool get isLoggedIn => currentUser.value != null;
   bool get isAdmin => currentUser.value?.role == AppStrings.appRoleAdmin;
 
-  Future<void> login(String email, String password) async {
+// Change the signature to accept the Login model
+  Future<void> login(Login loginPayload) async {
     loading.value = true;
-    final res = await _authServices.login(email, password);
+
+    // Call the service, passing the JSON representation of the Login model
+    final res = await _authServices.login(loginPayload);
+
     loading.value = false;
 
     if (res.isNotEmpty) {
       // expected res['data'] contains user profile and token
-      final data = res;
+      final data = res; // Assuming the server response wraps data in a 'data' key
       final user = User.fromJson(data);
       currentUser.value = user;
       _storage.saveMap(AppStrings.profileJson, user.toJson());
+
       // token save if provided
       if (data['token'] != null) {
         _storage.saveString(AppStrings.token, data['token']);

@@ -1,7 +1,8 @@
 // lib/services/user/user_service.dart
 import 'package:attedance_management_system/models/punch.dart';
-import 'package:attedance_management_system/services/api_service.dart';
 import 'package:attedance_management_system/core/constants/api_endpoints.dart';
+
+import '../common/api_service.dart';
 
 /// A small service to call punch APIs.
 /// Uses your existing ApiService (http wrapper).
@@ -31,4 +32,43 @@ class UserService {
       rethrow;
     }
   }
+
+
+
+  Future<List<Map<String, dynamic>>> fetchAllAttedanceActivity(String userKey) async {
+    print('fetchAllAttedanceActivity serice isidfds fdfd ');
+
+    try {
+      final resp = await _api.get("${ApiEndpoints.getAllAttedanceActivity}$userKey");
+      print('resp is the $resp');
+
+      if (resp is List) {
+        return List<Map<String, dynamic>>.from(resp);
+      }
+      return [];
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+
+  Future<List<Map<String, dynamic>>> fetchLeavesStatus(String userKey) async {
+    print('fetchAllAttedanceActivity serice isidfds fdfd ');
+
+    try {
+      final resp = await _api.get("${ApiEndpoints.getAllLeavesStatus}$userKey");
+      print('resp is the $resp');
+
+      if (resp is List) {
+        return List<Map<String, dynamic>>.from(resp);
+      }
+      return [];
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+
+
+
 }

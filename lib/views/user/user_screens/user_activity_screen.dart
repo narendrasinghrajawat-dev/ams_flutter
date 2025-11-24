@@ -1,46 +1,59 @@
+import 'package:attedance_management_system/controller/user_controller.dart';
+import 'package:attedance_management_system/models/attendance_activity.dart';
 import 'package:attedance_management_system/widgets/card/common_card.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/constants/app_theme_colors.dart';
+import '../../../data/utils/app_helper.dart';
 import '../../../widgets/app_text_type.dart';
 
-class UserActivityScreen extends StatelessWidget {
+class UserActivityScreen extends StatefulWidget {
   const UserActivityScreen({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    // Dummy activity list
-    final activities = [
-      {"type": "checkin", "time": "10:20 AM", "date": "Apr 23, 2025"},
-      {"type": "checkout", "time": "07:10 PM", "date": "Apr 23, 2025"},
-      {"type": "checkin", "time": "10:18 AM", "date": "Apr 22, 2025"},
-      {"type": "checkout", "time": "07:05 PM", "date": "Apr 22, 2025"},
-      {"type": "checkin", "time": "10:25 AM", "date": "Apr 21, 2025"},
-      {"type": "checkout", "time": "07:15 PM", "date": "Apr 21, 2025"},
-    ];
+  State<UserActivityScreen> createState() => _UserActivityScreenState();
+}
 
+class _UserActivityScreenState extends State<UserActivityScreen> {
+
+  // Initialize controller in the state class
+  final UserController _userController = Get.find<UserController>();
+
+  @override
+  Widget build(BuildContext context) {
     return SafeArea(
       child: Column(
         children: [
-
           // Card Wrapper
           Expanded(
-            child:  ListView.separated(
+            child: Obx(
+                  () => ListView.separated(
                 padding: const EdgeInsets.all(12),
-                itemCount: activities.length,
-                separatorBuilder: (_, __) =>
-                const SizedBox(height: 10),
+                itemCount: _userController.filteredAttendanceActivitiesList.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 10),
                 itemBuilder: (_, idx) {
-                  final activity = activities[idx];
-                  final bool isCheckIn = activity["type"] == "checkin";
+                  // Cast the item to the correct model type: AttendanceActivity
+                  final activity = _userController.filteredAttendanceActivitiesList[idx];
+
+                  // Use null-aware operators as fields are optional
+                  final bool isCheckIn = activity.punchType == "1";
+
+                  // --- FIX APPLIED HERE: Use AppHelper for formatting ---
+                  final String formattedTime = activity.punchTime != null
+                      ? AppHelper.formatTimeString(activity.punchTime!, context)
+                      : 'N/A';
+
+                  final String formattedDate = activity.punchDate != null
+                      ? AppHelper.formatDateString(activity.punchDate!)
+                      : 'N/A';
 
                   return _buildActivityTile(
-                    type: activity["type"]!,
-                    time: activity["time"]!,
-                    date: activity["date"]!,
+                    time: formattedTime,
+                    date: formattedDate,
                     isCheckIn: isCheckIn,
                   );
                 },
+              ),
             ),
           )
         ],
@@ -48,8 +61,8 @@ class UserActivityScreen extends StatelessWidget {
     );
   }
 
+  // NOTE: Removed 'type' from required parameters as it's not used in the UI logic now
   Widget _buildActivityTile({
-    required String type,
     required String time,
     required String date,
     required bool isCheckIn,
@@ -72,9 +85,7 @@ class UserActivityScreen extends StatelessWidget {
             ),
             child: Icon(icon, color: color, size: 22),
           ),
-
           const SizedBox(width: 14),
-
           // Text Content
           Expanded(
             child: Column(
@@ -86,16 +97,15 @@ class UserActivityScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 AppTextWidget.verySmall(
-                  date,
+                  date, // Display formatted date
                   color: AppThemeColors.muted,
                 ),
               ],
             ),
           ),
-
           // Time
           AppTextWidget.medium(
-            time,
+            time, // Display formatted time
             color: AppThemeColors.textPrimaryColor,
           )
         ],

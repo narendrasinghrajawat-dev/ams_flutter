@@ -8,8 +8,12 @@ import 'package:get_storage/get_storage.dart';
 import '../../controller/auth_controller.dart';
 import '../../core/constants/app_theme_colors.dart';
 import '../../core/constants/text_styles.dart';
+import '../../models/device_info.dart';
+import '../../models/login.dart';
+import '../../services/common/device_information_service.dart';
+import '../../services/common/location_service.dart';
+import '../../services/common/storage_service.dart';
 import '../../widgets/app_text_type.dart';
-import '../admin/admin_dashboard_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -21,6 +25,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final AuthController _auth = Get.find<AuthController>();
   final _box = GetStorage();
+  final StorageService storageService = StorageService();
 
   final TextEditingController emailC = TextEditingController();
   final TextEditingController passC = TextEditingController();
@@ -51,11 +56,13 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+
+// updated _submit()
   void _submit() async {
     FocusScope.of(context).unfocus();
     if (_formKey.currentState?.validate() != true) return;
 
-    // persist remember me choice
+    // Persist remember me choice
     if (rememberMe.value) {
       _box.write(AppStrings.rememberMe, true);
       _box.write(AppStrings.savedEmail, emailC.text.trim());
@@ -64,14 +71,54 @@ class _LoginScreenState extends State<LoginScreen> {
       _box.remove(AppStrings.savedEmail);
     }
 
-    // call auth
-    await _auth.login(emailC.text.trim(), passC.text.trim());
-    // Get.to(AdminDashboard());
+    // --- Location Retrieval ---
+    double? lat;
+    double? lng;
+    try {
+      final locRes = await LocationService.instance.getCurrentLocation();
+      if (locRes.ok && locRes.position != null) {
+        lat = locRes.position!.latitude;
+        lng = locRes.position!.longitude;
 
-    // handle login failure (AuthController shows snackbar on error already,
-    // but you can add extra checks here)
+        // Save strings for potential reuse (e.g., immediate punch-in)
+        storageService.saveString(AppStrings.loginLat, lat.toString());
+        storageService.saveString(AppStrings.loginLong, lng.toString());
+      } else {
+        // Location not available — inform user but continue login
+        final message = locRes.message != null && locRes.message!.isNotEmpty
+            ? locRes.message!
+            : 'Location not available';
+        Get.snackbar('Location', message, snackPosition: SnackPosition.BOTTOM);
+      }
+    } catch (e) {
+      print('Location error: $e');
+      Get.snackbar('Location', 'Failed to retrieve location', snackPosition: SnackPosition.BOTTOM);
+    }
+
+    // --- Device Information Retrieval ---
+    final Map<String, dynamic> deviceDataMap = await DeviceService.getDeviceInformation();
+    final DeviceInfo deviceInformation = DeviceInfo.fromJson(deviceDataMap);
+
+    print('login lat long is the $lat and $lng');
+    print("deviceData is the ${deviceInformation.toJson()}");
+
+    // --- Create Login Model and Call Auth Service ---
+    // If location is null, we use 0.0 or handle the error appropriately based on backend requirement
+    final loginPayload = Login(
+      email: emailC.text.trim(),
+      password: passC.text.trim(),
+      lat: lat ?? 0.0,
+      long: lng ?? 0.0,
+      deviceInformation: deviceInformation,
+    );
+
+    // Call auth controller with the complete model
+    await _auth.login(loginPayload);
+
     if (!_auth.isLoggedIn && !_auth.loading.value) {
       Get.snackbar('Login failed', 'Please check credentials', snackPosition: SnackPosition.BOTTOM);
+    } else {
+      // Optional post-login logic
     }
   }
 
