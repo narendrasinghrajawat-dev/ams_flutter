@@ -11,15 +11,17 @@ class ApiEndpoints {
 
 
   // admin employee apis
-  static const createUser = 'auth/create-user/';
-  static const usersList = 'auth/user-list/';
-  static const updateUser = 'auth/update-user/';
-  static const deleteUser = 'auth/delete-user/';
+  static const createUser = 'admin/create-user/';
+  static const usersList = 'admin/user-list/';
+  static const updateUser = 'admin/update-user/';
+  static const deleteUser = 'admin/delete-user/';
 
 
 
   // user apis
   static const punch = 'attendance/punch';
+  static const getAllAttedanceActivity = 'attendance/getAllAttedanceActivity/';
+  static const getAllLeavesStatus = 'leaves/getLeavesStatus/';
 
 
 

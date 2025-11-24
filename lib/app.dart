@@ -1,6 +1,5 @@
 import 'package:attedance_management_system/routes/app_pages.dart';
 import 'package:attedance_management_system/routes/app_routes.dart';
-import 'package:attedance_management_system/services/storage_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'core/bindings/app_binding.dart';

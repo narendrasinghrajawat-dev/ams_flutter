@@ -1,11 +1,10 @@
 // lib/modules/user/user_controller.dart
+import 'package:attedance_management_system/models/attendance_activity.dart';
 import 'package:get/get.dart';
-import 'package:attedance_management_system/core/constants/api_endpoints.dart';
-import 'package:attedance_management_system/core/constants/const_strings.dart';
-import 'package:attedance_management_system/services/storage_service.dart';
-import 'package:flutter/material.dart';
-
+import '../data/utils/app_helper.dart';
+import '../models/leaves.dart';
 import '../models/punch.dart';
+import '../services/common/storage_service.dart';
 import '../services/user/user_services.dart';
 
 /// Controller to handle user punch in / punch out flows.
@@ -13,6 +12,11 @@ import '../services/user/user_services.dart';
 class UserController extends GetxController {
   final UserService _service = UserService();
   final StorageService _storage = StorageService();
+
+
+  RxList<AttendanceActivity> attendanceActivitiesList = <AttendanceActivity>[].obs;
+  RxList<Leaves> leavesList = <Leaves>[].obs;
+
 
   // reactive state
   final RxBool isLoading = false.obs;
@@ -23,7 +27,10 @@ class UserController extends GetxController {
   void onInit() {
     super.onInit();
     // optional: load last punches from API/local storage
-    fetchLastPunches();
+    // fetchLastPunches();
+    loadAttendanceActivities(AppHelper.getProfileUser().key!);
+    loadLeavesStatus(AppHelper.getProfileUser().key!);
+
   }
 
   /// Fetch recent punches (last X entries).
@@ -106,4 +113,47 @@ class UserController extends GetxController {
     lastPunches.clear();
     currentStatus.value = '';
   }
+
+  loadAttendanceActivities(String userKey) async {
+    print('loadAttendanceActivities called is the ');
+
+    try {
+      final List<Map<String, dynamic>> res = await _service.fetchAllAttedanceActivity(userKey);
+      if (!AppHelper.isEmptyOrNull(res)) {
+        attendanceActivitiesList.clear();
+        for (var item in res) {
+          final user = AttendanceActivity.fromJson(item);
+          attendanceActivitiesList.add(user);
+        }
+      }
+    } catch (e) {
+      print('Error loading users: $e');
+    } finally {
+    }
+  }
+
+  List<AttendanceActivity> get filteredAttendanceActivitiesList => attendanceActivitiesList;
+  List<Leaves> get filteredLeavesList => leavesList;
+
+
+  loadLeavesStatus(String userKey) async {
+    print('loadAttendanceActivities called is the ');
+
+    try {
+      final List<Map<String, dynamic>> res = await _service.fetchLeavesStatus(userKey);
+      if (!AppHelper.isEmptyOrNull(res)) {
+        leavesList.clear();
+        for (var item in res) {
+          final user = Leaves.fromJson(item);
+          leavesList.add(user);
+        }
+      }
+    } catch (e) {
+      print('Error loading users: $e');
+    } finally {
+    }
+  }
+
+
+
 }

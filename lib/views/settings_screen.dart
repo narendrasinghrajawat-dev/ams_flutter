@@ -3,8 +3,8 @@ import 'package:attedance_management_system/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../core/constants/app_theme_colors.dart';
-import '../../services/storage_service.dart';
 import '../../controller/auth_controller.dart';
+import '../services/common/storage_service.dart';
 import '../widgets/app_text_type.dart';
 
 class SettingsScreen extends StatefulWidget {

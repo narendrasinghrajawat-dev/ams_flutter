@@ -2,6 +2,7 @@ import 'package:attedance_management_system/widgets/card/common_card.dart';
 import 'package:attedance_management_system/widgets/container/common_container.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../controller/user_controller.dart';
 import '../../../core/constants/app_theme_colors.dart';
 import '../../../widgets/app_text_type.dart';
 
@@ -15,12 +16,12 @@ class UserLeavesScreen extends StatefulWidget {
 class _UserLeavesScreenState extends State<UserLeavesScreen> {
   int _activeTab = 0; // 0 = Approved, 1 = Pending, 2 = Rejected
 
+
+  final UserController _userController = Get.find<UserController>();
+
+
   // Summary values (you can compute these dynamically from the lists)
-  final List<Map<String, dynamic>> _summary = [
-    {'title': 'Leave Balance', 'value': '20'},
-    {'title': 'Leave Approved', 'value': '2'},
-    {'title': 'Leave Pending', 'value': '4'},
-    {'title': 'Leave Rejected', 'value': '10'},
+  List<Map<String, dynamic>> _summary = [
   ];
 
   // Dummy leave items grouped by status
@@ -74,8 +75,25 @@ class _UserLeavesScreenState extends State<UserLeavesScreen> {
     return _rejected;
   }
 
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    final filteredLeavesList = _userController.filteredLeavesList;
+
+    _summary = [
+      {'title': 'Leave Balance', 'value': filteredLeavesList.first.totalLeaves.toString()},
+      {'title': 'Leave Available', 'value': filteredLeavesList.first.availableLeaves.toString()},
+      {'title': 'Leave Pending', 'value': filteredLeavesList.first.pendingLeaves.toString()},
+      {'title': 'Leave Rejected', 'value': filteredLeavesList.first.rejectedLeaves.toString()},
+    ];
+
+  }
   @override
   Widget build(BuildContext context) {
+
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 12),

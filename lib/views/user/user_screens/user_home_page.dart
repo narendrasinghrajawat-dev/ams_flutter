@@ -1,6 +1,7 @@
 // lib/views/user/user_home_page.dart
 import 'dart:async';
 import 'package:attedance_management_system/controller/user_controller.dart';
+import 'package:attedance_management_system/data/utils/app_helper.dart';
 import 'package:attedance_management_system/models/punch.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -65,22 +66,22 @@ class _UserHomePageState extends State<UserHomePage> {
   void _onCheckIn() async {
 
     var json = {
+      "userKey" : AppHelper.getProfileUser().key,
+      "punchType" : "1",
+      "punchTime" : TimeOfDay.now().toString(),
+      "punchDate" : DateTime.now().toIso8601String(),
+      "lat" : "25",
+      "long" : "78",
+      "deviceInformation": {
+        "os": "Android",
+        "version": "12",
+        "sdkInt": 31,
+        "model": "2201117PI",
+        "brand": "Oppo",
+        "device": "miel"
+      }
+    };
 
-      "userKey" : "111111",
-    "punchType" : "1",
-    "punchTime" : "12:05:49",
-    "punchDate" : "2025-11-21",
-    "lat" : "25",
-    "long" : "78",
-    "deviceInformation": {
-    "os": "Android",
-    "version": "12",
-    "sdkInt": 31,
-    "model": "2201117PI",
-    "brand": "Oppo",
-    "device": "miel"
-  }
-  };
 
    final res = _userController.punchIn(Punch.fromJson(json));
 
@@ -107,11 +108,10 @@ class _UserHomePageState extends State<UserHomePage> {
   void _onCheckOut() async {
 
     var json = {
-
-      "userKey" : "111111",
+      "userKey" : AppHelper.getProfileUser().key,
       "punchType" : "2",
-      "punchTime" : "12:05:49",
-      "punchDate" : "2025-11-21",
+      "punchTime" : TimeOfDay.now().toString(),
+      "punchDate" : DateTime.now().toIso8601String(),
       "lat" : "25",
       "long" : "78",
       "deviceInformation": {
@@ -163,6 +163,7 @@ class _UserHomePageState extends State<UserHomePage> {
 
   @override
   Widget build(BuildContext context) {
+
     // Use top area to show timer and buttons
     return SafeArea(
       child: Padding(
