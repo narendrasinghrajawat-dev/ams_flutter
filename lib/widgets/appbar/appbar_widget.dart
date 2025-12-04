@@ -1,5 +1,4 @@
 
-import 'package:attedance_management_system/widgets/app_text_type.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -8,7 +7,8 @@ import '../../core/constants/app_icons.dart';
 import '../../core/constants/app_theme_colors.dart';
 import '../../models/user.dart';
 import '../../routes/app_routes.dart';
-import '../app_icon_button.dart';
+import '../text_and_icon_widgets/app_icon_button.dart';
+import '../text_and_icon_widgets/app_text_type.dart';
 
 class UserAppBar extends StatelessWidget implements PreferredSizeWidget {
   final User user;

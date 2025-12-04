@@ -1,11 +1,10 @@
-import 'package:attedance_management_system/widgets/app_icons_type.dart';
 import 'package:attedance_management_system/widgets/card/common_card.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import '../../../controller/admin_controller.dart';
 import '../../../core/constants/app_theme_colors.dart';
-import '../../../widgets/app_text_type.dart';
+import '../../../widgets/text_and_icon_widgets/app_icons_type.dart';
+import '../../../widgets/text_and_icon_widgets/app_text_type.dart';
 
 class AdminHomePage extends StatelessWidget {
   AdminHomePage({Key? key}) : super(key: key);

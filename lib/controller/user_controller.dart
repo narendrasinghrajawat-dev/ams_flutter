@@ -2,6 +2,7 @@
 import 'package:attedance_management_system/models/attendance_activity.dart';
 import 'package:get/get.dart';
 import '../data/utils/app_helper.dart';
+import '../models/apply_leave_request.dart';
 import '../models/leaves.dart';
 import '../models/punch.dart';
 import '../services/common/storage_service.dart';
@@ -16,6 +17,7 @@ class UserController extends GetxController {
 
   RxList<AttendanceActivity> attendanceActivitiesList = <AttendanceActivity>[].obs;
   RxList<Leaves> leavesList = <Leaves>[].obs;
+  final RxBool applyingLeave = false.obs;
 
 
   // reactive state
@@ -151,6 +153,20 @@ class UserController extends GetxController {
     } catch (e) {
       print('Error loading users: $e');
     } finally {
+    }
+  }
+
+
+  Future<bool> applyLeave(ApplyLeaveRequest request) async {
+    applyingLeave.value = true;
+    try {
+      final ok = await _service.applyLeave(request);
+      return ok;
+    } catch (e) {
+      print('UserController.applyLeave error: $e');
+      return false;
+    } finally {
+      applyingLeave.value = false;
     }
   }
 

@@ -6,8 +6,8 @@ import 'package:attedance_management_system/models/punch.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/constants/app_theme_colors.dart';
-import '../../../widgets/app_text_type.dart';
 import '../../../widgets/card/common_card.dart';
+import '../../../widgets/text_and_icon_widgets/app_text_type.dart';
 
 class UserHomePage extends StatefulWidget {
   const UserHomePage({Key? key}) : super(key: key);

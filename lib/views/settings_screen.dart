@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import '../../core/constants/app_theme_colors.dart';
 import '../../controller/auth_controller.dart';
 import '../services/common/storage_service.dart';
-import '../widgets/app_text_type.dart';
+import '../widgets/text_and_icon_widgets/app_text_type.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);

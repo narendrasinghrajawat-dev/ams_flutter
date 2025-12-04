@@ -4,7 +4,7 @@ import '../../core/constants/app_theme_colors.dart';
 import '../../routes/app_routes.dart';
 import '../../core/constants/app_icons.dart';
 import '../../data/utils/auth_helper.dart';
-import '../widgets/app_text_type.dart'; // your helper to redirect
+import '../widgets/text_and_icon_widgets/app_text_type.dart';
 
 class SplashScreen extends StatefulWidget {
   final Duration duration;

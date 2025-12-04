@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 
 // Assuming this is where AppIconStyles is defined.
-import '../core/constants/icons_style.dart';
+import '../../core/constants/icons_style.dart';
 
 class AppIconWidget extends StatelessWidget {
   final IconData icon;

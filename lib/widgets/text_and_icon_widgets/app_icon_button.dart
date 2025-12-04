@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../core/constants/icons_style.dart';
+import '../../core/constants/icons_style.dart';
 
 class AppIconButtonWidget extends StatelessWidget {
   final IconData icon;

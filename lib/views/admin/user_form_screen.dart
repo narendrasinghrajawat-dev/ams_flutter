@@ -4,9 +4,9 @@ import 'package:get/get.dart';
 import '../../core/constants/app_theme_colors.dart';
 import '../../models/address.dart';
 import '../../models/user.dart';
-import '../../widgets/app_text_type.dart';
 import '../../widgets/form_widgets/dropdown_field_widget.dart';
 import '../../widgets/form_widgets/text_field_widget.dart';
+import '../../widgets/text_and_icon_widgets/app_text_type.dart';
 
 typedef OnUserSaved = void Function(Map<String, dynamic> userData);
 

@@ -23,6 +23,7 @@ class ApiEndpoints {
   static const getAllAttedanceActivity = 'attendance/getAllAttedanceActivity/';
   static const getAllLeavesStatus = 'leaves/getLeavesStatus/';
 
-
+  static const cancelLeaves = 'leaves/cancel/';
+  static const applyLeaves = 'leaves/applyLeaves/';
 
 }
