@@ -70,17 +70,18 @@ class UserService {
   }
 
 
-  Future<bool> applyLeave(ApplyLeaveRequest request) async {
+  Future<Map<String, dynamic>?> applyLeave(ApplyLeaveRequest request) async {
+    print('apply services called');
     try {
       final res = await _api.post(ApiEndpoints.applyLeaves, request.toJson());
-
+      print('res is teh $res');
       // If backend returns { message, statusCode, data },
       // you can inspect `res` here if needed.
       // For now, if no exception => success.
-      return true;
+      return res;
     } catch (e) {
       print('applyLeave error: $e');
-      return false;
+      return null;
     }
   }
 

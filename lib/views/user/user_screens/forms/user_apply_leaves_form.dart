@@ -123,10 +123,12 @@ class _UserApplyLeavesFormState extends State<UserApplyLeavesForm> {
       endDate: _formatDate(_endDate),
       reason: _reasonC.text.trim(),
       leaveType: _leaveType,
-      numberOfLeaves: numberOfLeaves,
+      numberOfLeaves: numberOfLeaves.toDouble(),
       isFullDay: _isFullDay,
       isHalfDay: _isHalfDay,
     );
+
+    print('res is the ${req.toJson()}');
 
     final ok = await _userController.applyLeave(req);
 
