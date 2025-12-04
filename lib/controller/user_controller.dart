@@ -17,7 +17,13 @@ class UserController extends GetxController {
 
   RxList<AttendanceActivity> attendanceActivitiesList = <AttendanceActivity>[].obs;
   RxList<Leaves> leavesList = <Leaves>[].obs;
+  RxList<ApplyLeaveRequest> appliedLeaves = <ApplyLeaveRequest>[].obs;
+
   final RxBool applyingLeave = false.obs;
+
+  List<AttendanceActivity> get filteredAttendanceActivitiesList => attendanceActivitiesList;
+  List<Leaves> get filteredLeavesList => leavesList;
+  List<ApplyLeaveRequest> get filteredAppliedLeavesList => appliedLeaves;
 
 
   // reactive state
@@ -134,8 +140,6 @@ class UserController extends GetxController {
     }
   }
 
-  List<AttendanceActivity> get filteredAttendanceActivitiesList => attendanceActivitiesList;
-  List<Leaves> get filteredLeavesList => leavesList;
 
 
   loadLeavesStatus(String userKey) async {
@@ -159,9 +163,24 @@ class UserController extends GetxController {
 
   Future<bool> applyLeave(ApplyLeaveRequest request) async {
     applyingLeave.value = true;
+
+    print('apply leavests rt s');
     try {
       final ok = await _service.applyLeave(request);
-      return ok;
+      print('ok is the $ok');
+
+      if(ok != null){
+        print('ok start formr');
+        print('before add length is hte ${appliedLeaves.length}');
+
+        appliedLeaves.add(ApplyLeaveRequest.fromJson(ok));
+        print('after add length is hte ${appliedLeaves.length}');
+
+      }
+      appliedLeaves.refresh();
+
+      print('yes return success');
+      return ok != null ? true : false;
     } catch (e) {
       print('UserController.applyLeave error: $e');
       return false;

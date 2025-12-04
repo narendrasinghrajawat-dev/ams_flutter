@@ -1,8 +1,10 @@
+import 'package:attedance_management_system/models/apply_leave_request.dart';
 import 'package:attedance_management_system/views/user/user_screens/forms/user_apply_leaves_form.dart';
 import 'package:attedance_management_system/widgets/card/common_card.dart';
 import 'package:attedance_management_system/widgets/container/common_container.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 import '../../../controller/user_controller.dart';
 import '../../../core/constants/app_theme_colors.dart';
 import '../../../widgets/common/common_dialong_box.dart';
@@ -16,89 +18,13 @@ class UserLeavesScreen extends StatefulWidget {
 }
 
 class _UserLeavesScreenState extends State<UserLeavesScreen> {
-  int _activeTab = 0; // 0 = Approved, 1 = Pending, 2 = Rejected
-
+  /// 0 = Approved, 1 = Pending, 2 = Rejected
+  int _activeTab = 0;
 
   final UserController _userController = Get.find<UserController>();
 
-
-  // Summary values (you can compute these dynamically from the lists)
-  List<Map<String, dynamic>> _summary = [
-  ];
-
-  // Dummy leave items grouped by status
-  final List<Map<String, dynamic>> _approved = [
-    {
-      'range': 'Apr 15, 2023 - Apr 18, 2023',
-      'days': 3,
-      'balance': 16,
-      'approvedBy': 'Martin Deo',
-      'status': 'Approved'
-    },
-    {
-      'range': 'Mar 02, 2023 - Mar 03, 2023',
-      'days': 2,
-      'balance': 18,
-      'approvedBy': 'HR',
-      'status': 'Approved'
-    },
-  ];
-
-  final List<Map<String, dynamic>> _pending = [
-    {
-      'range': 'May 05, 2023 - May 06, 2023',
-      'days': 2,
-      'balance': 14,
-      'approvedBy': 'Manager',
-      'status': 'Pending'
-    },
-    {
-      'range': 'Jun 01, 2023 - Jun 02, 2023',
-      'days': 2,
-      'balance': 12,
-      'approvedBy': '-',
-      'status': 'Pending'
-    },
-  ];
-
-  final List<Map<String, dynamic>> _rejected = [
-    {
-      'range': 'Feb 10, 2023 - Feb 11, 2023',
-      'days': 2,
-      'balance': 10,
-      'approvedBy': 'Manager',
-      'status': 'Rejected'
-    },
-  ];
-
-  List<Map<String, dynamic>> get _activeList {
-    if (_activeTab == 0) return _approved;
-    if (_activeTab == 1) return _pending;
-    return _rejected;
-  }
-
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-
-    final filteredLeavesList = _userController.filteredLeavesList;
-
-    _summary = [
-      // {'title': 'Leave Balance', 'value': filteredLeavesList.first.totalLeaves.toString()},
-      // {'title': 'Leave Available', 'value': filteredLeavesList.first.availableLeaves.toString()},
-      // {'title': 'Leave Pending', 'value': filteredLeavesList.first.pendingLeaves.toString()},
-      // {'title': 'Leave Rejected', 'value': filteredLeavesList.first.rejectedLeaves.toString()},
-    ];
-
-  }
-
-
-
   @override
   Widget build(BuildContext context) {
-
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 12),
@@ -107,21 +33,22 @@ class _UserLeavesScreenState extends State<UserLeavesScreen> {
             // Header row
             Row(
               children: [
-                AppTextWidget.large('All Leaves', color: AppThemeColors.textPrimaryColor),
+                AppTextWidget.large('All Leaves',
+                    color: AppThemeColors.textPrimaryColor),
                 const Spacer(),
                 IconButton(
                   onPressed: () {
                     showCommonDialog(
                       context: context,
-                      child: UserApplyLeavesForm(
-
-                      )
+                      child: const UserApplyLeavesForm(),
                     );
                   },
                   icon: Icon(Icons.add, color: AppThemeColors.iconColor),
                 ),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    // TODO: filter/sorting if needed
+                  },
                   icon: Icon(Icons.tune, color: AppThemeColors.iconColor),
                 ),
               ],
@@ -129,64 +56,133 @@ class _UserLeavesScreenState extends State<UserLeavesScreen> {
 
             const SizedBox(height: 12),
 
-            // Summary 2x2 grid
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: _summary.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisExtent: 75,
-                mainAxisSpacing: 10,
-                crossAxisSpacing: 10,
-                childAspectRatio: 1.6,
-              ),
-              itemBuilder: (ctx, idx) {
-                final s = _summary[idx];
-                return _SummaryCard(
-                    title: s['title']!,
-                    value: s['value']!
-                );
-              },
-            ),
+            // Everything below depends on controller data
+            Obx(() {
+              final List<ApplyLeaveRequest> all =
+                  _userController.filteredAppliedLeavesList;
 
-            const SizedBox(height: 14),
+              // Group by status (lowercase for safety)
+              final approved = all
+                  .where((e) =>
+              (e.leaveStatus ?? '').toLowerCase() == 'approved')
+                  .toList();
+              final pending = all
+                  .where((e) =>
+              (e.leaveStatus ?? '').toLowerCase() == 'pending')
+                  .toList();
+              final rejected = all
+                  .where((e) =>
+              (e.leaveStatus ?? '').toLowerCase() == 'rejected')
+                  .toList();
 
-            // Segmented tabs (Approved / Pending / Rejected)
-            CommonContainerWidget(
-              child: Row(
-                children: [
-                  _segButton('Approved', 0),
-                  _segButton('Pending', 1),
-                  _segButton('Rejected', 2),
-                ],
-              ),
-            ),
+              // Active list based on tab
+              List<ApplyLeaveRequest> activeList;
+              if (_activeTab == 0) {
+                activeList = approved;
+              } else if (_activeTab == 1) {
+                activeList = pending;
+              } else {
+                activeList = rejected;
+              }
 
-            const SizedBox(height: 12),
-
-            // List heading + container
-            Align(
-              alignment: Alignment.centerLeft,
-              child: AppTextWidget.medium(
-                _activeTab == 0 ? 'Approved' : (_activeTab == 1 ? 'Pending' : 'Rejected'),
-                color: AppThemeColors.textPrimaryColor,
-              ),
-            ),
-            const SizedBox(height: 10),
-
-            // List of leave cards
-            Expanded(
-              child: ListView.separated(
-                physics: const BouncingScrollPhysics(),
-                itemCount: _activeList.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 10),
-                itemBuilder: (ctx, idx) {
-                  final item = _activeList[idx];
-                  return _LeaveCard(item: item);
+              // Build summary cards data (dynamic)
+              final summary = [
+                {
+                  'title': 'Total Applied',
+                  'value': all.length.toString(),
                 },
-              ),
-            ),
+                {
+                  'title': 'Approved',
+                  'value': approved.length.toString(),
+                },
+                {
+                  'title': 'Pending',
+                  'value': pending.length.toString(),
+                },
+                {
+                  'title': 'Rejected',
+                  'value': rejected.length.toString(),
+                },
+              ];
+
+              return Expanded(
+                child: Column(
+                  children: [
+                    // Summary 2x2 grid
+                    GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: summary.length,
+                      gridDelegate:
+                      const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        mainAxisExtent: 75,
+                        mainAxisSpacing: 10,
+                        crossAxisSpacing: 10,
+                        childAspectRatio: 1.6,
+                      ),
+                      itemBuilder: (ctx, idx) {
+                        final s = summary[idx];
+                        return _SummaryCard(
+                          title: s['title']!,
+                          value: s['value']!,
+                        );
+                      },
+                    ),
+
+                    const SizedBox(height: 14),
+
+                    // Segmented tabs (Approved / Pending / Rejected)
+                    CommonContainerWidget(
+                      child: Row(
+                        children: [
+                          _segButton('Approved', 0),
+                          _segButton('Pending', 1),
+                          _segButton('Rejected', 2),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    // List heading
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: AppTextWidget.medium(
+                        _activeTab == 0
+                            ? 'Approved Leaves'
+                            : (_activeTab == 1
+                            ? 'Pending Leaves'
+                            : 'Rejected Leaves'),
+                        color: AppThemeColors.textPrimaryColor,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+
+                    // List of leave cards / empty state
+                    Expanded(
+                      child: activeList.isEmpty
+                          ? Center(
+                        child: AppTextWidget.small(
+                          'No leaves found',
+                          color: AppThemeColors.muted,
+                        ),
+                      )
+                          : ListView.separated(
+                        physics: const BouncingScrollPhysics(),
+                        itemCount: activeList.length,
+                        separatorBuilder: (_, __) =>
+                        const SizedBox(height: 10),
+                        itemBuilder: (ctx, idx) {
+                          final leave = activeList[idx];
+                          return _LeaveCard(leave: leave);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }),
           ],
         ),
       ),
@@ -202,11 +198,17 @@ class _UserLeavesScreenState extends State<UserLeavesScreen> {
           height: 42,
           margin: const EdgeInsets.symmetric(horizontal: 4),
           decoration: BoxDecoration(
-            color: selected ? AppThemeColors.primaryColor : Colors.transparent,
+            color:
+            selected ? AppThemeColors.primaryColor : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
           ),
           alignment: Alignment.center,
-          child: AppTextWidget.small(label, color: selected ? AppThemeColors.whiteColor : AppThemeColors.textSecondaryColor),
+          child: AppTextWidget.small(
+            label,
+            color: selected
+                ? AppThemeColors.whiteColor
+                : AppThemeColors.textSecondaryColor,
+          ),
         ),
       ),
     );
@@ -217,7 +219,8 @@ class _SummaryCard extends StatelessWidget {
   final String title;
   final String value;
 
-  const _SummaryCard({required this.title, required this.value, Key? key}) : super(key: key);
+  const _SummaryCard({required this.title, required this.value, Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -235,69 +238,161 @@ class _SummaryCard extends StatelessWidget {
 }
 
 class _LeaveCard extends StatelessWidget {
-  final Map<String, dynamic> item;
-  const _LeaveCard({required this.item, Key? key}) : super(key: key);
+  final ApplyLeaveRequest leave;
+  const _LeaveCard({required this.leave, Key? key}) : super(key: key);
 
   Color _statusColor(String s) {
-    if (s.toLowerCase() == 'approved') return AppThemeColors.successColor;
-    if (s.toLowerCase() == 'pending') return AppThemeColors.warningColor;
-    if (s.toLowerCase() == 'rejected' || s.toLowerCase() == 'cancelled') return AppThemeColors.errorColor;
+    final lower = s.toLowerCase();
+    if (lower == 'approved') return AppThemeColors.successColor;
+    if (lower == 'pending') return AppThemeColors.warningColor;
+    if (lower == 'rejected' || lower == 'cancelled') {
+      return AppThemeColors.errorColor;
+    }
     return AppThemeColors.muted;
   }
 
   @override
   Widget build(BuildContext context) {
-    final status = (item['status'] ?? '').toString();
+    final status = (leave.leaveStatus ?? 'pending');
+    final color = _statusColor(status);
+
+    // Range text
+    final from = leave.startDate ?? '';
+    final to = leave.endDate ?? '';
+    final range = (from.isNotEmpty && to.isNotEmpty)
+        ? (from == to ? from : '$from - $to')
+        : (from.isNotEmpty ? from : (to.isNotEmpty ? to : '-'));
+
+    // Leaves count as nice string
+    final days = leave.numberOfLeaves;
+    String daysStr;
+    if (days == null) {
+      daysStr = '-';
+    } else if (days % 1 == 0) {
+      daysStr = days.toInt().toString();
+    } else {
+      daysStr = days.toStringAsFixed(1);
+    }
+
+    final appliedAt = leave.actionDate ?? ''; // e.g. 2025-12-04T13:13...
+
     return CommonCardWidget(
       child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Top row: date range and status chip
-            Row(
-              children: [
-                Expanded(child: AppTextWidget.small(item['range'] ?? '-', color: AppThemeColors.textPrimaryColor)),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: _statusColor(status).withOpacity(0.12),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: _statusColor(status).withOpacity(0.6)),
-                  ),
-                  child: AppTextWidget.verySmall(status.capitalizeFirst ?? status, color: _statusColor(status)),
-                )
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Top row: date range & status chip
+          Row(
+            children: [
+              Expanded(
+                child: AppTextWidget.small(
+                  range,
+                  color: AppThemeColors.textPrimaryColor,
+                ),
+              ),
+              Container(
+                padding:
+                const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: color.withOpacity(0.6)),
+                ),
+                child: AppTextWidget.verySmall(
+                  status.capitalizeFirst ?? status,
+                  color: color,
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 8),
+
+          // Leave type + applied at
+          Row(
+            children: [
+              Icon(Icons.event_note,
+                  size: 16, color: AppThemeColors.iconColor),
+              const SizedBox(width: 4),
+              AppTextWidget.small(
+                leave.leaveType ?? '-',
+                color: AppThemeColors.textPrimaryColor,
+              ),
+              const Spacer(),
+              if (appliedAt.isNotEmpty) ...[
+                Icon(Icons.access_time,
+                    size: 14, color: AppThemeColors.iconColor),
+                const SizedBox(width: 4),
+                AppTextWidget.verySmall(
+                  appliedAt,
+                  color: AppThemeColors.muted,
+                ),
               ],
+            ],
+          ),
+
+          const SizedBox(height: 10),
+
+          // Detail row: days, full/half, approver
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AppTextWidget.verySmall('Applied Days',
+                        color: AppThemeColors.textSecondaryColor),
+                    const SizedBox(height: 4),
+                    AppTextWidget.small(daysStr,
+                        color: AppThemeColors.textPrimaryColor),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AppTextWidget.verySmall('Mode',
+                        color: AppThemeColors.textSecondaryColor),
+                    const SizedBox(height: 4),
+                    AppTextWidget.small(
+                      leave.isHalfDay == true ? 'Half Day' : 'Full Day',
+                      color: AppThemeColors.textPrimaryColor,
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AppTextWidget.verySmall('Approved By',
+                        color: AppThemeColors.textSecondaryColor),
+                    const SizedBox(height: 4),
+                    AppTextWidget.small(
+                      leave.approverByName ?? '-',
+                      color: AppThemeColors.textPrimaryColor,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 10),
+
+          // Reason (one or two lines)
+          if ((leave.reason ?? '').isNotEmpty) ...[
+            AppTextWidget.verySmall('Reason',
+                color: AppThemeColors.textSecondaryColor),
+            const SizedBox(height: 4),
+            AppTextWidget.small(
+              leave.reason ?? '',
+              color: AppThemeColors.textPrimaryColor,
+              maxLines: 2,
             ),
-
-            const SizedBox(height: 12),
-
-            // detail row
-            Row(
-              children: [
-                Expanded(
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    AppTextWidget.verySmall('Apply Days', color: AppThemeColors.textSecondaryColor),
-                    const SizedBox(height: 6),
-                    AppTextWidget.small('${item['days'] ?? '-'}', color: AppThemeColors.textPrimaryColor),
-                  ]),
-                ),
-                Expanded(
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    AppTextWidget.verySmall('Leave Balance', color: AppThemeColors.textSecondaryColor),
-                    const SizedBox(height: 6),
-                    AppTextWidget.small('${item['balance'] ?? '-'}', color: AppThemeColors.textPrimaryColor),
-                  ]),
-                ),
-                Expanded(
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    AppTextWidget.verySmall('Approved By', color: AppThemeColors.textSecondaryColor),
-                    const SizedBox(height: 6),
-                    AppTextWidget.small('${item['approvedBy'] ?? '-'}', color: AppThemeColors.textPrimaryColor),
-                  ]),
-                ),
-              ],
-            )
           ],
-        ),
+        ],
+      ),
     );
   }
 }
