@@ -1,4 +1,4 @@
-package com.example.attedance_management_system
+package com.example.ams
 
 import io.flutter.embedding.android.FlutterActivity
 
