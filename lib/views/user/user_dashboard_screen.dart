@@ -4,10 +4,8 @@ import 'package:attedance_management_system/views/user/user_screens/user_home_pa
 import 'package:attedance_management_system/views/user/user_screens/user_leaves_screen.dart';
 import 'package:attedance_management_system/views/user/user_screens/user_profile_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import '../../core/constants/app_theme_colors.dart';
 import '../../models/user.dart';
-import '../../widgets/app_text_type.dart';
 import '../../widgets/appbar/appbar_widget.dart';
 
 // design reference (if needed): /mnt/data/d2050a7b-a516-429c-9ce0-e2ccd1bb3b90.png
@@ -45,7 +43,6 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print(user.toJson());
 
     return Scaffold(
       appBar: PreferredSize(
@@ -56,16 +53,16 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
         index: _currentIndex,
         children: _pages,
       ),
-      floatingActionButton: _currentIndex == 0
-          ? FloatingActionButton(
-        onPressed: () {
-          // primary quick action on Home (example)
-          Get.snackbar('Action', 'Quick action tapped', snackPosition: SnackPosition.BOTTOM);
-        },
-        backgroundColor: AppThemeColors.primaryColor,
-        child: const Icon(Icons.add),
-      )
-          : null,
+      // floatingActionButton: _currentIndex == 0
+      //     ? FloatingActionButton(
+      //   onPressed: () {
+      //     // primary quick action on Home (example)
+      //     Get.snackbar('Action', 'Quick action tapped', snackPosition: SnackPosition.BOTTOM);
+      //   },
+      //   backgroundColor: AppThemeColors.primaryColor,
+      //   child: const Icon(Icons.add),
+      // )
+      //     : null,
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         selectedItemColor: AppThemeColors.primaryColor,

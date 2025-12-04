@@ -1,14 +1,14 @@
 import 'package:attedance_management_system/core/constants/app_icons.dart';
 import 'package:attedance_management_system/views/admin/admin_screens/admin_profile_screen.dart';
-import 'package:attedance_management_system/widgets/app_icon_button.dart';
-import 'package:attedance_management_system/widgets/app_icons_type.dart';
+import 'package:attedance_management_system/widgets/text_and_icon_widgets/app_icon_button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../controller/admin_controller.dart';
 import '../../controller/auth_controller.dart';
 import '../../core/constants/app_theme_colors.dart';
 import '../../routes/app_routes.dart';
-import '../../widgets/app_text_type.dart';
+import '../../widgets/text_and_icon_widgets/app_icons_type.dart';
+import '../../widgets/text_and_icon_widgets/app_text_type.dart';
 import 'admin_screens/admin_employees_list.dart';
 import 'admin_screens/admin_home_page.dart';
 import 'admin_screens/admin_leaves_screen.dart';

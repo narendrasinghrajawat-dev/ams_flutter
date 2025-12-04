@@ -1,9 +1,9 @@
 
-import 'package:attedance_management_system/widgets/app_text_type.dart';
 import 'package:flutter/material.dart';
 
 import '../../core/constants/app_theme_colors.dart';
 import '../../core/constants/text_styles.dart';
+import '../text_and_icon_widgets/app_text_type.dart';
 
 
 class DropdownFieldWidget extends StatefulWidget {

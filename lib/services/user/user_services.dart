@@ -2,6 +2,7 @@
 import 'package:attedance_management_system/models/punch.dart';
 import 'package:attedance_management_system/core/constants/api_endpoints.dart';
 
+import '../../models/apply_leave_request.dart';
 import '../common/api_service.dart';
 
 /// A small service to call punch APIs.
@@ -69,6 +70,18 @@ class UserService {
   }
 
 
+  Future<bool> applyLeave(ApplyLeaveRequest request) async {
+    try {
+      final res = await _api.post(ApiEndpoints.applyLeaves, request.toJson());
 
+      // If backend returns { message, statusCode, data },
+      // you can inspect `res` here if needed.
+      // For now, if no exception => success.
+      return true;
+    } catch (e) {
+      print('applyLeave error: $e');
+      return false;
+    }
+  }
 
 }

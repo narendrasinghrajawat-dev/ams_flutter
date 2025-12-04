@@ -1,10 +1,12 @@
+import 'package:attedance_management_system/views/user/user_screens/forms/user_apply_leaves_form.dart';
 import 'package:attedance_management_system/widgets/card/common_card.dart';
 import 'package:attedance_management_system/widgets/container/common_container.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../controller/user_controller.dart';
 import '../../../core/constants/app_theme_colors.dart';
-import '../../../widgets/app_text_type.dart';
+import '../../../widgets/common/common_dialong_box.dart';
+import '../../../widgets/text_and_icon_widgets/app_text_type.dart';
 
 class UserLeavesScreen extends StatefulWidget {
   const UserLeavesScreen({Key? key}) : super(key: key);
@@ -84,13 +86,16 @@ class _UserLeavesScreenState extends State<UserLeavesScreen> {
     final filteredLeavesList = _userController.filteredLeavesList;
 
     _summary = [
-      {'title': 'Leave Balance', 'value': filteredLeavesList.first.totalLeaves.toString()},
-      {'title': 'Leave Available', 'value': filteredLeavesList.first.availableLeaves.toString()},
-      {'title': 'Leave Pending', 'value': filteredLeavesList.first.pendingLeaves.toString()},
-      {'title': 'Leave Rejected', 'value': filteredLeavesList.first.rejectedLeaves.toString()},
+      // {'title': 'Leave Balance', 'value': filteredLeavesList.first.totalLeaves.toString()},
+      // {'title': 'Leave Available', 'value': filteredLeavesList.first.availableLeaves.toString()},
+      // {'title': 'Leave Pending', 'value': filteredLeavesList.first.pendingLeaves.toString()},
+      // {'title': 'Leave Rejected', 'value': filteredLeavesList.first.rejectedLeaves.toString()},
     ];
 
   }
+
+
+
   @override
   Widget build(BuildContext context) {
 
@@ -105,7 +110,14 @@ class _UserLeavesScreenState extends State<UserLeavesScreen> {
                 AppTextWidget.large('All Leaves', color: AppThemeColors.textPrimaryColor),
                 const Spacer(),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    showCommonDialog(
+                      context: context,
+                      child: UserApplyLeavesForm(
+
+                      )
+                    );
+                  },
                   icon: Icon(Icons.add, color: AppThemeColors.iconColor),
                 ),
                 IconButton(

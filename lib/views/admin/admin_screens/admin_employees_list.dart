@@ -1,12 +1,12 @@
 import 'package:attedance_management_system/core/constants/app_icons.dart';
-import 'package:attedance_management_system/widgets/app_icon_button.dart';
+import 'package:attedance_management_system/widgets/text_and_icon_widgets/app_icon_button.dart';
 import 'package:attedance_management_system/widgets/card/common_card.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../controller/admin_controller.dart';
 import '../../../core/constants/app_theme_colors.dart';
 import '../../../models/user.dart';
-import '../../../widgets/app_text_type.dart';
+import '../../../widgets/text_and_icon_widgets/app_text_type.dart';
 import '../user_form_screen.dart';
 
 class AdminEmployeesList extends StatelessWidget {

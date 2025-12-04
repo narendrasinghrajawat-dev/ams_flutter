@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../controller/auth_controller.dart';
 import '../../../core/constants/app_theme_colors.dart';
-import '../../../widgets/app_text_type.dart';
 
 class AdminProfileScreen extends StatefulWidget {
   const AdminProfileScreen({Key? key}) : super(key: key);

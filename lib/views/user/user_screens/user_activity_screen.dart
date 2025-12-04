@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/constants/app_theme_colors.dart';
 import '../../../data/utils/app_helper.dart';
-import '../../../widgets/app_text_type.dart';
+import '../../../widgets/text_and_icon_widgets/app_text_type.dart';
 
 class UserActivityScreen extends StatefulWidget {
   const UserActivityScreen({Key? key}) : super(key: key);

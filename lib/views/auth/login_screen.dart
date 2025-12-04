@@ -13,7 +13,7 @@ import '../../models/login.dart';
 import '../../services/common/device_information_service.dart';
 import '../../services/common/location_service.dart';
 import '../../services/common/storage_service.dart';
-import '../../widgets/app_text_type.dart';
+import '../../widgets/text_and_icon_widgets/app_text_type.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);

@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../controller/auth_controller.dart';
 import '../../../core/constants/app_theme_colors.dart';
-import '../../../widgets/app_text_type.dart';
 import '../../../widgets/card/common_card.dart';
+import '../../../widgets/text_and_icon_widgets/app_text_type.dart';
 
 class UserProfileScreen extends StatelessWidget {
   // local sample avatar image uploaded to container (use as demonstration)
