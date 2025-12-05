@@ -2,6 +2,7 @@ import 'package:attedance_management_system/routes/app_pages.dart';
 import 'package:attedance_management_system/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'controller/loading_controller.dart';
 import 'core/bindings/app_binding.dart';
 import 'core/localization/translation.dart';
 import 'core/theme/theme_service.dart';
@@ -13,6 +14,7 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loading = Get.find<LoadingController>();
 
     return GetMaterialApp(
       title: 'AMS',
@@ -26,6 +28,32 @@ class App extends StatelessWidget {
       getPages: AppPages.pages,
       initialRoute: AppRoutes.splashScreen,
       debugShowCheckedModeBanner: false,
+      builder: (context, child) {
+        return Stack(
+          children: [
+            child ?? const SizedBox.shrink(),
+
+            // Global loader overlay (hidden on splash screen)
+            Obx(() {
+              // ALWAYS read the Rx value so Obx can track it
+              final bool isLoading = loading.isLoading.value;
+              final String currentRoute = Get.currentRoute;
+              final bool isSplash = currentRoute == AppRoutes.splashScreen;
+
+              if (isSplash || !isLoading) {
+                return const SizedBox.shrink();
+              }
+
+              return Container(
+                color: Colors.black.withOpacity(0.3),
+                child: const Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
+            }),
+          ],
+        );
+      },
     );
   }
 }

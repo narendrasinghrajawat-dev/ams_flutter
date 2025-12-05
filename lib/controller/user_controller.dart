@@ -3,8 +3,6 @@ import 'package:attedance_management_system/models/attendance_activity.dart';
 import 'package:get/get.dart';
 import '../data/utils/app_helper.dart';
 import '../models/apply_leave_request.dart';
-import '../models/leaves.dart';
-import '../models/punch.dart';
 import '../services/common/storage_service.dart';
 import '../services/user/user_services.dart';
 
@@ -27,7 +25,6 @@ class UserController extends GetxController {
   // reactive state
   final RxBool isLoading = false.obs;
   final RxString currentStatus = ''.obs; // "checked_in" / "checked_out" / ''
-  final RxList<Punch> lastPunches = <Punch>[].obs;
 
   @override
   void onInit() {
@@ -39,32 +36,10 @@ class UserController extends GetxController {
 
   }
 
-  /// Fetch recent punches (last X entries).
-  Future<void> fetchLastPunches({int limit = 10}) async {
-    try {
-      isLoading.value = true;
-      final res = await _service.fetchPunches(limit: limit);
-      if (res != null && res is List) {
-        lastPunches.value = res.map((e) => Punch.fromJson(e)).toList();
-        // set status based on latest entry
-        if (lastPunches.isNotEmpty) {
-          final latest = lastPunches.first;
-          currentStatus.value = latest.punchType?.toLowerCase() == 'checkin' ? 'checked_in' : 'checked_out';
-        } else {
-          currentStatus.value = '';
-        }
-      }
-    } catch (e) {
-      // silently ignore or show error
-      Get.snackbar('Error', 'Failed to load punches');
-    } finally {
-      isLoading.value = false;
-    }
-  }
 
   /// Perform a punch-in.
   /// You can pass optional extras like location, device info, note, etc.
-  Future<bool> punchIn(Punch punchInData) async {
+  Future<bool> punchIn(AttendanceActivity punchInData) async {
     if (isLoading.value) return false;
     isLoading.value = true;
 
@@ -72,8 +47,8 @@ class UserController extends GetxController {
       final res = await _service.punch(punchInData);
       // res expected to be created punch object (map)
       if (res != null) {
-        final punch = Punch.fromJson(res);
-        lastPunches.insert(0, punch);
+        final punch = AttendanceActivity.fromJson(res);
+        filteredAttendanceActivitiesList.insert(0, punch);
         currentStatus.value = 'checked_in';
         Get.snackbar('Success', 'Checked in at ${punch.punchTime}', snackPosition: SnackPosition.BOTTOM);
         return true;
@@ -90,15 +65,15 @@ class UserController extends GetxController {
   }
 
   /// Perform a punch-out.
-  Future<bool> punchOut(Punch punchOutData) async {
+  Future<bool> punchOut(AttendanceActivity punchOutData) async {
     if (isLoading.value) return false;
     isLoading.value = true;
 
     try {
       final res = await _service.punch(punchOutData);
       if (res != null ) {
-        final punch = Punch.fromJson(res);
-        lastPunches.insert(0, punch);
+        final punch = AttendanceActivity.fromJson(res);
+        filteredAttendanceActivitiesList.insert(0, punch);
         currentStatus.value = 'checked_out';
         Get.snackbar('Success', 'Checked out at ${punch.punchTime}', snackPosition: SnackPosition.BOTTOM);
         return true;
@@ -116,7 +91,7 @@ class UserController extends GetxController {
 
   /// Helper: clear history (for debug)
   void clearHistory() {
-    lastPunches.clear();
+    filteredAttendanceActivitiesList.clear();
     currentStatus.value = '';
   }
 
