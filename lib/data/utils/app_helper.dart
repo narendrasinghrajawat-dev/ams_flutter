@@ -179,6 +179,116 @@ class AppHelper {
     return AppThemeColors.muted;
   }
 
+  static DateTime? parseDateTime(String? dateString) {
+    if (dateString == null || dateString.isEmpty) return null;
+    try {
+      return DateTime.parse(dateString);
+    } catch (e) {
+      print('Error parsing date: $dateString - $e');
+      return null;
+    }
+  }
+
+  /// Check if two dates are on the same day
+  static bool isSameDay(DateTime? date1, DateTime? date2) {
+    if (date1 == null || date2 == null) return false;
+    return date1.year == date2.year &&
+        date1.month == date2.month &&
+        date1.day == date2.day;
+  }
+
+  /// Format DateTime to time string (e.g., "2:30 pm")
+  static String formatTime(DateTime? dateTime) {
+    if (dateTime == null) return '--:--';
+    return DateFormat('h:mm a').format(dateTime);
+  }
+
+  /// Format DateTime to date string (e.g., "Dec 05, 2024")
+  static String formatDate(DateTime? dateTime) {
+    if (dateTime == null) return '--';
+    return DateFormat('MMM dd, yyyy').format(dateTime);
+  }
+
+  /// Format DateTime to short date (e.g., "Dec 05")
+  static String formatShortDate(DateTime? dateTime) {
+    if (dateTime == null) return '--';
+    return DateFormat('MMM dd').format(dateTime);
+  }
+
+  /// Format Duration to HH:MM:SS
+  static String formatDuration(Duration duration) {
+    final hh = duration.inHours.toString().padLeft(2, '0');
+    final mm = (duration.inMinutes % 60).toString().padLeft(2, '0');
+    final ss = (duration.inSeconds % 60).toString().padLeft(2, '0');
+    return "$hh:$mm:$ss";
+  }
+
+  /// Get greeting based on current time
+  static String getGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) return 'Morning';
+    if (hour < 17) return 'Afternoon';
+    return 'Evening';
+  }
+
+  /// Get current date at midnight (for comparing dates)
+  static DateTime getTodayStart() {
+    final now = DateTime.now();
+    return DateTime(now.year, now.month, now.day);
+  }
+
+  /// Check if date string is today
+  static bool isToday(String? dateString) {
+    final date = parseDateTime(dateString);
+    if (date == null) return false;
+    return isSameDay(date, DateTime.now());
+  }
+
+  /// Calculate duration between two date strings
+  static Duration? calculateDuration(String? startDate, String? endDate) {
+    final start = parseDateTime(startDate);
+    final end = parseDateTime(endDate);
+    if (start == null || end == null) return null;
+    return end.difference(start);
+  }
+
+  // ==================== ATTENDANCE UTILITIES ====================
+
+  /// Check if attendance record is check-in
+  static bool isCheckIn(String? punchType) {
+    return punchType == '1';
+  }
+
+  /// Check if attendance record is check-out
+  static bool isCheckOut(String? punchType) {
+    return punchType == '2';
+  }
+
+  /// Get punch type label
+  static String getPunchTypeLabel(String? punchType) {
+    if (punchType == '1') return 'Check In';
+    if (punchType == '2') return 'Check Out';
+    return 'Unknown';
+  }
+
+  // ==================== VALIDATION UTILITIES ====================
+
+
+
+  /// Validate location coordinates
+  static bool isValidLocation(String? lat, String? long) {
+    if (lat == null || long == null) return false;
+    try {
+      final latitude = double.parse(lat);
+      final longitude = double.parse(long);
+      return latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180;
+    } catch (e) {
+      return false;
+    }
+  }
+
+
+
 
 }
 

@@ -1,9 +1,13 @@
 // lib/services/api_service.dart
 import 'dart:convert';
 import 'dart:async';
+
 import 'package:attedance_management_system/services/common/storage_service.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
+
+import '../../controller/loading_controller.dart';
 import '../../core/constants/const_strings.dart';
 
 class ApiService {
@@ -12,6 +16,9 @@ class ApiService {
   final String baseUrl = dotenv.env['baseURL'] ?? '';
 
   final Duration timeout = const Duration(seconds: 15);
+
+  // Get global LoadingController
+  LoadingController get _loader => Get.find<LoadingController>();
 
   // -----------------------------
   // COMMON HEADERS
@@ -22,98 +29,93 @@ class ApiService {
     return {
       "Content-Type": "application/json",
       "Accept-Language": acceptLanguage,
-      if (token != null && token.isNotEmpty) "Authorization": "Bearer $token"
+      if (token != null && token.isNotEmpty) "Authorization": "Bearer $token",
     };
+  }
+
+  // -----------------------------
+  // INTERNAL WRAPPER (loader + timeout)
+  // -----------------------------
+  Future<dynamic> _sendRequest(
+      Future<http.Response> Function() requestFn, {
+        bool showLoader = true,
+      }) async {
+    if (showLoader) _loader.start();
+
+    try {
+      final response = await requestFn().timeout(timeout);
+      return _handleResponse(response);
+    } on TimeoutException {
+      throw Exception("Request timed out");
+    } catch (e) {
+      // you can log e here if you want
+      throw Exception("Network error: $e");
+    } finally {
+      if (showLoader) _loader.stop();
+    }
   }
 
   // -----------------------------
   // GET METHOD
   // -----------------------------
-  Future<dynamic> get(String path) async {
+  Future<dynamic> get(String path, {bool showLoader = true}) async {
     final url = Uri.parse("$baseUrl$path");
 
-    print('get start is teh ');
+    print('GET start:');
     print(path);
     print(url);
 
-
-    try {
-      final response = await http.get(url, headers: _headers()).timeout(timeout);
-
-      print('get response is teh ');
-      print(response.statusCode);
-      print(response.body);
-
-      return _handleResponse(response);
-    } catch (e) {
-      throw Exception("GET error: $e");
-    }
+    return _sendRequest(
+          () => http.get(url, headers: _headers()),
+      showLoader: showLoader,
+    );
   }
 
   // -----------------------------
   // POST METHOD
   // -----------------------------
-  Future<dynamic> post(String path, Map<String, dynamic> body) async {
+  Future<dynamic> post(String path, Map<String, dynamic> body,
+      {bool showLoader = true}) async {
     final url = Uri.parse("$baseUrl$path");
-   print('post url is teh $url');
-   print(_headers());
-    print('body is teh ${jsonEncode(body)}');
 
+    print('POST url: $url');
+    print(_headers());
+    print('body: ${jsonEncode(body)}');
 
-    try {
-      final response = await http
-          .post(url, headers: _headers(), body: jsonEncode(body))
-          .timeout(timeout);
-
-      print('post response is teh ');
-      print(response.statusCode);
-      print(response.body);
-
-
-      return _handleResponse(response);
-    } catch (e) {
-      throw Exception("POST error: $e");
-    }
+    return _sendRequest(
+          () => http.post(url, headers: _headers(), body: jsonEncode(body)),
+      showLoader: showLoader,
+    );
   }
 
   // -----------------------------
-  // PUT METHOD
+  // UPDATE (PATCH) METHOD
   // -----------------------------
-  Future<dynamic> update(String path, Map<String, dynamic> body) async {
+  Future<dynamic> update(String path, Map<String, dynamic> body,
+      {bool showLoader = true}) async {
     final url = Uri.parse("$baseUrl$path");
 
-    print('update start is teh $url');
+    print('UPDATE start: $url');
     print(body);
 
-    try {
-      final response = await http
-          .patch(url, headers: _headers(), body: jsonEncode(body))
-          .timeout(timeout);
-
-      print('update resaponse iteh $response');
-      print(response.statusCode);
-      print(response.body);
-
-      return _handleResponse(response);
-    } catch (e) {
-      throw Exception("PUT error: $e");
-    }
+    return _sendRequest(
+          () => http.patch(url, headers: _headers(), body: jsonEncode(body)),
+      showLoader: showLoader,
+    );
   }
 
   // -----------------------------
   // DELETE METHOD
   // -----------------------------
-  Future<dynamic> delete(String path) async {
+  Future<dynamic> delete(String path, {bool showLoader = true}) async {
     final url = Uri.parse("$baseUrl$path");
 
-    try {
-      final response =
-      await http.delete(url, headers: _headers()).timeout(timeout);
+    print('DELETE start: $url');
 
-      return _handleResponse(response);
-    } catch (e) {
-      throw Exception("DELETE error: $e");
-    }
+    return _sendRequest(
+          () => http.delete(url, headers: _headers()),
+      showLoader: showLoader,
+    );
   }
 
   // -----------------------------
@@ -122,7 +124,9 @@ class ApiService {
   dynamic _handleResponse(http.Response response) {
     final status = response.statusCode;
 
-    // decode body
+    print('API response status: $status');
+    print('API response body: ${response.body}');
+
     final body = response.body.isNotEmpty ? jsonDecode(response.body) : null;
 
     if (status == 200 || status == 201) {

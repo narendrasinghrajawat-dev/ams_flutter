@@ -1,8 +1,8 @@
 // lib/services/user/user_service.dart
-import 'package:attedance_management_system/models/punch.dart';
 import 'package:attedance_management_system/core/constants/api_endpoints.dart';
 
 import '../../models/apply_leave_request.dart';
+import '../../models/attendance_activity.dart';
 import '../common/api_service.dart';
 
 /// A small service to call punch APIs.
@@ -10,7 +10,7 @@ import '../common/api_service.dart';
 class UserService {
   final ApiService _api = ApiService();
 
-  Future<Map<String, dynamic>?> punch(Punch punchData) async {
+  Future<Map<String, dynamic>?> punch(AttendanceActivity punchData) async {
     try {
       final resp = await _api.post(ApiEndpoints.punch, punchData.toJson());
       return resp;
