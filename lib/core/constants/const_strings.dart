@@ -22,4 +22,14 @@ class AppStrings {
   static const String loginLat = "login_lat";
   static const String loginLong = "login_long";
 
+
+  static const String pendingStatusKey = "1";
+  static const String approvedStatusKey = "2";
+  static const String rejectedStatusKey = "3";
+
+
+  static const String fullDayKey = "1";
+  static const String halfDayKey = "2";
+
+
 }

@@ -1,3 +1,5 @@
+import 'package:attedance_management_system/core/constants/const_strings.dart';
+import 'package:attedance_management_system/data/utils/app_helper.dart';
 import 'package:attedance_management_system/models/apply_leave_request.dart';
 import 'package:attedance_management_system/views/user/user_screens/forms/user_apply_leaves_form.dart';
 import 'package:attedance_management_system/widgets/card/common_card.dart';
@@ -58,22 +60,12 @@ class _UserLeavesScreenState extends State<UserLeavesScreen> {
 
             // Everything below depends on controller data
             Obx(() {
-              final List<ApplyLeaveRequest> all =
-                  _userController.filteredAppliedLeavesList;
+              final List<ApplyLeaveRequest> all = _userController.filteredAppliedLeavesList;
 
               // Group by status (lowercase for safety)
-              final approved = all
-                  .where((e) =>
-              (e.leaveStatus ?? '').toLowerCase() == 'approved')
-                  .toList();
-              final pending = all
-                  .where((e) =>
-              (e.leaveStatus ?? '').toLowerCase() == 'pending')
-                  .toList();
-              final rejected = all
-                  .where((e) =>
-              (e.leaveStatus ?? '').toLowerCase() == 'rejected')
-                  .toList();
+              final approved = all.where((e) => (e.leaveStatus ?? '').toLowerCase() == 'approved').toList();
+              final pending = all.where((e) => (e.leaveStatus ?? '').toLowerCase() == 'pending').toList();
+              final rejected = all.where((e) => (e.leaveStatus ?? '').toLowerCase() == 'rejected').toList();
 
               // Active list based on tab
               List<ApplyLeaveRequest> activeList;
@@ -144,20 +136,6 @@ class _UserLeavesScreenState extends State<UserLeavesScreen> {
                     ),
 
                     const SizedBox(height: 12),
-
-                    // List heading
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: AppTextWidget.medium(
-                        _activeTab == 0
-                            ? 'Approved Leaves'
-                            : (_activeTab == 1
-                            ? 'Pending Leaves'
-                            : 'Rejected Leaves'),
-                        color: AppThemeColors.textPrimaryColor,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
 
                     // List of leave cards / empty state
                     Expanded(
@@ -241,38 +219,13 @@ class _LeaveCard extends StatelessWidget {
   final ApplyLeaveRequest leave;
   const _LeaveCard({required this.leave, Key? key}) : super(key: key);
 
-  Color _statusColor(String s) {
-    final lower = s.toLowerCase();
-    if (lower == 'approved') return AppThemeColors.successColor;
-    if (lower == 'pending') return AppThemeColors.warningColor;
-    if (lower == 'rejected' || lower == 'cancelled') {
-      return AppThemeColors.errorColor;
-    }
-    return AppThemeColors.muted;
-  }
 
   @override
   Widget build(BuildContext context) {
+
     final status = (leave.leaveStatus ?? 'pending');
-    final color = _statusColor(status);
+    print('status is the $status');
 
-    // Range text
-    final from = leave.startDate ?? '';
-    final to = leave.endDate ?? '';
-    final range = (from.isNotEmpty && to.isNotEmpty)
-        ? (from == to ? from : '$from - $to')
-        : (from.isNotEmpty ? from : (to.isNotEmpty ? to : '-'));
-
-    // Leaves count as nice string
-    final days = leave.numberOfLeaves;
-    String daysStr;
-    if (days == null) {
-      daysStr = '-';
-    } else if (days % 1 == 0) {
-      daysStr = days.toInt().toString();
-    } else {
-      daysStr = days.toStringAsFixed(1);
-    }
 
     final appliedAt = leave.actionDate ?? ''; // e.g. 2025-12-04T13:13...
 
@@ -285,7 +238,7 @@ class _LeaveCard extends StatelessWidget {
             children: [
               Expanded(
                 child: AppTextWidget.small(
-                  range,
+                  "${AppHelper.formatDateString(leave.startDate)} - ${AppHelper.formatDateString(leave.endDate)}" ,
                   color: AppThemeColors.textPrimaryColor,
                 ),
               ),
@@ -293,13 +246,13 @@ class _LeaveCard extends StatelessWidget {
                 padding:
                 const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.12),
+                  color: AppHelper.getLeavesStatusColor(leave.leaveStatus).withOpacity(0.12),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: color.withOpacity(0.6)),
+                  border: Border.all(color: AppHelper.getLeavesStatusColor(leave.leaveStatus).withOpacity(0.6)),
                 ),
                 child: AppTextWidget.verySmall(
                   status.capitalizeFirst ?? status,
-                  color: color,
+                  color: AppHelper.getLeavesStatusColor(leave.leaveStatus),
                 ),
               ),
             ],
@@ -342,7 +295,7 @@ class _LeaveCard extends StatelessWidget {
                     AppTextWidget.verySmall('Applied Days',
                         color: AppThemeColors.textSecondaryColor),
                     const SizedBox(height: 4),
-                    AppTextWidget.small(daysStr,
+                    AppTextWidget.small(leave.numberOfLeaves.toString(),
                         color: AppThemeColors.textPrimaryColor),
                   ],
                 ),
@@ -355,7 +308,7 @@ class _LeaveCard extends StatelessWidget {
                         color: AppThemeColors.textSecondaryColor),
                     const SizedBox(height: 4),
                     AppTextWidget.small(
-                      leave.isHalfDay == true ? 'Half Day' : 'Full Day',
+                      leave.leaveDurationsType == AppStrings.halfDayKey ? 'Half Day' : 'Full Day',
                       color: AppThemeColors.textPrimaryColor,
                     ),
                   ],

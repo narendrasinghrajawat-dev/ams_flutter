@@ -37,6 +37,7 @@ dependencies:
   flutter_dotenv: ^5.2.1
   geolocator: ^14.0.2
   device_info_plus: ^12.2.0
+  intl: ^0.20.2
 
 
 

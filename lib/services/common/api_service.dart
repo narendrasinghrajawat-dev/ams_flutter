@@ -34,6 +34,7 @@ class ApiService {
 
     print('get start is teh ');
     print(path);
+    print(url);
 
 
     try {
@@ -56,7 +57,7 @@ class ApiService {
     final url = Uri.parse("$baseUrl$path");
    print('post url is teh $url');
    print(_headers());
-    print('body is teh $body');
+    print('body is teh ${jsonEncode(body)}');
 
 
     try {

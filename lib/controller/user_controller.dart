@@ -16,13 +16,11 @@ class UserController extends GetxController {
 
 
   RxList<AttendanceActivity> attendanceActivitiesList = <AttendanceActivity>[].obs;
-  RxList<Leaves> leavesList = <Leaves>[].obs;
   RxList<ApplyLeaveRequest> appliedLeaves = <ApplyLeaveRequest>[].obs;
 
-  final RxBool applyingLeave = false.obs;
+  RxBool applyingLeave = false.obs;
 
   List<AttendanceActivity> get filteredAttendanceActivitiesList => attendanceActivitiesList;
-  List<Leaves> get filteredLeavesList => leavesList;
   List<ApplyLeaveRequest> get filteredAppliedLeavesList => appliedLeaves;
 
 
@@ -148,11 +146,13 @@ class UserController extends GetxController {
     try {
       final List<Map<String, dynamic>> res = await _service.fetchLeavesStatus(userKey);
       if (!AppHelper.isEmptyOrNull(res)) {
-        leavesList.clear();
+        appliedLeaves.clear();
         for (var item in res) {
-          final user = Leaves.fromJson(item);
-          leavesList.add(user);
+          final user = ApplyLeaveRequest.fromJson(item);
+          appliedLeaves.add(user);
         }
+
+        appliedLeaves.refresh();
       }
     } catch (e) {
       print('Error loading users: $e');

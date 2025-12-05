@@ -6,6 +6,7 @@ class ApiEndpoints {
   static const login = 'auth/login/';
   static const attendance = 'attendance/';
 
+  static const getAllMasterDataUrl = 'masterData/';
 
 
 

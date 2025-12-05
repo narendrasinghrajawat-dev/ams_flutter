@@ -1,3 +1,6 @@
+// The main data model for a leave request, using the AppJsonHelper for safe type conversions.
+import '../data/utils/app_json_helper.dart';
+
 class ApplyLeaveRequest {
   // Optional fields for database/backend identification
   final String? key;
@@ -10,20 +13,21 @@ class ApplyLeaveRequest {
   final String endDate;       // e.g. "2025-11-23"
   final String reason;
   final String leaveType;     // e.g. "Sick", "Casual"
-  final double numberOfLeaves; // Changed to double to handle half days (e.g., 0.5, 1.5)
-  final bool isFullDay;
-  final bool isHalfDay;
+  final double numberOfLeaves;
+  final String leaveDurationsType; // e.g., "Full Day", "Half Day"
+
+  final bool isActive;
+  final String? modifiedDate;
+  final String? createdDate;
 
   // Fields set by the system/approver (optional upon creation, present upon retrieval)
   final String? leaveStatus;     // e.g. "Pending", "Approved", "Rejected"
   final String? actionDate;      // Date status was set, e.g. "2025-11-23"
-
   final String? approverByName;  // Name of the approver
   final String? approverByKey;   // Key/ID of the approver
 
   // --- Constructor ---
 
-  // Main constructor to initialize all fields. Optional fields should be nullable.
   ApplyLeaveRequest({
     this.key,
     this.id,
@@ -34,8 +38,10 @@ class ApplyLeaveRequest {
     required this.reason,
     required this.leaveType,
     required this.numberOfLeaves,
-    required this.isFullDay,
-    required this.isHalfDay,
+    required this.leaveDurationsType,
+    required this.isActive,
+     this.modifiedDate,
+     this.createdDate,
     this.leaveStatus,
     this.actionDate,
     this.approverByName,
@@ -47,39 +53,39 @@ class ApplyLeaveRequest {
   factory ApplyLeaveRequest.fromJson(Map<String, dynamic> json) {
     print('ApplyLeaveRequest json is the $json');
 
-    // Helper for safe string
-    String _s(dynamic v) => v?.toString() ?? '';
-
-    // Helper for optional string
-    String? _sOrNull(dynamic v) => v == null ? null : v.toString();
+    // Use AppJsonHelper methods for safe and consistent type conversion
 
     return ApplyLeaveRequest(
-      // DB fields
-      key: _sOrNull(json['_key'] ?? json['key']),
-      id: _sOrNull(json['_id'] ?? json['id']),
-      rev: _sOrNull(json['_rev'] ?? json['rev']),
+      // DB fields - using safeNullableString to allow nulls
+      key: AppJsonHelper.safeNullableString(json['_key'] ?? json['key']),
+      id: AppJsonHelper.safeNullableString(json['_id'] ?? json['id']),
+      rev: AppJsonHelper.safeNullableString(json['_rev'] ?? json['rev']),
 
-      // Core request fields (non-nullable in most models -> give defaults)
-      userKey: _s(json['userKey']),
-      startDate: _s(json['fromDate'] ?? json['startDate']),
-      endDate: _s(json['toDate'] ?? json['endDate']),
-      reason: _s(json['reason']),
-      leaveType: _s(json['type'] ?? json['leaveType']),
+      // Core request fields - using safeString or safeDouble
+      userKey: AppJsonHelper.safeString(json['userKey']),
+      startDate: AppJsonHelper.safeString(json['fromDate'] ?? json['startDate']),
+      endDate: AppJsonHelper.safeString(json['toDate'] ?? json['endDate']),
+      reason: AppJsonHelper.safeString(json['reason']),
+      leaveType: AppJsonHelper.safeString(json['type'] ?? json['leaveType']),
 
-      // If backend doesn’t send numberOfLeaves, default to 0.0
-      numberOfLeaves: (json['numberOfLeaves'] is num)
-          ? (json['numberOfLeaves'] as num).toDouble()
-          : 0.0,
+      // Use safeDouble to handle int or string number inputs
+      numberOfLeaves: AppJsonHelper.safeDouble(json['numberOfLeaves']),
 
-      // Booleans (API uses `ishalfDay` and `isFullDay`)
-      isFullDay: (json['isFullDay'] ?? json['isfullDay'] ?? false) as bool,
-      isHalfDay: (json['isHalfDay'] ?? json['ishalfDay'] ?? false) as bool,
+      // Duration Type
+      leaveDurationsType: AppJsonHelper.safeString(
+          json['leaveDurationsType'] ?? json['durationType'],
+          defaultValue: 'Full Day'),
 
-      // Status / metadata
-      leaveStatus: _sOrNull(json['status'] ?? json['leaveStatus']),
-      actionDate: _sOrNull(json['appliedAt'] ?? json['actionDate']),
-      approverByName: _sOrNull(json['approverByName']),
-      approverByKey: _sOrNull(json['approverByKey']),
+      // System/Metadata fields
+      isActive: AppJsonHelper.safeBool(json['isActive']),
+      modifiedDate: AppJsonHelper.safeString(json['modifiedDate'], defaultValue: 'N/A'),
+      createdDate: AppJsonHelper.safeString(json['createdDate'] ?? json['appliedAt'], defaultValue: 'N/A'),
+
+      // Status / Approval fields - using safeNullableString for optional fields
+      leaveStatus: AppJsonHelper.safeNullableString(json['leaveStatus'] ?? json['status']),
+      actionDate: AppJsonHelper.safeNullableString(json['actionDate']),
+      approverByName: AppJsonHelper.safeNullableString(json['approverByName']),
+      approverByKey: AppJsonHelper.safeNullableString(json['approverByKey']),
     );
   }
 
@@ -87,11 +93,12 @@ class ApplyLeaveRequest {
 
   // Includes all fields, even the optional ones, for saving/updating the object.
   Map<String, dynamic> toJson() {
+
     return {
       // Optional database/backend fields
-      if (key != null) 'key': key,
-      if (id != null) 'id': id,
-      if (rev != null) 'rev': rev,
+     'key': key,
+     'id': id,
+     'rev': rev,
 
       // Core Request fields
       'userKey': userKey,
@@ -100,14 +107,15 @@ class ApplyLeaveRequest {
       'reason': reason,
       'leaveType': leaveType,
       'numberOfLeaves': numberOfLeaves,
-      'isFullDay': isFullDay,
-      'isHalfDay': isHalfDay,
-
-      // Status/Approval fields - only include if not null
-      if (leaveStatus != null) 'leaveStatus': leaveStatus,
-      if (actionDate != null) 'actionDate': actionDate,
-      if (approverByName != null) 'approverByName': approverByName,
-      if (approverByKey != null) 'approverByKey': approverByKey,
+      'leaveDurationsType': leaveDurationsType,
+      "leaveStatus" : leaveStatus,
+      // System/Metadata fields
+      'isActive': isActive,
+      'modifiedDate': modifiedDate,
+      'createdDate': createdDate,
+      'actionDate': actionDate,
+      'approverByName': approverByName,
+      'approverByKey': approverByKey,
     };
   }
 }
