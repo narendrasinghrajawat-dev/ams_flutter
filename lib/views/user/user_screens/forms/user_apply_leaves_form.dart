@@ -1,3 +1,8 @@
+import 'package:attedance_management_system/controller/common_controller.dart';
+import 'package:attedance_management_system/core/constants/const_strings.dart';
+import 'package:attedance_management_system/models/masterData.dart';
+import 'package:attedance_management_system/widgets/form_widgets/radio_button_widget.dart';
+import 'package:attedance_management_system/widgets/text_and_icon_widgets/app_icon_button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:attedance_management_system/controller/auth_controller.dart';
@@ -7,56 +12,178 @@ import 'package:attedance_management_system/models/apply_leave_request.dart';
 import 'package:attedance_management_system/widgets/card/common_card.dart';
 import 'package:attedance_management_system/widgets/form_widgets/text_field_widget.dart';
 import 'package:attedance_management_system/widgets/text_and_icon_widgets/app_text_type.dart';
+import '../../../../widgets/form_widgets/dropdown_field_widget.dart';
 
 class UserApplyLeavesForm extends StatefulWidget {
-  const UserApplyLeavesForm({super.key});
+  const UserApplyLeavesForm({super.key, this.editForm});
+
+  final ApplyLeaveRequest? editForm;
 
   @override
   State<UserApplyLeavesForm> createState() => _UserApplyLeavesFormState();
 }
 
 class _UserApplyLeavesFormState extends State<UserApplyLeavesForm> {
-  final _formKey = GlobalKey<FormState>();
-
-  final TextEditingController _reasonC = TextEditingController();
-  final TextEditingController _daysC = TextEditingController(text: '1');
-
-  String _leaveType = 'Casual';
-  DateTime? _startDate;
-  DateTime? _endDate;
-  bool _isFullDay = true;
-  bool _isHalfDay = false;
 
   final UserController _userController = Get.find<UserController>();
   final AuthController _auth = Get.find<AuthController>();
+  final CommonController _commonController = Get.find<CommonController>();
+
+
+
+
+
+  final _formKey = GlobalKey<FormState>();
+
+  final TextEditingController _reasonController = TextEditingController();
+  final TextEditingController _daysController =
+  TextEditingController(text: '1');
+  final TextEditingController _startDateController = TextEditingController();
+  final TextEditingController _endDateController = TextEditingController();
+
+  bool isSaved = false;
+  MasterData? masterData;
+
+  // For API
+  String _leaveType = 'Casual';
+  String? _startDate; // yyyy-MM-dd
+  String? _endDate; // yyyy-MM-dd
+
+  // For date picker
+  DateTime? _startDateTime;
+  DateTime? _endDateTime;
+
+  bool _isFullDay = true;
+  bool _isHalfDay = false;
+
+
+
+  String? leaveTypeId;
+  List<Map<String, dynamic>> leaveTypeList = [];
+
+  String? leaveDurationsId;
+  List<Map<String, dynamic>> leaveDurationsList = [];
 
   @override
-  void dispose() {
-    _reasonC.dispose();
-    _daysC.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+    getMasterData();
+    _initEditData();
+  }
+
+  getMasterData() async {
+    masterData = _commonController.masterData.value;
+    leaveTypeList = masterData!.leaveType
+        .map((item) => item.toJson()) // Converts each MasterDataItem instance to a Map
+        .toList();                     // Collects the resulting Maps into a new List
+
+    leaveDurationsList = masterData!.leaveDurationsType
+        .map((item) => item.toJson()) // Converts each MasterDataItem instance to a Map
+        .toList();
+
+  }
+  Future<void> _initEditData() async {
+
+    final edit = widget.editForm;
+    if (edit == null) return;
+
+    // Reason
+    _reasonController.text = edit.reason ?? '';
+
+    // Days
+    final n = edit.numberOfLeaves;
+    _daysController.text =
+    n % 1 == 0 ? n.toInt().toString() : n.toStringAsFixed(1);
+
+    // Leave type (map backend string to our dropdown)
+    _leaveType = edit.leaveType ?? 'Casual';
+    final typeItem = leaveTypeList
+        .firstWhereOrNull((e) => e['name']?.toLowerCase() == _leaveType.toLowerCase());
+    leaveTypeId = typeItem?['id'];
+
+    // Full / half day
+    leaveDurationsId = _isHalfDay ? '2' : '1';
+
+    // Dates: assume backend sends yyyy-MM-dd or yyyy-MM-ddTHH:mm...
+    if (edit.startDate.isNotEmpty) {
+      _startDate = _normalizeApiDate(edit.startDate!);
+      final dt = DateTime.tryParse(_startDate!);
+      if (dt != null) {
+        _startDateTime = dt;
+        _startDateController.text = _formatDateForUi(dt);
+      }
+    }
+
+    if (edit.endDate != null && edit.endDate!.isNotEmpty) {
+      _endDate = _normalizeApiDate(edit.endDate!);
+      final dt = DateTime.tryParse(_endDate!);
+      if (dt != null) {
+        _endDateTime = dt;
+        _endDateController.text = _formatDateForUi(dt);
+      }
+    }
+  }
+
+  String _normalizeApiDate(String raw) {
+    // If date has time part, keep only date.
+    final parts = raw.split('T');
+    return parts.first;
+  }
+
+  String _formatDateForApi(DateTime d) {
+    final y = d.year.toString().padLeft(4, '0');
+    final m = d.month.toString().padLeft(2, '0');
+    final day = d.day.toString().padLeft(2, '0');
+    return '$y-$m-$day';
+  }
+
+  String _formatDateForUi(DateTime d) {
+    // DD/MM/YYYY or whatever you prefer
+    final day = d.day.toString().padLeft(2, '0');
+    final m = d.month.toString().padLeft(2, '0');
+    final y = d.year.toString();
+    return '$day/$m/$y';
+  }
+
+  errorMessageFunc() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10.0),
+      child: AppTextWidget.medium("Required Field",
+          color: AppThemeColors.errorColor),
+    );
   }
 
   Future<void> _pickStartDate() async {
     final now = DateTime.now();
+    final initial = _startDateTime ?? now;
+    final first = DateTime(now.year - 1);
+    final last = DateTime(now.year + 1);
+
     final picked = await showDatePicker(
       context: context,
-      firstDate: DateTime(now.year - 1),
-      lastDate: DateTime(now.year + 1),
-      initialDate: _startDate ?? now,
+      initialDate: initial,
+      firstDate: first,
+      lastDate: last,
     );
+
     if (picked != null) {
       setState(() {
-        _startDate = picked;
-        if (_endDate != null && _endDate!.isBefore(_startDate!)) {
-          _endDate = _startDate;
+        _startDateTime = picked;
+        _startDate = _formatDateForApi(picked);
+        _startDateController.text = _formatDateForUi(picked);
+
+        // If end date is before start, reset end
+        if (_endDateTime != null && _endDateTime!.isBefore(picked)) {
+          _endDateTime = picked;
+          _endDate = _formatDateForApi(picked);
+          _endDateController.text = _formatDateForUi(picked);
         }
       });
     }
   }
 
   Future<void> _pickEndDate() async {
-    if (_startDate == null) {
+    if (_startDateTime == null) {
       Get.snackbar(
         'Select start date',
         'Please select start date first',
@@ -64,25 +191,36 @@ class _UserApplyLeavesFormState extends State<UserApplyLeavesForm> {
       );
       return;
     }
+
+    final first = _startDateTime!;
+    final last = DateTime(first.year + 1);
+    final initial = _endDateTime ?? first;
+
     final picked = await showDatePicker(
       context: context,
-      firstDate: _startDate!,
-      lastDate: DateTime(_startDate!.year + 1),
-      initialDate: _endDate ?? _startDate!,
+      initialDate: initial,
+      firstDate: first,
+      lastDate: last,
     );
-    if (picked != null) {
-      setState(() => _endDate = picked);
-    }
-  }
 
-  String _formatDate(DateTime? d) {
-    if (d == null) return 'Select date';
-    return '${d.year.toString().padLeft(4, "0")}-${d.month.toString().padLeft(2, "0")}-${d.day.toString().padLeft(2, "0")}';
+    if (picked != null) {
+      setState(() {
+        _endDateTime = picked;
+        _endDate = _formatDateForApi(picked);
+        _endDateController.text = _formatDateForUi(picked);
+      });
+    }
   }
 
   Future<void> _submit() async {
     FocusScope.of(context).unfocus();
+    setState(() {
+      isSaved = true;
+    });
 
+    if (_formKey.currentState?.validate() != true) return;
+
+    // Check date presence
     if (_startDate == null || _endDate == null) {
       Get.snackbar(
         'Missing dates',
@@ -92,11 +230,25 @@ class _UserApplyLeavesFormState extends State<UserApplyLeavesForm> {
       return;
     }
 
-    if (_formKey.currentState?.validate() != true) return;
+    // Check logical order
+    final s = DateTime.tryParse(_startDate!);
+    final e = DateTime.tryParse(_endDate!);
+    if (s != null && e != null && e.isBefore(s)) {
+      Get.snackbar(
+        'Invalid date range',
+        'End date cannot be before start date',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    // Set full/half day based on radio selection
+    _isFullDay = leaveDurationsId == '1';
+    _isHalfDay = leaveDurationsId == '2';
 
     if (!_isFullDay && !_isHalfDay) {
       Get.snackbar(
-        'Select leave type',
+        'Select leave duration',
         'Choose full day or half day',
         snackPosition: SnackPosition.BOTTOM,
       );
@@ -115,184 +267,152 @@ class _UserApplyLeavesFormState extends State<UserApplyLeavesForm> {
       return;
     }
 
-    final int numberOfLeaves = int.tryParse(_daysC.text.trim()) ?? 1;
+    final int numberOfLeaves = int.tryParse(_daysController.text.trim()) ?? 1;
 
     final req = ApplyLeaveRequest(
+      // if you want to keep original key on edit
+      key: widget.editForm?.key,
+      id: widget.editForm?.id,
+      rev: widget.editForm?.rev,
+      isActive: true,
       userKey: userKey,
-      startDate: _formatDate(_startDate),
-      endDate: _formatDate(_endDate),
-      reason: _reasonC.text.trim(),
+      approverByKey:  widget.editForm?.approverByKey,
+      approverByName:  widget.editForm?.approverByName,
+      leaveStatus: widget.editForm?.leaveStatus ?? AppStrings.pendingStatusKey,
+      startDate: _startDate ?? "",
+      endDate: _endDate ?? "",
+      reason: _reasonController.text.trim(),
       leaveType: _leaveType,
       numberOfLeaves: numberOfLeaves.toDouble(),
-      isFullDay: _isFullDay,
-      isHalfDay: _isHalfDay,
+      actionDate: widget.editForm?.actionDate ?? DateTime.now().toString(),
+      leaveDurationsType: widget.editForm?.leaveDurationsType ?? leaveDurationsId!,
+      modifiedDate: '',
+      createdDate: '',
     );
 
-    print('res is the ${req.toJson()}');
+    print('ApplyLeaveRequest payload: ${req.toJson()}');
 
+    // For now we always call applyLeave; if you add update API,
+    // you can branch here on widget.editForm != null.
     final ok = await _userController.applyLeave(req);
 
     if (ok) {
       Get.back();
       Get.snackbar(
         'Success',
-        'Leave applied successfully',
+        widget.editForm == null
+            ? 'Leave applied successfully'
+            : 'Leave updated successfully',
         snackPosition: SnackPosition.BOTTOM,
       );
     } else {
       Get.snackbar(
         'Error',
-        'Failed to apply leave. Try again.',
+        'Failed to submit leave. Try again.',
         snackPosition: SnackPosition.BOTTOM,
       );
     }
   }
 
   @override
+  void dispose() {
+    _reasonController.dispose();
+    _daysController.dispose();
+    _startDateController.dispose();
+    _endDateController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+
+    final isEdit = widget.editForm != null;
+
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Handle bar
-          Center(
-            child: Container(
-              width: 60,
-              height: 5,
-              margin: const EdgeInsets.only(bottom: 12),
-              decoration: BoxDecoration(
-                color: AppThemeColors.dividerColor,
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-          ),
-
+          // Header
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              IconButton(
-                onPressed: () => Get.back(),
-                icon: Icon(Icons.close, color: AppThemeColors.iconColor),
-              ),
               AppTextWidget.large(
-                'Apply Leave',
+                isEdit ? 'Edit Leave' : 'Apply Leave',
                 color: AppThemeColors.textPrimaryColor,
               ),
+              AppIconButtonWidget.large(
+                onPressed: () => Get.back(),
+                icon: Icons.close,
+                color: AppThemeColors.iconColor,
+              ),
             ],
-          ),
-
-          const SizedBox(height: 8),
-          AppTextWidget.verySmall(
-            'Fill the details below to apply for leave.',
-            color: AppThemeColors.muted,
-          ),
-          const SizedBox(height: 16),
+          ).marginOnly(bottom: 10),
 
           Form(
             key: _formKey,
             child: Column(
               children: [
-                // Date range row
-                Row(
-                  children: [
-                    Expanded(
-                      child: InkWell(
-                        onTap: _pickStartDate,
-                        borderRadius: BorderRadius.circular(12),
-                        child: CommonCardWidget(
-                          color: AppThemeColors.cardBackgroundColor,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              AppTextWidget.verySmall(
-                                'Start Date',
-                                color: AppThemeColors.textSecondaryColor,
-                              ),
-                              const SizedBox(height: 6),
-                              AppTextWidget.small(
-                                _startDate == null
-                                    ? 'Select date'
-                                    : _formatDate(_startDate),
-                                color: AppThemeColors.textPrimaryColor,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: InkWell(
-                        onTap: _pickEndDate,
-                        borderRadius: BorderRadius.circular(12),
-                        child: CommonCardWidget(
-                          color: AppThemeColors.cardBackgroundColor,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              AppTextWidget.verySmall(
-                                'End Date',
-                                color: AppThemeColors.textSecondaryColor,
-                              ),
-                              const SizedBox(height: 6),
-                              AppTextWidget.small(
-                                _endDate == null
-                                    ? 'Select date'
-                                    : _formatDate(_endDate),
-                                color: AppThemeColors.textPrimaryColor,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                // Start Date
+                TextFieldWidget(
+                  controller: _startDateController,
+                  labelText: "Start Date",
+                  suffixIcon: const Icon(Icons.date_range),
+                  onTep: _pickStartDate,
+                  keyboardInputType: TextInputType.datetime,
+                  readOnly: true,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Required Field *";
+                    }
+                    return null;
+                  },
+                ),
+
+                // End Date
+                TextFieldWidget(
+                  controller: _endDateController,
+                  labelText: "End Date",
+                  suffixIcon: const Icon(Icons.date_range),
+                  onTep: _pickEndDate,
+                  keyboardInputType: TextInputType.datetime,
+                  readOnly: true,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Required Field *";
+                    }
+                    return null;
+                  },
                 ),
 
                 const SizedBox(height: 14),
 
-                // Leave type dropdown
-                DropdownButtonFormField<String>(
-                  value: _leaveType,
-                  decoration: InputDecoration(
-                    labelText: 'Leave Type',
-                    filled: true,
-                    fillColor: AppThemeColors.cardBackgroundColor,
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide:
-                      BorderSide(color: AppThemeColors.borderColor),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide:
-                      BorderSide(color: AppThemeColors.primaryColor),
-                    ),
-                  ),
-                  items: const [
-                    DropdownMenuItem(
-                      value: 'Casual',
-                      child: Text('Casual Leave'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'Sick',
-                      child: Text('Sick Leave'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'Annual',
-                      child: Text('Annual Leave'),
-                    ),
-                  ],
-                  onChanged: (v) {
-                    if (v != null) setState(() => _leaveType = v);
+                // Leave Type dropdown
+                DropdownFieldWidget(
+                  labelText: "Leave Type",
+                  items: leaveTypeList,
+                  value: leaveTypeId,
+                  onChanged: (value) {
+                    setState(() {
+                      leaveTypeId = value;
+                      final match = leaveTypeList
+                          .firstWhereOrNull((e) => e['id'] == value);
+                      _leaveType = match?['name'] ?? 'Casual';
+                    });
+                  },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Required *";
+                    }
+                    return null;
                   },
                 ),
 
                 const SizedBox(height: 12),
 
-                // Number of days (common text field)
+                // Number of days
                 TextFieldWidget(
-                  controller: _daysC,
+                  controller: _daysController,
                   labelText: 'Number of Leaves',
                   hintText: 'Enter number of days',
                   keyboardInputType: TextInputType.number,
@@ -310,51 +430,45 @@ class _UserApplyLeavesFormState extends State<UserApplyLeavesForm> {
 
                 const SizedBox(height: 12),
 
-                // Full day / Half day toggle
-                Row(
-                  children: [
-                    Expanded(
-                      child: CheckboxListTile(
-                        contentPadding: EdgeInsets.zero,
-                        value: _isFullDay,
-                        onChanged: (v) {
-                          setState(() {
-                            _isFullDay = v ?? false;
-                            if (_isFullDay) _isHalfDay = false;
-                          });
-                        },
-                        title: AppTextWidget.small(
-                          'Full Day',
-                          color: AppThemeColors.textPrimaryColor,
+                // Full day / Half day radio
+                FormField<String>(
+                  initialValue: leaveDurationsId,
+                  builder: (FormFieldState<String> state) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AppRadioListTileFieldWidget(
+                          radioList: leaveDurationsList,
+                          radioId: leaveDurationsId,
+                          onChanged: (String? value) {
+                            if (value != leaveDurationsId) {
+                              setState(() {
+                                leaveDurationsId = value!;
+                                _isFullDay = value == '1';
+                                _isHalfDay = value == '2';
+                              });
+                              state.didChange(value);
+                            }
+                          },
                         ),
-                        controlAffinity: ListTileControlAffinity.leading,
-                      ),
-                    ),
-                    Expanded(
-                      child: CheckboxListTile(
-                        contentPadding: EdgeInsets.zero,
-                        value: _isHalfDay,
-                        onChanged: (v) {
-                          setState(() {
-                            _isHalfDay = v ?? false;
-                            if (_isHalfDay) _isFullDay = false;
-                          });
-                        },
-                        title: AppTextWidget.small(
-                          'Half Day',
-                          color: AppThemeColors.textPrimaryColor,
-                        ),
-                        controlAffinity: ListTileControlAffinity.leading,
-                      ),
-                    ),
-                  ],
+                        if (state.hasError && leaveDurationsId == null)
+                          errorMessageFunc(),
+                      ],
+                    );
+                  },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Required Field *";
+                    }
+                    return null;
+                  },
                 ),
 
                 const SizedBox(height: 12),
 
-                // Reason (common text field, multiline)
+                // Reason
                 TextFieldWidget(
-                  controller: _reasonC,
+                  controller: _reasonController,
                   labelText: 'Reason',
                   hintText: 'Describe your reason for leave',
                   keyboardInputType: TextInputType.multiline,
@@ -368,7 +482,7 @@ class _UserApplyLeavesFormState extends State<UserApplyLeavesForm> {
 
                 const SizedBox(height: 20),
 
-                // Submit button
+                // Submit button / loader
                 Obx(() {
                   if (_userController.applyingLeave.value) {
                     return SizedBox(
@@ -394,7 +508,7 @@ class _UserApplyLeavesFormState extends State<UserApplyLeavesForm> {
                         ),
                       ),
                       child: AppTextWidget.medium(
-                        'Apply Leave',
+                        isEdit ? 'Update Leave' : 'Apply Leave',
                         color: AppThemeColors.whiteColor,
                       ),
                     ),
