@@ -1,4 +1,5 @@
 // lib/modules/user/user_controller.dart
+import 'package:attedance_management_system/core/constants/const_strings.dart';
 import 'package:attedance_management_system/models/attendance_activity.dart';
 import 'package:get/get.dart';
 import '../data/utils/app_helper.dart';
@@ -31,8 +32,11 @@ class UserController extends GetxController {
     super.onInit();
     // optional: load last punches from API/local storage
     // fetchLastPunches();
-    loadAttendanceActivities(AppHelper.getProfileUser().key!);
-    loadLeavesStatus(AppHelper.getProfileUser().key!);
+    if(_storage.readMap(AppStrings.profileJson) != null){
+      loadAttendanceActivities(AppHelper.getProfileUser().key!);
+      loadLeavesStatus(AppHelper.getProfileUser().key!);
+    }
+
 
   }
 

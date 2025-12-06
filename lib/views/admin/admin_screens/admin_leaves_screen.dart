@@ -1,10 +1,14 @@
-import 'package:attedance_management_system/widgets/container/common_container.dart';
+import 'package:attedance_management_system/core/constants/const_strings.dart';
+import 'package:attedance_management_system/data/utils/app_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../controller/admin_controller.dart';
 import '../../../core/constants/app_theme_colors.dart';
+import '../../../models/admin_action.dart';
 import '../../../widgets/card/common_card.dart';
 import '../../../widgets/text_and_icon_widgets/app_text_type.dart';
+// Import the new item widget
+import 'admin_widgets/admin_leaves_screen_widgets.dart';
 
 class AdminLeavesScreen extends StatelessWidget {
   AdminLeavesScreen({Key? key}) : super(key: key);
@@ -12,41 +16,59 @@ class AdminLeavesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CommonCardWidget(child:  Padding(
-          padding: const EdgeInsets.all(12),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+    return CommonCardWidget(
+      child: Padding(
+        padding: const EdgeInsets.only(top: 12.0, left: 12.0, right: 12.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
             AppTextWidget.medium('Leave Requests'.tr, color: AppThemeColors.textPrimaryColor),
-            const SizedBox(height: 8),
-            Obx(() {
-              final list = _admin.leaveRequests;
-              if (list.isEmpty) return Center(child: AppTextWidget.small('No leave requests'.tr, color: AppThemeColors.muted));
-              return Expanded(
-                child: ListView.separated(
+            const SizedBox(height: 16),
+            Expanded(
+              child: Obx(() {
+                final list = _admin.filteredLeaveRequestsList;
+                if (list.isEmpty) {
+                  return Center(child: AppTextWidget.small('No leave requests'.tr, color: AppThemeColors.muted));
+                }
+                return ListView.builder(
                   itemCount: list.length,
-                  separatorBuilder: (_, __) => Divider(color: AppThemeColors.dividerColor),
                   itemBuilder: (_, idx) {
-                    final l = list[idx];
-                    return ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: AppTextWidget.small(l.userName, color: AppThemeColors.textPrimaryColor),
-                      subtitle: AppTextWidget.verySmall('${l.from} → ${l.to}', color: AppThemeColors.muted),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          if (l.status == 'pending') ...[
-                            IconButton(icon: Icon(Icons.check_circle, color: AppThemeColors.successColor), onPressed: () => _admin.approveLeave(l.id)),
-                            IconButton(icon: Icon(Icons.cancel, color: AppThemeColors.errorColor), onPressed: () => _admin.rejectLeave(l.id)),
-                          ] else
-                            AppTextWidget.small(l.status.capitalizeFirst ?? l.status, color: l.status == 'approved' ? AppThemeColors.successColor : AppThemeColors.warningColor),
-                        ],
+                    final leaveRequest = list[idx];
+                    // Use the new dedicated list item widget
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 12.0),
+                      child: LeaveRequestListItem(
+                        leaveRequest: leaveRequest,
+                        // 🟢 ON APPROVE
+                        onApprove: () {
+                          final payload = AdminAction(
+                            leavesId: leaveRequest.key!, // Leaves ID (document _key)
+                            leavesStatus: AppStrings.approvedStatusKey, // Status code for Approved
+                            approveByKey: AppHelper.getProfileUser().key!, // Admin's key
+                          );
+                          _admin.approveLeave(payload);
+                        },
+
+                        // 🔴 ON REJECT
+                        onReject: () {
+                          final payload = AdminAction(
+                            leavesId: leaveRequest.key!, // Leaves ID (document _key)
+                            leavesStatus: AppStrings.rejectedStatusKey, // Status code for Rejected
+                            approveByKey: AppHelper.getProfileUser().key!, // Admin's key
+                          );
+                          _admin.rejectLeave(payload);
+                        },
                       ),
                     );
                   },
-                ),
-              );
-            }),
-          ]),
+                );
+              }),
+            ),
+          ],
         ),
+      ),
     );
   }
 }
+// Assuming ApplyLeaveRequest model is available in the scope
+// class ApplyLeaveRequest {...}

@@ -16,6 +16,9 @@ class ApiEndpoints {
   static const usersList = 'admin/user-list/';
   static const updateUser = 'admin/update-user/';
   static const deleteUser = 'admin/delete-user/';
+  static const getTotalAttendance = 'admin/getTotalAttendance/';
+  static const getAllLeavesRequests = 'admin/getAllLeavesRequests';
+  static const adminActionOnLeaveRequest = 'admin/adminActionOnLeaveRequest/';
 
 
 

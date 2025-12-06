@@ -1,4 +1,7 @@
-import 'package:attedance_management_system/models/device_info.dart'; // Ensure correct path to DeviceInfo
+import 'package:attedance_management_system/models/device_info.dart';
+import 'package:attedance_management_system/data/utils/app_helper.dart';
+
+import '../data/utils/app_json_helper.dart'; // Ensure correct path to AppHelper/AppJsonHelper
 
 class AttendanceActivity {
   // Document Metadata (Metadata is often nullable/optional from a client perspective)
@@ -8,8 +11,10 @@ class AttendanceActivity {
 
   // Core Required Field
   final String userKey;
+  final String? userName; // Added back, often needed for display
 
-  // Optional Fields (Made nullable with '?')
+
+  // Optional Fields
   final String? punchType;
   final String? punchTime;
   final String? punchDate;
@@ -25,44 +30,54 @@ class AttendanceActivity {
     this.key,
     this.id,
     this.rev,
-    required this.userKey, // Still required
-    this.punchType, // Now optional
-    this.punchTime, // Now optional
-    this.punchDate, // Now optional
-    this.lat,       // Now optional
-    this.long,      // Now optional
-    this.createdDate, // Optional
-    this.deviceInfo,  // Now optional
+    required this.userKey,
+    this.userName,
+    // Optional fields
+    this.punchType,
+    this.punchTime,
+    this.punchDate,
+    this.lat,
+    this.long,
+    this.createdDate,
+    this.deviceInfo,
   });
 
-  // 2. fromJson() Method (Handles null values from the server)
+  // 2. fromJson() Method (Handles null values and uses safe helper)
   /// Creates an AttendanceActivity object from a JSON map.
   factory AttendanceActivity.fromJson(Map<String, dynamic> json) {
-    // Note: Use 'as String?' for nullable String fields
-    // Use the null-aware spread operator or conditional logic for nested objects
 
+    // --- Safe String Parsing using AppJsonHelper ---
+    // Handle both '_key' (from DB) and 'key' (potential API response)
+    final key = AppJsonHelper.safeNullableString(json['_key'] ?? json['key']);
+    final id = AppJsonHelper.safeNullableString(json['_id'] ?? json['id']);
+    final rev = AppJsonHelper.safeNullableString(json['_rev'] ?? json['rev']);
+    final userKey = AppJsonHelper.safeNullableString(json['userKey']);
+    final punchTime = AppJsonHelper.safeNullableString(json['punchTime']);
+
+    // --- Nested Object Parsing ---
     DeviceInfo? info;
-    if (json['deviceInfo'] != null) {
+    if (json['deviceInfo'] is Map<String, dynamic>) {
       info = DeviceInfo.fromJson(json['deviceInfo'] as Map<String, dynamic>);
     }
 
     return AttendanceActivity(
-      key: json['_key'] as String?,
-      id: json['_id'] as String?,
-      rev: json['_rev'] as String?,
+      key: key,
+      id: id,
+      rev: rev,
 
-      // We assume userKey is always present (not marked with '?')
-      userKey: json['userKey'] as String,
+      // Handle null userKey with a fallback if needed, though typically required
+      userKey: userKey ?? '',
+      userName: AppJsonHelper.safeNullableString(json['userName']),
 
       // Optional fields
-      punchType: json['punchType'] as String?,
-      punchTime: json['punchTime'] as String?,
-      punchDate: json['punchDate'] as String?,
-      lat: json['lat'] as String?,
-      long: json['long'] as String?,
-      createdDate: json['createdDate'] as String?,
+      punchType: AppJsonHelper.safeNullableString(json['punchType']),
+      punchTime: punchTime,
+      punchDate: AppJsonHelper.safeNullableString(json['punchDate']),
+      lat: AppJsonHelper.safeNullableString(json['lat']),
+      long: AppJsonHelper.safeNullableString(json['long']),
+      createdDate: AppJsonHelper.safeNullableString(json['createdDate']),
 
-      deviceInfo: info, // Assigned the potentially null DeviceInfo object
+      deviceInfo: info,
     );
   }
 
@@ -72,17 +87,15 @@ class AttendanceActivity {
     return {
       "userKey": userKey,
 
-      // We use the null-aware spread operator 'if (fieldName != null)'
-      // or a simple check to only include fields if they are not null.
-
+      // Include optional fields only if they are not null
+      if (userName != null) "userName": userName,
       if (punchType != null) "punchType": punchType,
       if (punchTime != null) "punchTime": punchTime,
       if (punchDate != null) "punchDate": punchDate,
       if (lat != null) "lat": lat,
       if (long != null) "long": long,
 
-      // For the nested object, only include it if it's not null,
-      // and call its toJson() method.
+      // Nested object
       if (deviceInfo != null) "deviceInfo": deviceInfo!.toJson(),
 
       // Metadata (Optional in requests)
@@ -90,6 +103,8 @@ class AttendanceActivity {
       if (id != null) "_id": id,
       if (rev != null) "_rev": rev,
       if (createdDate != null) "createdDate": createdDate,
+
+      // We don't typically send computed fields back
     };
   }
 }

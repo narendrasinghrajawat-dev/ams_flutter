@@ -2,13 +2,13 @@
 import 'dart:async';
 import 'package:attedance_management_system/controller/user_controller.dart';
 import 'package:attedance_management_system/data/utils/app_helper.dart';
+import 'package:attedance_management_system/views/user/user_screens/user_widgets/user_homepage_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/constants/app_theme_colors.dart';
 import '../../../models/attendance_activity.dart';
 import '../../../widgets/card/common_card.dart';
 import '../../../widgets/text_and_icon_widgets/app_text_type.dart';
-import 'homepage_widgets/user_homepage_widgets.dart';
 
 class UserHomePage extends StatefulWidget {
   const UserHomePage({Key? key}) : super(key: key);

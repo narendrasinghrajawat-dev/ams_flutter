@@ -38,6 +38,7 @@ dependencies:
   geolocator: ^14.0.2
   device_info_plus: ^12.2.0
   intl: ^0.20.2
+  custom_refresh_indicator: ^4.0.1
 
 
 
@@ -70,6 +71,8 @@ flutter:
     - env/.env.dev
     - env/.env.test
     - env/.env.prod
+    - assets/
+    - assets/app_icons/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

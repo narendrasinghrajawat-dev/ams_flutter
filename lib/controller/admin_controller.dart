@@ -1,13 +1,76 @@
+import 'package:attedance_management_system/core/constants/const_strings.dart';
+import 'package:attedance_management_system/models/admin_action.dart';
+import 'package:attedance_management_system/models/apply_leave_request.dart';
+import 'package:attedance_management_system/models/attendance_activity.dart';
 import 'package:get/get.dart';
 import 'package:attedance_management_system/data/utils/app_helper.dart';
 import 'package:attedance_management_system/models/user.dart';
-import 'package:attedance_management_system/models/leave_request.dart';
 import 'package:attedance_management_system/services/admin/admin_services.dart';
+import 'package:intl/intl.dart';
 
 class AdminController extends GetxController {
-  RxList<User> users = <User>[].obs;
-  final RxList<LeaveRequest> leaveRequests = <LeaveRequest>[].obs;
   final AdminServices _adminServices = AdminServices();
+
+  RxList<User> users = <User>[].obs;
+  List<User> get filteredUsers => users;
+
+  final RxList<ApplyLeaveRequest> leaveRequestsList = <ApplyLeaveRequest>[].obs;
+  List<ApplyLeaveRequest> get filteredLeaveRequestsList => leaveRequestsList;
+
+
+  final RxList<AttendanceActivity> attendanceList = <AttendanceActivity>[].obs;
+  List<AttendanceActivity> get filteredAttendanceList => attendanceList;
+
+
+
+  String get _todayDateString => DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+  static const String _lateCutoffTime = '10:00:00';
+
+  int get totalEmployees => users.length;
+
+  // 2. Present Today Calculation
+  int get presentToday {
+    final todayAttendance = attendanceList.where(
+          (a) => a.punchDate == _todayDateString && a.punchType == 'IN',
+    );
+    // Count unique users who punched in today
+    return todayAttendance.map((a) => a.userKey).toSet().length;
+  }
+
+  // 3. Late Arrivals Calculation
+  int get lateArrivalsToday {
+    // 1. Filter for all 'IN' punches made today
+    final todayInPunches = attendanceList.where(
+          (a) => a.punchDate == _todayDateString && a.punchType == 'IN',
+    );
+
+    // 2. Identify late users
+    final lateUserKeys = todayInPunches
+        .where((a) {
+      // We only check the time string for simplicity
+      if (a.punchTime == null) return false;
+
+      // This compares '09:05:00' > '09:00:00'
+      return a.punchTime!.compareTo(_lateCutoffTime) > 0;
+    })
+        .map((a) => a.userKey)
+        .toSet(); // Get unique user keys
+
+    return lateUserKeys.length;
+  }
+
+  // 4. On Leave Today (Logic remains the same, assuming status codes are used)
+  int get onLeaveToday => leaveRequestsList.where(
+        (l) => l.leaveStatus == AppStrings.approvedStatusKey,
+  ).length;
+
+  // 5. Pending Leaves (Logic remains the same)
+  int get pendingLeaves => leaveRequestsList.where(
+        (l) => l.leaveStatus == AppStrings.pendingStatusKey,
+  ).length;
+
+
 
   final RxBool loading = false.obs;
 
@@ -15,6 +78,27 @@ class AdminController extends GetxController {
   void onInit() {
     super.onInit();
     _loadUsersList();
+    _loadAllAttendanceList();
+    _loadAllLeavesRequestList();
+  }
+
+
+  List<dynamic> get recentActivityList {
+    final activity = <dynamic>[
+      // Limit attendance to 5 recent items
+      ...attendanceList.take(5),
+      // Include pending leaves as activity
+      ...leaveRequestsList.where((l) => l.leaveStatus == AppStrings.pendingStatusKey),
+    ];
+
+    // Sort all activities by creation date (most recent first)
+    activity.sort((a, b) {
+      DateTime dateA = DateTime.tryParse(a.createdDate ?? '') ?? DateTime(1900);
+      DateTime dateB = DateTime.tryParse(b.createdDate ?? '') ?? DateTime(1900);
+      return dateB.compareTo(dateA); // Descending order
+    });
+
+    return activity.take(8).toList(); // Return top 8 items
   }
 
   _loadUsersList() async {
@@ -36,7 +120,44 @@ class AdminController extends GetxController {
     }
   }
 
-  List<User> get filteredUsers => users;
+  _loadAllAttendanceList() async {
+
+    try {
+      final List<Map<String, dynamic>> res = await _adminServices.fetchAttendanceList();
+      if (!AppHelper.isEmptyOrNull(res)) {
+        attendanceList.clear();
+        for (var item in res) {
+          final user = AttendanceActivity.fromJson(item);
+          attendanceList.add(user);
+        }
+        attendanceList.refresh();
+      }
+    } catch (e) {
+      print('Error loading users: $e');
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  _loadAllLeavesRequestList() async {
+
+    try {
+      final List<Map<String, dynamic>> res = await _adminServices.fetchLeavesList();
+      if (!AppHelper.isEmptyOrNull(res)) {
+        leaveRequestsList.clear();
+        for (var item in res) {
+          final user = ApplyLeaveRequest.fromJson(item);
+          leaveRequestsList.add(user);
+        }
+        leaveRequestsList.refresh();
+      }
+    } catch (e) {
+      print('Error loading users: $e');
+    } finally {
+      loading.value = false;
+    }
+  }
+
 
   /// Add a new user: calls service, on success insert into users list and return created User.
   Future<User?> addUser({required User user }) async {
@@ -119,20 +240,48 @@ class AdminController extends GetxController {
       loading.value = false;
     }
   }
+// ... inside AdminController ...
 
-  void approveLeave(String id) {
-    final idx = leaveRequests.indexWhere((l) => l.id == id);
-    if (idx != -1) {
-      leaveRequests[idx].status = 'approved';
-      leaveRequests.refresh();
+// --- UPDATED FUNCTIONS ---
+
+
+
+  Future<void> approveLeave(AdminAction payload) async {
+    print('approveLeave called');
+    print(payload.toJson());
+
+    // Directly call the service with the complete payload
+    final updatedRequest = await _adminServices.adminActionOnLeave(payload);
+
+    // 1. Update the local list if the backend update was successful
+    if (updatedRequest != null) {
+      final idx = leaveRequestsList.indexWhere((l) => l.key == payload.leavesId);
+      if (idx != -1) {
+        // Use the data returned from the backend (updatedRequest) for a precise refresh
+        leaveRequestsList[idx] = updatedRequest;
+        leaveRequestsList.refresh();
+      }
     }
   }
 
-  void rejectLeave(String id) {
-    final idx = leaveRequests.indexWhere((l) => l.id == id);
-    if (idx != -1) {
-      leaveRequests[idx].status = 'rejected';
-      leaveRequests.refresh();
+  Future<void> rejectLeave(AdminAction payload) async {
+    print('rejectLeave called');
+    print(payload.toJson());
+
+    // Directly call the service with the complete payload
+    final updatedRequest = await _adminServices.adminActionOnLeave(payload);
+
+    // 1. Update the local list if the backend update was successful
+    if (updatedRequest != null) {
+      final idx = leaveRequestsList.indexWhere((l) => l.key == payload.leavesId);
+      if (idx != -1) {
+        // Use the data returned from the backend (updatedRequest) for a precise refresh
+        leaveRequestsList[idx] = updatedRequest;
+        leaveRequestsList.refresh();
+      }
     }
   }
+
+
+
 }

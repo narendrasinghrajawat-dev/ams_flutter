@@ -78,6 +78,7 @@ class AppThemeColors {
 
   static Color get buttonBgColor => isDark ? primaryDarkColor : primaryLightColor;
 
+  static Color get loaderColor => isDark ? primaryDarkColor : primaryLightColor;
 
   static Color get containerBackgroundColor => isDark ? const Color(0xFF121212) : const Color(0xFFF5F5F5);
 
