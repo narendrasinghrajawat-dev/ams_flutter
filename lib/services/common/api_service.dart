@@ -44,6 +44,8 @@ class ApiService {
 
     try {
       final response = await requestFn().timeout(timeout);
+      print('response is the $response');
+
       return _handleResponse(response);
     } on TimeoutException {
       throw Exception("Request timed out");
@@ -62,7 +64,6 @@ class ApiService {
     final url = Uri.parse("$baseUrl$path");
 
     print('GET start:');
-    print(path);
     print(url);
 
     return _sendRequest(
@@ -87,6 +88,26 @@ class ApiService {
       showLoader: showLoader,
     );
   }
+
+
+  Future<dynamic> postWithoutHeaders(String path, Map<String, dynamic> body,
+      {bool showLoader = true}) async {
+    final url = Uri.parse("$baseUrl$path");
+
+    print('POST url: $url');
+    print(_headers());
+    print('body: ${jsonEncode(body)}');
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "Accept-Language": "en",
+    };
+
+    return _sendRequest(
+          () => http.post(url, headers: headers, body: jsonEncode(body)),
+      showLoader: showLoader,
+    );
+  }
+
 
   // -----------------------------
   // UPDATE (PATCH) METHOD

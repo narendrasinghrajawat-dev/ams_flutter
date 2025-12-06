@@ -3,54 +3,51 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../controller/admin_controller.dart';
 import '../../../core/constants/app_theme_colors.dart';
+import '../../../widgets/refresh_screen_widget/icecream_indicator.dart';
 import '../../../widgets/text_and_icon_widgets/app_icons_type.dart';
 import '../../../widgets/text_and_icon_widgets/app_text_type.dart';
+
+// Import the new common dashboard widgets
+import 'admin_widgets/admin_homepage_widgets.dart';
+
 
 class AdminHomePage extends StatelessWidget {
   AdminHomePage({Key? key}) : super(key: key);
 
+  // Get the controller instance
+  final AdminController _admin = Get.find<AdminController>();
+
+  Future<void> _refreshData() async {
+    print('refresh called');
+    // await _admin.refreshAllData(); // Use the central refresh function
+    print('refresh called after data update');
+  }
+
+
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      child: Column(
+    return RefreshIndicatorWidget(
+      onRefresh: _refreshData,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header Section
-            // _buildHeaderSection(),
-            // const SizedBox(height: 24),
-
-            // Statistics Cards Grid
-            _buildStatsGrid(),
+            // Statistics Cards Grid (Dynamic)
+            Obx(() => _buildStatsGrid()),
             const SizedBox(height: 15),
 
-            // Quick Actions Section
+            // Quick Actions Section (Static for now, onTap can be dynamic)
             _buildQuickActions(),
             const SizedBox(height: 10),
 
-            // Recent Activity Section
+            // Recent Activity Section (Dynamic)
             Expanded(
               child: _buildRecentActivity(),
             ),
           ],
         ),
-    );
-  }
-
-  Widget _buildHeaderSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        AppTextWidget.veryLarge(
-          'Dashboard',
-          color: AppThemeColors.textPrimaryColor,
-        ),
-        const SizedBox(height: 8),
-        AppTextWidget.medium(
-          'Welcome back, Admin! Here\'s your overview',
-          color: AppThemeColors.textSecondaryColor,
-        ),
-      ],
+      ),
     );
   }
 
@@ -62,28 +59,29 @@ class AdminHomePage extends StatelessWidget {
       crossAxisSpacing: 16,
       mainAxisSpacing: 16,
       children: [
-        _StatCard(
+        StatCard(
           title: 'Total Employees',
-          value: '48',
-          subtitle: '+2 this week',
+          value: _admin.totalEmployees.toString(),
+          subtitle: 'Total registered staff',
           icon: Icons.people_alt_rounded,
         ),
-        _StatCard(
+        StatCard(
           title: 'Present Today',
-          value: '42',
-          subtitle: '87.5% attendance',
+          value: _admin.presentToday.toString(),
+          // Calculate percentage: (Present / Total) * 100
+          subtitle: '${(_admin.totalEmployees > 0 ? (_admin.presentToday / _admin.totalEmployees) * 100 : 0).toStringAsFixed(1)}% attendance',
           icon: Icons.check_circle_rounded,
         ),
-        _StatCard(
+        StatCard(
           title: 'On Leave',
-          value: '4',
-          subtitle: '2 pending approval',
+          value: _admin.onLeaveToday.toString(),
+          subtitle: '${_admin.pendingLeaves} pending approval',
           icon: Icons.beach_access_rounded,
         ),
-        _StatCard(
+        StatCard(
           title: 'Late Arrivals',
-          value: '2',
-          subtitle: '-50% from last week',
+          value: _admin.lateArrivalsToday.toString(),
+          subtitle: 'Attendance issues today',
           icon: Icons.schedule_rounded,
         ),
       ],
@@ -103,34 +101,30 @@ class AdminHomePage extends StatelessWidget {
           scrollDirection: Axis.horizontal,
           child: Row(
             children: [
-              _ActionCard(
-                icon: Icons.add_circle_outline_rounded,
+              ActionCard(
+                icon: Icons.person_add_alt_1_rounded,
                 title: 'Add Employee',
-                subtitle: 'Register new staff',
                 color: AppThemeColors.primaryColor,
-                onTap: () {},
+                onTap: () => Get.toNamed('/add-employee'), // Example navigation
               ),
               const SizedBox(width: 12),
-              _ActionCard(
+              ActionCard(
                 icon: Icons.calendar_today_rounded,
                 title: 'Manage Leaves',
-                subtitle: 'Approve/reject requests',
                 color: Colors.green,
-                onTap: () {},
+                onTap: () => Get.toNamed('/admin-leaves'), // Example navigation
               ),
               const SizedBox(width: 12),
-              _ActionCard(
+              ActionCard(
                 icon: Icons.bar_chart_rounded,
                 title: 'Reports',
-                subtitle: 'View analytics',
                 color: Colors.purple,
                 onTap: () {},
               ),
               const SizedBox(width: 12),
-              _ActionCard(
+              ActionCard(
                 icon: Icons.settings_rounded,
                 title: 'Settings',
-                subtitle: 'System configuration',
                 color: Colors.blueGrey,
                 onTap: () {},
               ),
@@ -153,7 +147,7 @@ class AdminHomePage extends StatelessWidget {
               color: AppThemeColors.textPrimaryColor,
             ),
             TextButton(
-              onPressed: () {},
+              onPressed: () => Get.toNamed('/activity-log'), // Example navigation
               child: AppTextWidget.small(
                 'View All',
                 color: AppThemeColors.primaryColor,
@@ -162,223 +156,27 @@ class AdminHomePage extends StatelessWidget {
           ],
         ),
         Expanded(
-          child:  ListView(
-              children: [
-                _ActivityItem(
-                  icon: Icons.login_rounded,
-                  title: 'John Doe checked in',
-                  subtitle: 'Today at 08:45 AM',
-                  color: Colors.green,
-                ),
-
-
-                _ActivityItem(
-                  icon: Icons.logout_rounded,
-                  title: 'Jane Smith checked out',
-                  subtitle: 'Today at 05:30 PM',
-                  color: Colors.blue,
-                ),
-                _ActivityItem(
-                  icon: Icons.beach_access_rounded,
-                  title: 'Mike Johnson applied for leave',
-                  subtitle: '2 hours ago',
-                  color: Colors.orange,
-                ),
-                _ActivityItem(
-                  icon: Icons.warning_rounded,
-                  title: 'Late arrival - Sarah Wilson',
-                  subtitle: 'Today at 09:15 AM',
-                  color: Colors.red,
-                ),
-                _ActivityItem(
-                  icon: Icons.check_circle_rounded,
-                  title: 'Leave approved - Robert Brown',
-                  subtitle: 'Yesterday at 03:20 PM',
-                  color: Colors.green,
-                ),
-              ],
-            ),
-          ),
+          child: Obx(() {
+            final list = _admin.recentActivityList;
+            if (_admin.loading.value && list.isEmpty) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (list.isEmpty) {
+              return Center(
+                child: AppTextWidget.small('No recent activity found.', color: AppThemeColors.muted),
+              );
+            }
+            return ListView.builder(
+              padding: EdgeInsets.zero,
+              itemCount: list.length,
+              itemBuilder: (_, idx) {
+                final activity = list[idx];
+                return ActivityItem.fromActivity(activity); // Use the smart factory constructor
+              },
+            );
+          }),
+        ),
       ],
     );
-  }
-}
-
-class _StatCard extends StatelessWidget {
-  final String title;
-  final String value;
-  final String subtitle;
-  final IconData icon;
-
-  const _StatCard({
-    required this.title,
-    required this.value,
-    required this.subtitle,
-    required this.icon,
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return CommonCardWidget(
-      color: AppThemeColors.dashboardCardBackgroundColor,
-      child : Padding(
-        padding: const EdgeInsets.all(0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: AppIconWidget.large(icon),
-                    ),
-                    AppTextWidget.veryLarge(
-                      value,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                AppTextWidget.small(
-                  title,
-                ),
-                const SizedBox(height: 2),
-                AppTextWidget.verySmall(
-                  subtitle,
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _ActionCard extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final Color color;
-  final VoidCallback onTap;
-
-  const _ActionCard({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.color,
-    required this.onTap,
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 140,
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppThemeColors.cardBackgroundColor,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
-          ],
-          border: Border.all(
-            color: Colors.grey.withOpacity(0.1),
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(icon, color: color, size: 24),
-            ),
-            const SizedBox(height: 12),
-            AppTextWidget.small(
-              title,
-              color: AppThemeColors.textPrimaryColor,
-            ),
-            // const SizedBox(height: 4),
-            // AppTextWidget.small(
-            //   subtitle,
-            //   color: AppThemeColors.textSecondaryColor,
-            // ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _ActivityItem extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final Color color;
-
-  const _ActivityItem({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.color,
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return CommonCardWidget(
-      color: AppThemeColors.cardBackgroundColor,
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(icon, color: color, size: 20),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                AppTextWidget.medium(
-                  title,
-                  color: AppThemeColors.textPrimaryColor,
-                ),
-                const SizedBox(height: 4),
-                AppTextWidget.small(
-                  subtitle,
-                  color: AppThemeColors.textSecondaryColor,
-                ),
-              ],
-            ),
-          ),
-          Icon(
-            Icons.chevron_right_rounded,
-            color: Colors.grey.withOpacity(0.5),
-          ),
-        ],
-      ),
-    ).marginOnly(bottom: 5);
   }
 }

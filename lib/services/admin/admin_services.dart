@@ -1,4 +1,6 @@
 import 'package:attedance_management_system/core/constants/api_endpoints.dart';
+import 'package:attedance_management_system/models/admin_action.dart';
+import '../../models/apply_leave_request.dart';
 import '../common/api_service.dart';
 
 class AdminServices {
@@ -28,6 +30,54 @@ class AdminServices {
       return [];
     }
   }
+
+
+  Future<List<Map<String, dynamic>>> fetchAttendanceList() async {
+    try {
+      final apiResponse = await apiService.get(ApiEndpoints.getTotalAttendance);
+      if (apiResponse is List) {
+        final List<Map<String, dynamic>> validatedList = [];
+        for (final item in apiResponse) {
+          if (item is Map<String, dynamic>) {
+            validatedList.add(item);
+          } else {
+            print('Warning: Skipping item with unexpected type: ${item.runtimeType}');
+          }
+        }
+        return validatedList;
+      }
+
+      print('Error: API response was not a list, but was: ${apiResponse.runtimeType}');
+      return [];
+    } catch (e) {
+      print('Failed to fetch user list: $e');
+      return [];
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> fetchLeavesList() async {
+    try {
+      final apiResponse = await apiService.get(ApiEndpoints.getAllLeavesRequests);
+      if (apiResponse is List) {
+        final List<Map<String, dynamic>> validatedList = [];
+        for (final item in apiResponse) {
+          if (item is Map<String, dynamic>) {
+            validatedList.add(item);
+          } else {
+            print('Warning: Skipping item with unexpected type: ${item.runtimeType}');
+          }
+        }
+        return validatedList;
+      }
+
+      print('Error: API response was not a list, but was: ${apiResponse.runtimeType}');
+      return [];
+    } catch (e) {
+      print('Failed to fetch user list: $e');
+      return [];
+    }
+  }
+
 
   /// Create a new user.
   /// Returns the created user JSON on success, or null on failure.
@@ -75,4 +125,22 @@ class AdminServices {
       return false;
     }
   }
+
+
+  /// Delete user by id. Returns true on success.
+  Future<ApplyLeaveRequest?> adminActionOnLeave(AdminAction payload) async {
+    try {
+      final endpoint = "${ApiEndpoints.adminActionOnLeaveRequest}";
+      final apiResponse = await apiService.post(endpoint, payload.toJson());
+      ApplyLeaveRequest  applyLeaveRequest = ApplyLeaveRequest.fromJson(apiResponse);
+      return applyLeaveRequest;
+    } catch (e) {
+      print('Delete user failed: $e');
+      return null;
+    }
+  }
+
+
+
+
 }

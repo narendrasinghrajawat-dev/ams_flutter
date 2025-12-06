@@ -6,6 +6,8 @@ class AppStrings {
   static const String test = "test";
   static const String prod = "prod";
 
+  static const String appName = "AMS";
+
 
   static const String appRoleAdmin = "admin";
   static const String appRoleAdminId = "1";

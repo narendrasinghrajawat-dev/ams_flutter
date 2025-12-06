@@ -8,23 +8,25 @@ class ApplyLeaveRequest {
   final String? rev;
 
   // Required fields for creating a new leave request
-  final String userKey;
-  final String startDate;     // e.g. "2025-11-21"
-  final String endDate;       // e.g. "2025-11-23"
-  final String reason;
-  final String leaveType;     // e.g. "Sick", "Casual"
-  final double numberOfLeaves;
-  final String leaveDurationsType; // e.g., "Full Day", "Half Day"
+  String userKey;
+  String? userName;
 
-  final bool isActive;
-  final String? modifiedDate;
-  final String? createdDate;
+  String startDate;     // e.g. "2025-11-21"
+  String endDate;       // e.g. "2025-11-23"
+  String reason;
+  String leaveType;     // e.g. "Sick", "Casual"
+  double numberOfLeaves;
+  String leaveDurationsType; // e.g., "Full Day", "Half Day"
+
+  bool isActive;
+  String? modifiedDate;
+  String? createdDate;
 
   // Fields set by the system/approver (optional upon creation, present upon retrieval)
-  final String? leaveStatus;     // e.g. "Pending", "Approved", "Rejected"
-  final String? actionDate;      // Date status was set, e.g. "2025-11-23"
-  final String? approverByName;  // Name of the approver
-  final String? approverByKey;   // Key/ID of the approver
+  String? leaveStatus;     // e.g. "Pending", "Approved", "Rejected"
+  String? actionDate;      // Date status was set, e.g. "2025-11-23"
+  String? approverByName;  // Name of the approver
+  String? approverByKey;   // Key/ID of the approver
 
   // --- Constructor ---
 
@@ -33,6 +35,7 @@ class ApplyLeaveRequest {
     this.id,
     this.rev,
     required this.userKey,
+    this.userName,
     required this.startDate,
     required this.endDate,
     required this.reason,
@@ -63,6 +66,8 @@ class ApplyLeaveRequest {
 
       // Core request fields - using safeString or safeDouble
       userKey: AppJsonHelper.safeString(json['userKey']),
+      userName: AppJsonHelper.safeString(json['userName']),
+
       startDate: AppJsonHelper.safeString(json['fromDate'] ?? json['startDate']),
       endDate: AppJsonHelper.safeString(json['toDate'] ?? json['endDate']),
       reason: AppJsonHelper.safeString(json['reason']),

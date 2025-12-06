@@ -1,9 +1,14 @@
 import 'package:attedance_management_system/core/constants/const_strings.dart';
+import 'package:attedance_management_system/models/masterData.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 import 'dart:math';
 
+import '../../controller/common_controller.dart';
 import '../../core/constants/app_theme_colors.dart';
 import '../../models/user.dart';
 import '../../services/common/storage_service.dart';
@@ -178,6 +183,26 @@ class AppHelper {
     }
     return AppThemeColors.muted;
   }
+
+
+  static String getLeavesStatusValue(String? s) {
+
+    final CommonController _commonController = Get.find<CommonController>();
+    MasterData? masterData = _commonController.masterData.value;
+
+    if(s == null || s.isEmpty){
+      return '';
+    }
+
+    final lower = s.toLowerCase();
+    if (lower == AppStrings.approvedStatusKey) return masterData?.leaveStatus.firstWhere((e) => e.id == s).name ?? "";
+    if (lower == AppStrings.pendingStatusKey) return masterData?.leaveStatus.firstWhere((e) => e.id == s).name ?? "";
+    if (lower == AppStrings.rejectedStatusKey) {
+      return masterData?.leaveStatus.firstWhere((e) => e.id == s).name ?? "";
+    }
+    return "";
+  }
+
 
   static DateTime? parseDateTime(String? dateString) {
     if (dateString == null || dateString.isEmpty) return null;

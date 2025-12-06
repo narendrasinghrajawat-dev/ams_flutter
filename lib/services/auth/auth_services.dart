@@ -11,7 +11,7 @@ class AuthServices {
 // Change the signature to accept the Map payload
   Future<Map<String, dynamic>> login(Login loginPayload) async {
     // Use the payload directly in the post request body
-    final resp = await apiService.post(ApiEndpoints.login, loginPayload.toJson());
+    final resp = await apiService.postWithoutHeaders(ApiEndpoints.login, loginPayload.toJson());
     return resp;
   }
 
