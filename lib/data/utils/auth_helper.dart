@@ -1,9 +1,9 @@
 import 'package:get/get.dart';
-import '../../controller/auth_controller.dart';
+import '../../modules/auth/controller/auth_controller.dart';
+import '../../modules/common/services/storage_service.dart';
 import '../../core/constants/const_strings.dart';
-import '../../models/user.dart';
+import '../../modules/models/user.dart';
 import '../../routes/app_routes.dart';
-import '../../services/common/storage_service.dart';
 
 
 class AuthHelper {
@@ -50,8 +50,8 @@ class AuthHelper {
     }
 
     // Decide role-based routing
-    final role = authCtrl.currentUser.value?.role?.toLowerCase() ?? 'user';
-    if (role == 'admin' || role == 'administrator') {
+    final roleId = authCtrl.currentUser.value?.roleId;
+    if (roleId == AppStrings.appRoleAdminId) {
       // Admin — slide from top (visible emphasis)
       _navigate(AppRoutes.adminDashboard, Transition.downToUp);
     } else {

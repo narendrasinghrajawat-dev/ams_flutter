@@ -1,11 +1,13 @@
-import 'package:attedance_management_system/views/splash_screen.dart';
-import 'package:attedance_management_system/views/settings_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import '../controller/auth_controller.dart';
-import '../views/admin/admin_dashboard_screen.dart';
-import '../views/auth/login_screen.dart';
-import '../views/user/user_dashboard_screen.dart';
+import '../modules/admin/binding/admin_root_binding.dart';
+import '../modules/admin/views/admin_dashboard_screen.dart';
+import '../modules/auth/controller/auth_controller.dart';
+import '../modules/auth/views/login_screen.dart';
+import '../modules/common/views/settings_screen.dart';
+import '../modules/common/views/splash_screen.dart';
+import '../modules/user/bindings/user_root_binding.dart';
+import '../modules/user/views/user_dashboard_screen.dart';
 import 'app_routes.dart';
 
 class RoleMiddleware extends GetMiddleware {
@@ -24,8 +26,18 @@ class AppPages {
     GetPage(name: AppRoutes.login, page: () => LoginScreen()),
     GetPage(name: AppRoutes.splashScreen, page: () => SplashScreen()),
     GetPage(name: AppRoutes.settingsScreen, page: () => SettingsScreen(), middlewares: [RoleMiddleware()]),
-    GetPage(name: AppRoutes.adminDashboard, page: () => AdminDashboardScreen(), middlewares: [RoleMiddleware()]),
-    GetPage(name: AppRoutes.userDashboard, page: () => UserDashboardScreen(), middlewares: [RoleMiddleware()]),
+
+    GetPage(
+      name: AppRoutes.userDashboard,
+      page: () => const UserDashboardScreen(),
+      binding: UserRootBinding(),
+    ),
+
+    GetPage(
+      name: AppRoutes.adminDashboard,
+      page: () => const AdminDashboardScreen(),
+      binding: AdminRootBinding(),
+    ),
 
 
   ];

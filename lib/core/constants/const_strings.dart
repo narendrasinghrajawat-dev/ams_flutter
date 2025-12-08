@@ -10,10 +10,10 @@ class AppStrings {
 
 
   static const String appRoleAdmin = "admin";
-  static const String appRoleAdminId = "1";
+  static const String appRoleAdminId = "2";
 
   static const String appRoleUser = "user";
-  static const String appRoleUserId = "2";
+  static const String appRoleUserId = "1";
 
   static const String token = "token";
   static const String profileJson = "profileJson";

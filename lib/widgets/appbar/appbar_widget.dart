@@ -5,7 +5,7 @@ import 'package:get/get_core/src/get_main.dart';
 
 import '../../core/constants/app_icons.dart';
 import '../../core/constants/app_theme_colors.dart';
-import '../../models/user.dart';
+import '../../modules/models/user.dart';
 import '../../routes/app_routes.dart';
 import '../text_and_icon_widgets/app_icon_button.dart';
 import '../text_and_icon_widgets/app_text_type.dart';
@@ -24,7 +24,7 @@ class UserAppBar extends StatelessWidget implements PreferredSizeWidget {
 
 // Helper method to construct the full name
   String get _fullName {
-    final middle = user.middleName.isEmpty ? '' : ' ${user.middleName}';
+    final middle = user.middleName == null ? '' : ' ${user.middleName}';
     return '${user.firstName}$middle ${user.lastName}';
   }
 

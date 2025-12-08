@@ -4,9 +4,9 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get_storage/get_storage.dart';
 import 'app.dart';
-import 'controller/loading_controller.dart';
 import 'core/constants/app_theme_colors.dart';
 import 'core/enums/app_environment.dart';
+import 'modules/common/controller/loading_controller.dart';
 
 
 Future<void> main() async {
