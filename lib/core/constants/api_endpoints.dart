@@ -23,11 +23,11 @@ class ApiEndpoints {
 
 
   // user apis
-  static const punch = 'attendance/punch';
-  static const getAllAttedanceActivity = 'attendance/getAllAttedanceActivity/';
-  static const getAllLeavesStatus = 'leaves/getLeavesStatus/';
+  static const punch = 'user/attendance/punch';
+  static const getAllAttedanceActivity = 'user/attendance/getAllAttedanceActivity/';
+  static const getAllLeavesStatus = 'user/leaves/getLeavesStatus/';
 
-  static const cancelLeaves = 'leaves/cancel/';
-  static const applyLeaves = 'leaves/applyLeaves/';
+  static const applyLeaves = 'user/leaves/applyLeaves/';
+  static const cancelLeaves = 'user/leaves/cancel/';
 
 }
