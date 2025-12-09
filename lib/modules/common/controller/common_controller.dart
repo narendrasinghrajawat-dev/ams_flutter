@@ -23,15 +23,14 @@ class CommonController extends GetxController {
 
   // FIX: Changed return type to Future<void> as the function updates an Rx variable.
   Future<void> getAllMasterData() async {
-    print('loadAttendanceActivities called is the ');
 
     try {
       final Map<String, dynamic> res = await _service.fetchMasterData();
-      MasterData masterDataResult = MasterData.fromJson(res);
 
+      MasterData masterDataResult = MasterData.fromJson(res);
       // FIX: Use .value to assign the new object to the Rx variable.
       masterData.value = masterDataResult;
-
+      masterData.refresh();
     } catch (e) {
       print('Error loading master data: $e');
       // In a real app, you might set an error state here.

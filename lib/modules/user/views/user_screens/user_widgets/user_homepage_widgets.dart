@@ -1,5 +1,7 @@
 
 
+import 'package:attedance_management_system/core/constants/app_icons.dart';
+import 'package:attedance_management_system/widgets/text_and_icon_widgets/app_icons_type.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../../core/constants/app_theme_colors.dart';
@@ -206,11 +208,11 @@ class ActivityTile extends StatelessWidget {
                 if (AppHelper.isValidLocation(activity.lat, activity.long))
                   Row(
                     children: [
-                      Icon(Icons.location_on, size: 12, color: AppThemeColors.muted),
+                      AppIconWidget.small(AppConstIcons.dateIcon,color: AppHelper.isCheckIn(activity.punchType) ? AppThemeColors.successColor.withOpacity(.5) : AppThemeColors.errorColor.withOpacity(.5),),
                       const SizedBox(width: 4),
                       Expanded(
-                        child: AppTextWidget.verySmall(
-                          'Lat: ${activity.lat}, Long: ${activity.long}',
+                        child: AppTextWidget.small(
+                          AppHelper.formatShortDate(punchDateTime),
                           color: AppThemeColors.muted,
                         ),
                       ),
@@ -226,11 +228,7 @@ class ActivityTile extends StatelessWidget {
                 AppHelper.formatTime(punchDateTime),
                 color: AppThemeColors.textPrimaryColor,
               ),
-              const SizedBox(height: 4),
-              AppTextWidget.verySmall(
-                AppHelper.formatShortDate(punchDateTime),
-                color: AppThemeColors.muted,
-              ),
+
             ],
           ),
         ],

@@ -23,7 +23,7 @@ class AppStrings {
 
   static const String loginLat = "login_lat";
   static const String loginLong = "login_long";
-
+  static const String deviceInformation = "device_information";
 
   static const String pendingStatusKey = "1";
   static const String approvedStatusKey = "2";

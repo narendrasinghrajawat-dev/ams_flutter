@@ -1,16 +1,25 @@
 // lib/views/user/user_home_screen.dart
 import 'dart:async';
+
 import 'package:attedance_management_system/data/utils/app_helper.dart';
 import 'package:attedance_management_system/modules/user/controller/user_activity_controller.dart';
 import 'package:attedance_management_system/modules/user/controller/user_home_controller.dart';
 import 'package:attedance_management_system/modules/user/views/user_screens/user_widgets/user_homepage_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../../../core/constants/app_theme_colors.dart';
-import '../../../../../widgets/card/common_card.dart';
-import '../../../../../widgets/text_and_icon_widgets/app_text_type.dart';
-import '../../../models/attendance_activity.dart';
 
+import 'package:attedance_management_system/core/constants/app_theme_colors.dart';
+import 'package:attedance_management_system/widgets/card/common_card.dart';
+import 'package:attedance_management_system/widgets/text_and_icon_widgets/app_text_type.dart';
+
+import 'package:attedance_management_system/core/constants/const_strings.dart';
+import 'package:attedance_management_system/modules/common/controller/common_controller.dart';
+
+import '../../../common/services/device_information_service.dart';
+import '../../../common/services/location_service.dart';
+import '../../../common/services/storage_service.dart';
+import '../../../models/attendance_activity.dart';
+import '../../../models/masterData.dart';
 
 class UserHomeScreen extends StatefulWidget {
   const UserHomeScreen({Key? key}) : super(key: key);
@@ -20,10 +29,12 @@ class UserHomeScreen extends StatefulWidget {
 }
 
 class _UserHomeScreenState extends State<UserHomeScreen> {
-
-
   final UserHomeController _userController = Get.find<UserHomeController>();
-  final UserActivityController _userActivityController = Get.find<UserActivityController>();
+  final UserActivityController _userActivityController =
+  Get.find<UserActivityController>();
+
+  final CommonController _commonController = Get.find<CommonController>();
+  final StorageService _storageService = StorageService();
 
   Timer? _tick;
   Duration _elapsed = Duration.zero;
@@ -42,15 +53,22 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   }
 
   void _initializeTimer() {
+    print('_initializeTimer called ');
+
     final todayCheckIn = _getTodayCheckIn();
     final todayCheckOut = _getTodayCheckOut();
+    print('todayCheckIn $todayCheckIn ');
+    print('todayCheckOut $todayCheckOut ');
 
     if (todayCheckIn != null && todayCheckOut == null) {
+      print('punch chek in is ');
       final checkInTime = AppHelper.parseDateTime(todayCheckIn.punchDate);
       if (checkInTime != null) {
         _startTimer(checkInTime);
       }
     } else if (todayCheckIn != null && todayCheckOut != null) {
+      print('punch out in is ');
+
       final duration = AppHelper.calculateDuration(
         todayCheckIn.punchDate,
         todayCheckOut.punchDate,
@@ -101,6 +119,159 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         .toList();
   }
 
+  // ------------ HELPERS FOR DEVICE & LOCATION VALIDATION ------------
+
+  bool _isSameDevice(
+      Map<String, dynamic> current,
+      Map<String, dynamic> stored,
+      ) {
+    const keys = [
+      'os',
+      'version',
+      'sdkInt',
+      'model',
+      'brand',
+      'androidId',
+      'fingerprint',
+      'uniqueId',
+    ];
+    for (final key in keys) {
+      final currentVal = current[key]?.toString();
+      final storedVal = stored[key]?.toString();
+      if (currentVal != storedVal) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /// Builds an AttendanceActivity for punch with:
+  /// - Current location
+  /// - Office radius validation
+  /// - Same-device validation
+  Future<AttendanceActivity?> _buildPunchActivity(String punchType) async {
+    try {
+      // 1️⃣ Get current location
+      final locRes = await LocationService.instance.getCurrentLocation();
+
+      if (!locRes.ok || locRes.position == null) {
+        Get.snackbar(
+          'Location',
+          locRes.message ?? 'Unable to get current location',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: AppThemeColors.errorColor.withOpacity(0.1),
+        );
+        return null;
+      }
+
+      final double userLat = locRes.position!.latitude;
+      final double userLng = locRes.position!.longitude;
+
+      // 2️⃣ Master data & office radius
+      final MasterData? masterData = _commonController.masterData.value;
+
+      if (masterData == null) {
+        Get.snackbar(
+          'Master Data',
+          'Master data not loaded. Please login again.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: AppThemeColors.errorColor.withOpacity(0.1),
+        );
+        return null;
+      }
+
+      final officeLat = double.tryParse(masterData.officeLat ?? '');
+      final officeLng = double.tryParse(masterData.officeLong ?? '');
+
+      // If officeRadius is int/double in your model:
+      final double? officeRadius = masterData.officeRadius?.toDouble();
+
+      if (officeLat == null || officeLng == null) {
+        Get.snackbar(
+          'Office Location',
+          'Office coordinates are not configured properly.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: AppThemeColors.errorColor.withOpacity(0.1),
+        );
+        return null;
+      }
+
+      final isInsideOfficeRadius = LocationService.instance.isWithinRadius(
+        userLat: userLat,
+        userLng: userLng,
+        targetLat: officeLat,
+        targetLng: officeLng,
+        radiusInMeters: officeRadius ?? 100.0,
+      );
+
+      // 👉 Uncomment this when you want to enforce geo-fence
+      // if (!isInsideOfficeRadius) {
+      //   Get.snackbar(
+      //     'Outside Office Area',
+      //     'You must be within ${officeRadius ?? 100} meters of the office to punch.',
+      //     snackPosition: SnackPosition.BOTTOM,
+      //     backgroundColor: AppThemeColors.warningColor.withOpacity(0.2),
+      //   );
+      //   return null;
+      // }
+
+      // 3️⃣ Device validation: must be same as login device
+      final Map<String, dynamic> currentDeviceMap =
+      await DeviceService.getDeviceInformation();
+
+      final Map<String, dynamic>? storedDeviceMap =
+      _storageService.readMap(AppStrings.deviceInformation);
+      print('storedDeviceMap is the $storedDeviceMap');
+      print('currentDeviceMap is the $currentDeviceMap');
+
+      if (storedDeviceMap == null || storedDeviceMap.isEmpty) {
+        Get.snackbar(
+          'Device Verification',
+          'Device info not found. Please login again.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: AppThemeColors.errorColor.withOpacity(0.1),
+        );
+        return null;
+      }
+
+      if (!_isSameDevice(currentDeviceMap, storedDeviceMap)) {
+        Get.snackbar(
+          'Device Mismatch',
+          'Attendance can be marked only from the device used for login.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: AppThemeColors.errorColor.withOpacity(0.1),
+        );
+        return null;
+      }
+
+      // 4️⃣ Build punch JSON (same format as your existing API)
+      final nowLocal = DateTime.now();
+      final punchJson = {
+        "userKey": AppHelper.getProfileUser().key,
+        "punchType": punchType, // "1" = check-in, "2" = check-out
+        // DB example: punchTime is UTC, punchDate is local
+        "punchTime": nowLocal.toUtc().toIso8601String(),
+        "punchDate": nowLocal.toIso8601String(),
+        "lat": userLat.toString(),
+        "long": userLng.toString(),
+        "deviceInfo": currentDeviceMap,
+      };
+
+      return AttendanceActivity.fromJson(punchJson);
+    } catch (e) {
+      print('Punch build error: $e');
+      Get.snackbar(
+        'Error',
+        'Failed to prepare punch data',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: AppThemeColors.errorColor.withOpacity(0.1),
+      );
+      return null;
+    }
+  }
+
+  // ---------------------- CHECK-IN / CHECK-OUT ----------------------
+
   void _onCheckIn() async {
     if (_busy) return;
 
@@ -118,29 +289,15 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
     setState(() => _busy = true);
 
-    var json = {
-      "userKey": AppHelper.getProfileUser().key,
-      "punchType": "1",
-      "punchTime": TimeOfDay.now().toString(),
-      "punchDate": DateTime.now().toIso8601String(),
-      "lat": "25",
-      "long": "78",
-      "deviceInformation": {
-        "os": "Android",
-        "version": "12",
-        "sdkInt": 31,
-        "model": "2201117PI",
-        "brand": "Oppo",
-        "device": "miel"
-      }
-    };
+    // Build punch with location + office radius + device validation
+    final activity = await _buildPunchActivity("1");
 
-    final success = await _userController.punch(AttendanceActivity.fromJson(json));
+    if (activity != null) {
+      final success = await _userController.punch(activity);
 
-    if (success) {
-      final checkIn = _getTodayCheckIn();
-      if (checkIn != null) {
-        final checkInTime = AppHelper.parseDateTime(checkIn.punchDate);
+      if (success) {
+        // ✅ Start timer from this activity directly
+        final checkInTime = AppHelper.parseDateTime(activity.punchDate);
         if (checkInTime != null) {
           _startTimer(checkInTime);
         }
@@ -178,32 +335,19 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
     setState(() => _busy = true);
 
-    var json = {
-      "userKey": AppHelper.getProfileUser().key,
-      "punchType": "2",
-      "punchTime": TimeOfDay.now().toString(),
-      "punchDate": DateTime.now().toIso8601String(),
-      "lat": "25",
-      "long": "78",
-      "deviceInformation": {
-        "os": "Android",
-        "version": "12",
-        "sdkInt": 31,
-        "model": "2201117PI",
-        "brand": "Oppo",
-        "device": "miel"
-      }
-    };
+    // Build punch with location + office radius + device validation
+    final activity = await _buildPunchActivity("2");
 
-    final success = await _userController.punch(AttendanceActivity.fromJson(json));
+    if (activity != null) {
+      final success = await _userController.punch(activity);
 
-    if (success) {
-      _stopTimer();
-      final checkOut = _getTodayCheckOut();
-      if (checkOut != null) {
+      if (success) {
+        _stopTimer();
+
+        // ✅ Use punchDate from the checkout activity itself
         final duration = AppHelper.calculateDuration(
           todayCheckIn.punchDate,
-          checkOut.punchDate,
+          activity.punchDate,
         );
         if (duration != null) {
           setState(() {
@@ -215,6 +359,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
     setState(() => _busy = false);
   }
+
+  // ---------------------- STATS / UI HELPERS ----------------------
 
   Color _getStatusColor() {
     final todayCheckIn = _getTodayCheckIn();
@@ -238,7 +384,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     double total = 0.0;
     final grouped = <String, List<AttendanceActivity>>{};
 
-    for (var activity in _userActivityController.filteredAttendanceActivitiesList) {
+    for (var activity
+    in _userActivityController.filteredAttendanceActivitiesList) {
       if (activity.punchDate != null) {
         final dateTime = AppHelper.parseDateTime(activity.punchDate);
         if (dateTime != null) {
@@ -250,11 +397,14 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     }
 
     grouped.forEach((date, activities) {
-      final checkIn = activities.firstWhereOrNull((a) => AppHelper.isCheckIn(a.punchType));
-      final checkOut = activities.firstWhereOrNull((a) => AppHelper.isCheckOut(a.punchType));
+      final checkIn =
+      activities.firstWhereOrNull((a) => AppHelper.isCheckIn(a.punchType));
+      final checkOut =
+      activities.firstWhereOrNull((a) => AppHelper.isCheckOut(a.punchType));
 
       if (checkIn != null && checkOut != null) {
-        final duration = AppHelper.calculateDuration(checkIn.punchDate, checkOut.punchDate);
+        final duration =
+        AppHelper.calculateDuration(checkIn.punchDate, checkOut.punchDate);
         if (duration != null) {
           total += duration.inMinutes / 60.0;
         }
@@ -276,8 +426,11 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         .length;
   }
 
+  // ---------------------- BUILD UI ----------------------
+
   @override
   Widget build(BuildContext context) {
+
     return Obx(() {
       final todayCheckIn = _getTodayCheckIn();
       final todayCheckOut = _getTodayCheckOut();
@@ -285,7 +438,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
       final totalDays = _getTotalDays();
       final totalHoursWorked = _calculateTotalHours();
-      final averageHours = totalDays > 0 ? totalHoursWorked / totalDays : 0.0;
+      final averageHours =
+      totalDays > 0 ? totalHoursWorked / totalDays : 0.0;
 
       final bool canCheckIn = todayCheckIn == null;
       final bool canCheckOut = todayCheckIn != null && todayCheckOut == null;
@@ -294,9 +448,15 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       final checkInTime = AppHelper.parseDateTime(todayCheckIn?.punchDate);
       final checkOutTime = AppHelper.parseDateTime(todayCheckOut?.punchDate);
 
+      print('checkInTime ios the $checkInTime');
+      print('checkOutTime ios the $checkOutTime');
+      print('_elapsed ios the $_elapsed');
+
+
       return SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
+          padding:
+          const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
           child: Column(
             children: [
               // Header Section
@@ -334,11 +494,13 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                       children: [
                         Expanded(
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            crossAxisAlignment:
+                            CrossAxisAlignment.start,
                             children: [
                               AppTextWidget.small(
                                 'Today\'s Work Time',
-                                color: AppThemeColors.textSecondaryColor,
+                                color:
+                                AppThemeColors.textSecondaryColor,
                               ),
                               const SizedBox(height: 8),
                               if (!canCheckIn && !isCompleted) ...[
@@ -379,13 +541,25 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                                 height: 48,
                                 width: 140,
                                 child: ElevatedButton.icon(
-                                  onPressed: _busy ? null : _onCheckIn,
-                                  icon: const Icon(Icons.login_rounded, color: Colors.white, size: 20),
-                                  label: AppTextWidget.medium('Check In', color: Colors.white),
+                                  onPressed:
+                                  _busy ? null : _onCheckIn,
+                                  icon: const Icon(
+                                    Icons.login_rounded,
+                                    color: Colors.white,
+                                    size: 20,
+                                  ),
+                                  label: AppTextWidget.medium(
+                                    'Check In',
+                                    color: Colors.white,
+                                  ),
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppThemeColors.successColor,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                    backgroundColor:
+                                    AppThemeColors.successColor,
+                                    shape:
+                                    RoundedRectangleBorder(
+                                      borderRadius:
+                                      BorderRadius.circular(
+                                          12),
                                     ),
                                     elevation: 0,
                                   ),
@@ -396,13 +570,25 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                                 height: 48,
                                 width: 140,
                                 child: ElevatedButton.icon(
-                                  onPressed: _busy ? null : _onCheckOut,
-                                  icon: const Icon(Icons.logout_rounded, color: Colors.white, size: 20),
-                                  label: AppTextWidget.medium('Check Out', color: Colors.white),
+                                  onPressed:
+                                  _busy ? null : _onCheckOut,
+                                  icon: const Icon(
+                                    Icons.logout_rounded,
+                                    color: Colors.white,
+                                    size: 20,
+                                  ),
+                                  label: AppTextWidget.medium(
+                                    'Check Out',
+                                    color: Colors.white,
+                                  ),
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppThemeColors.errorColor,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                    backgroundColor:
+                                    AppThemeColors.errorColor,
+                                    shape:
+                                    RoundedRectangleBorder(
+                                      borderRadius:
+                                      BorderRadius.circular(
+                                          12),
                                     ),
                                     elevation: 0,
                                   ),
@@ -413,19 +599,32 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                                 height: 48,
                                 width: 140,
                                 decoration: BoxDecoration(
-                                  color: AppThemeColors.muted.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: AppThemeColors.borderColor),
+                                  color: AppThemeColors.muted
+                                      .withOpacity(0.1),
+                                  borderRadius:
+                                  BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: AppThemeColors
+                                        .borderColor,
+                                  ),
                                 ),
                                 child: Center(
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisAlignment:
+                                    MainAxisAlignment
+                                        .center,
                                     children: [
-                                      Icon(Icons.check_circle, color: AppThemeColors.successColor, size: 20),
+                                      Icon(
+                                        Icons.check_circle,
+                                        color: AppThemeColors
+                                            .successColor,
+                                        size: 20,
+                                      ),
                                       const SizedBox(width: 6),
                                       AppTextWidget.medium(
                                         'Completed',
-                                        color: AppThemeColors.textSecondaryColor,
+                                        color: AppThemeColors
+                                            .textSecondaryColor,
                                       ),
                                     ],
                                   ),
@@ -449,7 +648,9 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                     child: AttendanceCard(
                       title: 'Check In',
                       time: AppHelper.formatTime(checkInTime),
-                      subtitle: todayCheckIn != null ? 'On Time' : 'Not recorded',
+                      subtitle: todayCheckIn != null
+                          ? 'On Time'
+                          : 'Not recorded',
                       icon: Icons.login_outlined,
                       color: AppThemeColors.successColor,
                       isRecorded: todayCheckIn != null,
@@ -460,7 +661,9 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                     child: AttendanceCard(
                       title: 'Check Out',
                       time: AppHelper.formatTime(checkOutTime),
-                      subtitle: todayCheckOut != null ? 'Completed' : 'Not recorded',
+                      subtitle: todayCheckOut != null
+                          ? 'Completed'
+                          : 'Not recorded',
                       icon: Icons.logout_outlined,
                       color: AppThemeColors.errorColor,
                       isRecorded: todayCheckOut != null,
@@ -505,9 +708,13 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                   ),
                   const SizedBox(width: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
-                      color: AppThemeColors.primaryColor.withOpacity(0.1),
+                      color: AppThemeColors.primaryColor
+                          .withOpacity(0.1),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: AppTextWidget.verySmall(
@@ -525,11 +732,15 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 child: todayActivities.isEmpty
                     ? const EmptyActivityState()
                     : ListView.separated(
-                  physics: const BouncingScrollPhysics(),
+                  physics:
+                  const BouncingScrollPhysics(),
                   itemCount: todayActivities.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 10),
+                  separatorBuilder: (_, __) =>
+                  const SizedBox(height: 10),
                   itemBuilder: (ctx, idx) {
-                    return ActivityTile(activity: todayActivities[idx]);
+                    return ActivityTile(
+                      activity: todayActivities[idx],
+                    );
                   },
                 ),
               ),

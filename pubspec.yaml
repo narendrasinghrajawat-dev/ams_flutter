@@ -39,6 +39,7 @@ dependencies:
   device_info_plus: ^12.2.0
   intl: ^0.20.2
   custom_refresh_indicator: ^4.0.1
+  location: ^6.0.0
 
 
 

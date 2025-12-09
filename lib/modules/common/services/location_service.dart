@@ -1,6 +1,6 @@
 // lib/services/location/location_service.dart
 import 'dart:async';
-import 'dart:io' show Platform;
+import 'dart:math' as math;
 import 'package:geolocator/geolocator.dart';
 
 class LocationResult {
@@ -69,4 +69,37 @@ class LocationService {
       return LocationResult(ok: false, message: 'Failed to get location: $e');
     }
   }
+
+  double _degToRad(double deg) => deg * (math.pi / 180.0);
+
+
+  /// Returns distance (in meters) between two lat/long points.
+  double calculateDistanceInMeters(double startLat, double startLng, double endLat, double endLng,) {
+    const earthRadius = 6371000.0; // meters
+
+    final dLat = _degToRad(endLat - startLat);
+    final dLng = _degToRad(endLng - startLng);
+
+    final a = math.sin(dLat / 2) * math.sin(dLat / 2) +
+        math.cos(_degToRad(startLat)) *
+            math.cos(_degToRad(endLat)) *
+            math.sin(dLng / 2) *
+            math.sin(dLng / 2);
+
+    final c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
+
+    return earthRadius * c;
+  }
+
+  /// ✅ Common function: is user within given radius of target (e.g. office)?
+  bool isWithinRadius({required double userLat, required double userLng, required double targetLat, required double targetLng, double radiusInMeters = 100.0,}) {
+    final distance = calculateDistanceInMeters(userLat, userLng, targetLat, targetLng);
+
+    print('Distance user–office: $distance meters');
+
+    return distance <= radiusInMeters;
+  }
+
+
+
 }
