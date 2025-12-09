@@ -21,6 +21,30 @@ class AppJsonHelper{
     return v.toString();
   }
 
+  static int? safeNullableInt(dynamic v) {
+    if (v == null) {
+      return null;
+    }
+
+    if (v is int) {
+      return v;
+    }
+
+    if (v is String) {
+      return int.tryParse(v);
+    }
+
+    if (v is double) {
+      if (v == v.truncateToDouble()) {
+        return v.toInt();
+      }
+      return null;
+    }
+
+    // For any other type (bool, List, Map, etc.), return null.
+    return null;
+  }
+
   /// Converts any dynamic value to a non-nullable bool.
   /// Handles string representations of booleans ("true", "false") and defaults to false.
   static bool safeBool(dynamic v, {bool defaultValue = false}) {

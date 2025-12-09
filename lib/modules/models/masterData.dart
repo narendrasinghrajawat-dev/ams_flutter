@@ -15,6 +15,9 @@ class MasterData {
   final List<MasterDataItem> leaveDurationsType;
   final List<MasterDataItem> leaveType;
   final List<MasterDataItem> role;
+  final String? officeLat;
+  final String? officeLong;
+  final int? officeRadius;
 
   MasterData({
     this.key,
@@ -24,9 +27,15 @@ class MasterData {
     required this.leaveDurationsType,
     required this.leaveType,
     required this.role,
+    this.officeLat,
+    this.officeLong,
+    this.officeRadius
   });
 
   factory MasterData.fromJson(Map<String, dynamic> json) {
+
+    print('master json si the $json');
+
     // Helper function to safely parse a list of maps into a List<MasterDataItem>
     List<MasterDataItem> _parseList(dynamic listData) {
       if (listData is List) {
@@ -42,12 +51,18 @@ class MasterData {
       key: AppJsonHelper.safeNullableString(json['_key'] ?? json['key']),
       id: AppJsonHelper.safeNullableString(json['_id'] ?? json['id']),
       rev: AppJsonHelper.safeNullableString(json['_rev'] ?? json['rev']),
+      officeLat: AppJsonHelper.safeNullableString(json['officeLat'] ?? json['officeLat']),
+      officeLong: AppJsonHelper.safeNullableString(json['officeLong'] ?? json['officeLong']),
+      officeRadius: AppJsonHelper.safeNullableInt(json['officeRadius'] ?? json['officeRadius']),
+
 
       // Parsing the nested lists
       leaveStatus: _parseList(json['leaveStatus']),
       leaveDurationsType: _parseList(json['leaveDurationsType']),
       leaveType: _parseList(json['leaveType']),
       role: _parseList(json['role']),
+
+
     );
   }
 
@@ -57,12 +72,17 @@ class MasterData {
       if (key != null) '_key': key,
       if (id != null) '_id': id,
       if (rev != null) '_rev': rev,
-
       // Configuration lists (converting item models back to JSON maps)
       'leaveStatus': leaveStatus.map((item) => item.toJson()).toList(),
       'leaveDurationsType': leaveDurationsType.map((item) => item.toJson()).toList(),
       'leaveType': leaveType.map((item) => item.toJson()).toList(),
       'role': role.map((item) => item.toJson()).toList(),
+
+      'officeLat': officeLat,
+      'officeLong': officeLong,
+      'officeRadius': officeRadius,
+
+
     };
   }
 }

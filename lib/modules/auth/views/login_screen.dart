@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:attedance_management_system/core/constants/const_strings.dart';
+import 'package:attedance_management_system/modules/common/controller/common_controller.dart';
+import 'package:attedance_management_system/modules/models/masterData.dart';
 import 'package:attedance_management_system/widgets/card/common_card.dart';
 import 'package:attedance_management_system/widgets/container/common_container.dart';
 import 'package:attedance_management_system/widgets/form_widgets/text_field_widget.dart';
@@ -26,6 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final AuthController _auth = Get.find<AuthController>();
   final _box = GetStorage();
   final StorageService storageService = StorageService();
+  final CommonController _commonController = Get.find<CommonController>();
 
   final TextEditingController emailC = TextEditingController();
   final TextEditingController passC = TextEditingController();
@@ -38,10 +43,10 @@ class _LoginScreenState extends State<LoginScreen> {
   void initState() {
     super.initState();
     // load saved email if remember-me was used before
-    final saved = _box.read('remember_me') ?? false;
+    final saved = _box.read(AppStrings.rememberMe) ?? false;
     rememberMe.value = saved;
     if (saved) {
-      final savedEmail = _box.read('saved_email') as String?;
+      final savedEmail = _box.read(AppStrings.savedEmail) as String?;
       if (savedEmail != null) emailC.text = savedEmail;
     }
 
@@ -76,49 +81,87 @@ class _LoginScreenState extends State<LoginScreen> {
     double? lng;
     try {
       final locRes = await LocationService.instance.getCurrentLocation();
+
       if (locRes.ok && locRes.position != null) {
         lat = locRes.position!.latitude;
         lng = locRes.position!.longitude;
 
-        // Save strings for potential reuse (e.g., immediate punch-in)
         storageService.saveString(AppStrings.loginLat, lat.toString());
         storageService.saveString(AppStrings.loginLong, lng.toString());
       } else {
-        // Location not available — inform user but continue login
         final message = locRes.message != null && locRes.message!.isNotEmpty
             ? locRes.message!
             : 'Location not available';
         Get.snackbar('Location', message, snackPosition: SnackPosition.BOTTOM);
+        return;
       }
     } catch (e) {
       print('Location error: $e');
-      Get.snackbar('Location', 'Failed to retrieve location', snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(
+        'Location',
+        'Failed to retrieve location',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
     }
 
+    // --- Master Data & Office Radius Validation ---
+    MasterData? masterData = _commonController.masterData.value;
+    print('master data is the ${jsonEncode(masterData?.toJson())}');
+
+    if (lat == null || lng == null) {
+      Get.snackbar(
+        'Location',
+        'Unable to get your current location.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    final officeLat = double.tryParse(masterData?.officeLat ?? '');
+    final officeLng = double.tryParse(masterData?.officeLong ?? '');
+    final officeRadius = masterData?.officeRadius;
+
+    if (officeLat == null || officeLng == null) {
+      Get.snackbar(
+        'Office Location',
+        'Office coordinates are not configured properly.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    final isInsideOfficeRadius = LocationService.instance.isWithinRadius(
+      userLat: lat,
+      userLng: lng,
+      targetLat: officeLat,
+      targetLng: officeLng,
+      radiusInMeters: officeRadius?.toDouble() ?? 100, // 100 meters
+    );
     // --- Device Information Retrieval ---
     final Map<String, dynamic> deviceDataMap = await DeviceService.getDeviceInformation();
+
     final DeviceInfo deviceInformation = DeviceInfo.fromJson(deviceDataMap);
 
-    print('login lat long is the $lat and $lng');
-    print("deviceData is the ${deviceInformation.toJson()}");
-
     // --- Create Login Model and Call Auth Service ---
-    // If location is null, we use 0.0 or handle the error appropriately based on backend requirement
     final loginPayload = Login(
       email: emailC.text.trim(),
       password: passC.text.trim(),
-      lat: lat ?? 0.0,
-      long: lng ?? 0.0,
+      lat: lat,
+      long: lng,
       deviceInformation: deviceInformation,
     );
 
-    // Call auth controller with the complete model
     await _auth.login(loginPayload);
 
     if (!_auth.isLoggedIn && !_auth.loading.value) {
-      Get.snackbar('Login failed', 'Please check credentials', snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(
+        'Login failed',
+        'Please check credentials',
+        snackPosition: SnackPosition.BOTTOM,
+      );
     } else {
-      // Optional post-login logic
+      storageService.saveMap(AppStrings.deviceInformation, deviceInformation.toJson());
     }
   }
 
@@ -235,19 +278,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           const SizedBox(height: 18),
 
                           // Login button / loader
-                          Obx(() {
-                            if (_auth.loading.value) {
-                              return SizedBox(
-                                height: 48,
-                                child: Center(
-                                  child: CircularProgressIndicator(
-                                    valueColor: AlwaysStoppedAnimation(AppThemeColors.primaryColor),
-                                  ),
-                                ),
-                              );
-                            }
-
-                            return SizedBox(
+                           SizedBox(
                               width: double.infinity,
                               height: 48,
                               child: ElevatedButton(
@@ -260,8 +291,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                                 child: AppTextWidget.medium('login'.tr, color: Colors.white),
                               ),
-                            );
-                          }),
+                            ),
 
                           const SizedBox(height: 12),
 

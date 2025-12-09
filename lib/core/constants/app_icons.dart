@@ -12,4 +12,8 @@ class AppConstIcons{
   static const editIcon = Icons.edit;
   static const deleteIcon = Icons.delete;
 
+  static const dateIcon = Icons.date_range;
+
+
+
 }
