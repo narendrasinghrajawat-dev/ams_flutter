@@ -1,4 +1,5 @@
 import 'package:attedance_management_system/data/utils/app_helper.dart';
+import 'package:attedance_management_system/modules/models/leave_balance.dart';
 import 'package:get/get.dart';
 
 import '../../models/apply_leave_request.dart';
@@ -12,8 +13,10 @@ class UserLeavesController extends GetxController {
   final RxBool isCancelling = false.obs;
 
   final RxList<ApplyLeaveRequest> appliedLeaves = <ApplyLeaveRequest>[].obs;
+  final RxList<LeaveBalance> leaveBalance = <LeaveBalance>[].obs;
 
   List<ApplyLeaveRequest> get filteredAppliedLeavesList => appliedLeaves;
+  List<LeaveBalance> get filteredLeaveBalanceList => leaveBalance;
 
 
 
@@ -24,15 +27,40 @@ class UserLeavesController extends GetxController {
     final user = AppHelper.getProfileUser();
     if (user.key != null) {
       loadLeavesStatus(user.key!);
+      loadLeavesBalance(user.key!);
     }
   }
 
   Future<void> refreshLeaves() async {
     final userKey = AppHelper.getProfileUser().key!;
     await loadLeavesStatus(userKey);
+    await loadLeavesBalance(userKey);
+
   }
 
+  // Controller Class Method
 
+  Future<void> loadLeavesBalance(String userKey) async {
+    try {
+      isLoading.value = true;
+
+      // This line now correctly receives a List<Map<String, dynamic>>
+      final List<Map<String, dynamic>> res =
+      await _service.fetchLeavesBalance(userKey);
+
+      leaveBalance
+        ..clear()
+      // Mapping from the correct List is now successful
+        ..addAll(res.map((e) => LeaveBalance.fromJson(e)));
+
+      leaveBalance.refresh();
+    } catch (e) {
+      // The print line has a typo in the original code, corrected here.
+      print('UserLeavesController.loadLeavesBalance error: $e');
+    } finally {
+      isLoading.value = false;
+    }
+  }
 
   Future<void> loadLeavesStatus(String userKey) async {
     try {

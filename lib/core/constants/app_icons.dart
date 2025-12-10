@@ -14,6 +14,8 @@ class AppConstIcons{
 
   static const dateIcon = Icons.date_range;
 
+  static const backIcon = Icons.arrow_back;
+  static const saveIcon = Icons.save;
 
 
 }

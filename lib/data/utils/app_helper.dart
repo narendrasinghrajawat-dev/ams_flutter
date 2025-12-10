@@ -46,32 +46,6 @@ class AppHelper {
 
   /// Converts a string like "TimeOfDay(18:52)" into a displayable time "06:52 PM".
 
-  /// Converts a string like "TimeOfDay(18:52)" into a displayable time "06:52 PM".
-  static String formatTimeString(String punchTime, BuildContext context) {
-    // Expected format: "TimeOfDay(HH:mm)"
-    try {
-      // 1. Extract the time string "18:52"
-      final timeString = punchTime.replaceAll('TimeOfDay(', '').replaceAll(')', '').trim();
-      final parts = timeString.split(':');
-
-      if (parts.length != 2) return punchTime;
-
-      final hour = int.parse(parts[0]);
-      final minute = int.parse(parts[1]);
-
-      // 2. Create the TimeOfDay object
-      final timeOfDay = TimeOfDay(hour: hour, minute: minute);
-
-      // 3. Use the format() method with BuildContext to get the localized time string
-      // This is what converts 18:52 to 6:52 PM (or 18:52 depending on locale settings)
-      return timeOfDay.format(context);
-
-    } catch (e) {
-      // Log or handle error if parsing fails
-      debugPrint('Error formatting punch time: $e, Input: $punchTime');
-      return 'Invalid Time';
-    }
-  }
 
 // --- How to use it in your Widget ---
 //
@@ -152,17 +126,30 @@ class AppHelper {
   }
 
 
-  static String formateTimeString(String? inputDate) {
+
+  static String formatTimeString(String? inputDate, {String format = 'HH:mm:ss', bool localize = true,}) {
     if (AppHelper.isEmptyOrNull(inputDate)) {
       return "";
     }
 
-    DateTime dateTime = DateTime.parse(inputDate!);
+    try {
+      DateTime dateTime = DateTime.parse(inputDate!);
+      DateTime finalDateTime = dateTime;
 
-    // Format the time to HH:mm
-    return DateFormat('HH:mm').format(dateTime);
+      // 1. Convert to local time if the input is UTC (indicated by the 'Z' or lack of zone info)
+      if (localize) {
+        finalDateTime = dateTime.toLocal();
+      }
+
+      // 2. Format using the specified pattern
+      return DateFormat(format).format(finalDateTime);
+
+    } catch (e) {
+      // 3. Robust error handling
+      print("Error parsing date '$inputDate': $e");
+      return "Invalid Time";
+    }
   }
-
 
   // Helper function to get month abbreviation (optional, can use Intl package too)
   static String _getMonthAbbreviation(int month) {

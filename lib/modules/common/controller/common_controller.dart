@@ -13,6 +13,7 @@ class CommonController extends GetxController {
 
   // Example list that uses the converted data (List<Map<String, dynamic>>)
   final RxList<Map<String, dynamic>> leaveTypeListMaps = <Map<String, dynamic>>[].obs;
+  Rx<MasterData?> get getMasterData => masterData;
 
 
   @override

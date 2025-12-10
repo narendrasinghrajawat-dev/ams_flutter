@@ -39,7 +39,7 @@ class _UserActivityScreenState extends State<UserActivityScreen> {
 
                   // --- FIX APPLIED HERE: Use AppHelper for formatting ---
                   final String formattedTime = activity.punchTime != null
-                      ? AppHelper.formatTimeString(activity.punchTime!, context)
+                      ? AppHelper.formatTimeString(activity.punchTime!)
                       : 'N/A';
 
                   final String formattedDate = activity.punchDate != null
@@ -61,13 +61,11 @@ class _UserActivityScreenState extends State<UserActivityScreen> {
   }
 
   // NOTE: Removed 'type' from required parameters as it's not used in the UI logic now
-  Widget _buildActivityTile({
-    required String time,
-    required String date,
-    required bool isCheckIn,
-  }) {
+  Widget _buildActivityTile({required String time, required String date, required bool isCheckIn,}) {
     final Color color =
     isCheckIn ? AppThemeColors.successColor : AppThemeColors.errorColor;
+    print(time);
+
 
     final IconData icon =
     isCheckIn ? Icons.login_rounded : Icons.logout_rounded;

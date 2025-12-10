@@ -1,5 +1,6 @@
 import 'package:attedance_management_system/core/constants/app_icons.dart';
 import 'package:attedance_management_system/modules/admin/views/user_form_screen.dart';
+import 'package:attedance_management_system/widgets/common/common_dialong_box.dart';
 import 'package:attedance_management_system/widgets/text_and_icon_widgets/app_icon_button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -43,12 +44,15 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   ];
 
   void _openAddUser() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => const UserForm(),
-    );
+
+    showCommonDialog(context: context, child:  UserForm());
+
+    // showModalBottomSheet(
+    //   context: context,
+    //   isScrollControlled: true,
+    //   backgroundColor: Colors.transparent,
+    //   builder: (_) => const UserForm(),
+    // );
   }
 
   /// 🔹 Called whenever bottom nav tab is changed

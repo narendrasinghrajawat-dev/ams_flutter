@@ -15,6 +15,8 @@ class MasterData {
   final List<MasterDataItem> leaveDurationsType;
   final List<MasterDataItem> leaveType;
   final List<MasterDataItem> role;
+  final List<MasterDataItem> gender;
+
   final String? officeLat;
   final String? officeLong;
   final int? officeRadius;
@@ -27,6 +29,8 @@ class MasterData {
     required this.leaveDurationsType,
     required this.leaveType,
     required this.role,
+    required this.gender,
+
     this.officeLat,
     this.officeLong,
     this.officeRadius
@@ -61,6 +65,7 @@ class MasterData {
       leaveDurationsType: _parseList(json['leaveDurationsType']),
       leaveType: _parseList(json['leaveType']),
       role: _parseList(json['role']),
+      gender: _parseList(json['gender']),
 
 
     );
@@ -77,6 +82,7 @@ class MasterData {
       'leaveDurationsType': leaveDurationsType.map((item) => item.toJson()).toList(),
       'leaveType': leaveType.map((item) => item.toJson()).toList(),
       'role': role.map((item) => item.toJson()).toList(),
+      'gender': gender.map((item) => item.toJson()).toList(),
 
       'officeLat': officeLat,
       'officeLong': officeLong,
