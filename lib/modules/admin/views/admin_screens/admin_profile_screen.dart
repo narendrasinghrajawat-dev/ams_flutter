@@ -271,7 +271,7 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        user?.role ?? 'Admin',
+                        user?.roleId ?? 'Admin',
                         style: const TextStyle(
                           fontSize: 14,
                           color: Colors.white,

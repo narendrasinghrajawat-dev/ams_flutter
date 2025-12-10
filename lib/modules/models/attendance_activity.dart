@@ -24,7 +24,7 @@ class AttendanceActivity {
   final String? createdDate;
 
   // Optional Nested Object
-  final DeviceInfo? deviceInfo;
+  final DeviceInfo? deviceInformation;
 
   // 1. Constructor
   AttendanceActivity({
@@ -40,7 +40,7 @@ class AttendanceActivity {
     this.lat,
     this.long,
     this.createdDate,
-    this.deviceInfo,
+    this.deviceInformation,
   });
 
   // 2. fromJson() Method (Handles null values and uses safe helper)
@@ -57,8 +57,8 @@ class AttendanceActivity {
 
     // --- Nested Object Parsing ---
     DeviceInfo? info;
-    if (json['deviceInfo'] is Map<String, dynamic>) {
-      info = DeviceInfo.fromJson(json['deviceInfo'] as Map<String, dynamic>);
+    if (json['deviceInformation'] is Map<String, dynamic>) {
+      info = DeviceInfo.fromJson(json['deviceInformation'] as Map<String, dynamic>);
     }
 
     return AttendanceActivity(
@@ -78,7 +78,7 @@ class AttendanceActivity {
       long: AppJsonHelper.safeNullableString(json['long']),
       createdDate: AppJsonHelper.safeNullableString(json['createdDate']),
 
-      deviceInfo: info,
+      deviceInformation: info,
     );
   }
 
@@ -97,7 +97,7 @@ class AttendanceActivity {
       if (long != null) "long": long,
 
       // Nested object
-      if (deviceInfo != null) "deviceInfo": deviceInfo!.toJson(),
+      if (deviceInformation != null) "deviceInformation": deviceInformation!.toJson(),
 
       // Metadata (Optional in requests)
       if (key != null) "_key": key,

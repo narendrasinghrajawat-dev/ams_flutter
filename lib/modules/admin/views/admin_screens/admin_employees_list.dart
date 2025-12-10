@@ -1,5 +1,6 @@
 import 'package:attedance_management_system/core/constants/app_icons.dart';
 import 'package:attedance_management_system/data/utils/app_helper.dart';
+import 'package:attedance_management_system/widgets/common/common_dialong_box.dart';
 import 'package:attedance_management_system/widgets/text_and_icon_widgets/app_icon_button.dart';
 import 'package:attedance_management_system/widgets/card/common_card.dart';
 import 'package:flutter/material.dart';
@@ -141,12 +142,7 @@ class _UserTile extends StatelessWidget {
                 icon: AppConstIcons.editIcon,
                 color: AppThemeColors.editIconColors,
                 onPressed: () {
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                    builder: (_) => UserForm(initialData: user),
-                  );
+                  showCommonDialog(context: context, child: UserForm(initialData: user));
                 },
               ).marginOnly(bottom: 5),
               AppIconButtonWidget.medium(

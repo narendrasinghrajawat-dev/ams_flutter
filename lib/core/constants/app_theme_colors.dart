@@ -241,6 +241,11 @@ class AppThemeColors {
 
 
 
+  // SnackBar Color
+  static Color get snackBarSuccessColor => isDark ? Colors.green : Colors.green;
+  static Color get snackBarErrorColor => isDark ? Colors.red : Colors.green;
+  static Color get snackBarWarningColor => isDark ? Colors.yellow : Colors.green;
+  static Color get snackBarInfoColor => isDark ? Colors.green : Colors.green;
 
 
 }

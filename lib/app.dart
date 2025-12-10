@@ -2,6 +2,7 @@ import 'package:attedance_management_system/routes/app_pages.dart';
 import 'package:attedance_management_system/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'core/constants/app_theme_colors.dart';
 import 'modules/common/controller/loading_controller.dart';
 import 'core/bindings/app_binding.dart';
 import 'core/localization/translation.dart';
@@ -41,16 +42,14 @@ class App extends StatelessWidget {
               final String currentRoute = Get.currentRoute;
               final bool isSplash = currentRoute == AppRoutes.splashScreen;
 
-              print('app loaidnd id dh$isLoading');
-
               if (isSplash || !isLoading) {
                 return const SizedBox.shrink();
               }
 
               return Container(
                 color: Colors.black.withOpacity(0.3),
-                child: const Center(
-                  child: CircularProgressIndicator(),
+                child: Center(
+                  child: CircularProgressIndicator(color:  AppThemeColors.loaderColor,),
                 ),
               );
             }),

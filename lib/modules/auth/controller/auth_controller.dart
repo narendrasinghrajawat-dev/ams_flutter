@@ -15,7 +15,7 @@ class AuthController extends GetxController {
   final RxBool loading = false.obs;
 
   bool get isLoggedIn => currentUser.value != null;
-  bool get isAdmin => currentUser.value?.role == AppStrings.appRoleAdmin;
+  bool get isAdmin => currentUser.value?.roleId == AppStrings.appRoleAdminId;
 
 // Change the signature to accept the Login model
   Future<void> login(Login loginPayload) async {

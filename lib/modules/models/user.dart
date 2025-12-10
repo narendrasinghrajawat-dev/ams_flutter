@@ -13,10 +13,9 @@ class User {
   final String phoneNo;
   final String username;
   final String dob;
-  final String genderId;
-  final String departmentId;
-  final String role;
-  final String roleId;
+  final String? genderId;
+  final String? departmentId;
+  final String? roleId;
   final String password;
   final String? profileImageS3Key;
   final String? profileImageNetworkKey;
@@ -34,10 +33,9 @@ class User {
     required this.phoneNo,
     required this.username,
     required this.dob,
-    required this.genderId,
-    required this.departmentId,
-    required this.role,
-    required this.roleId,
+    this.genderId,
+    this.departmentId,
+    this.roleId,
     required this.password,
     this.address,
     this.profileImageS3Key,
@@ -63,7 +61,6 @@ class User {
       dob: json['dob'] ?? "",
       genderId: json['genderId'] ?? "",
       departmentId: json['departmentId'] ?? "",
-      role: json['role'] ?? "",
       roleId: json['roleId'] ?? "",
       password: json['password'] ?? "",
       profileImageS3Key: json['profileImageS3Key'] ?? "",
@@ -92,7 +89,6 @@ class User {
       'dob': dob,
       'genderId': genderId,
       'departmentId': departmentId,
-      'role': role,
       'roleId': roleId,
       "password" : password,
       // Converts the nested Address object to JSON

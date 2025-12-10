@@ -26,6 +26,7 @@ class ApiEndpoints {
   static const punch = 'user/attendance/punch';
   static const getAllAttedanceActivity = 'user/attendance/getAllAttedanceActivity/';
   static const getAllLeavesStatus = 'user/leaves/getLeavesStatus/';
+  static const getLeaveBalance = 'user/leaves/getLeavesBalance/';
 
   static const applyLeaves = 'user/leaves/applyLeaves/';
   static const cancelLeaves = 'user/leaves/cancel/';

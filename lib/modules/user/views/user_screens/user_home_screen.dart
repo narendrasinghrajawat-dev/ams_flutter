@@ -1,9 +1,9 @@
-// lib/views/user/user_home_screen.dart
+// lib/modules/user/views/user_screens/user_home_screen.dart
 import 'dart:async';
 
 import 'package:attedance_management_system/data/utils/app_helper.dart';
+import 'package:attedance_management_system/modules/common/controller/loading_controller.dart';
 import 'package:attedance_management_system/modules/user/controller/user_activity_controller.dart';
-import 'package:attedance_management_system/modules/user/controller/user_home_controller.dart';
 import 'package:attedance_management_system/modules/user/views/user_screens/user_widgets/user_homepage_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -29,7 +29,6 @@ class UserHomeScreen extends StatefulWidget {
 }
 
 class _UserHomeScreenState extends State<UserHomeScreen> {
-  final UserHomeController _userController = Get.find<UserHomeController>();
   final UserActivityController _userActivityController =
   Get.find<UserActivityController>();
 
@@ -40,44 +39,67 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   Duration _elapsed = Duration.zero;
   bool _busy = false;
 
+  // 🔹 Worker to react when attendanceActivities list changes (API success, punch, refresh)
+  Worker? _activityWorker;
+
   @override
   void initState() {
     super.initState();
+
+    // 1️⃣ Initially try (in case activities already loaded)
     _initializeTimer();
+
+    // 2️⃣ Whenever attendanceActivities changes, re-evaluate timer
+    _activityWorker = ever<List<AttendanceActivity>>(
+      _userActivityController.attendanceActivities,
+          (_) {
+        _initializeTimer();
+      },
+    );
   }
 
   @override
   void dispose() {
     _tick?.cancel();
+    _activityWorker?.dispose();
     super.dispose();
   }
 
   void _initializeTimer() {
-    print('_initializeTimer called ');
+    // Always reset previous timer & elapsed when recalculating
+    _stopTimer();
 
     final todayCheckIn = _getTodayCheckIn();
     final todayCheckOut = _getTodayCheckOut();
-    print('todayCheckIn $todayCheckIn ');
-    print('todayCheckOut $todayCheckOut ');
 
     if (todayCheckIn != null && todayCheckOut == null) {
-      print('punch chek in is ');
+      // ✅ Checked in, not checked out → start running timer
       final checkInTime = AppHelper.parseDateTime(todayCheckIn.punchDate);
       if (checkInTime != null) {
         _startTimer(checkInTime);
+      } else {
+        // parsing failed; reset
+        setState(() {
+          _elapsed = Duration.zero;
+        });
       }
     } else if (todayCheckIn != null && todayCheckOut != null) {
-      print('punch out in is ');
-
+      // ✅ Both exist → show final worked duration
       final duration = AppHelper.calculateDuration(
         todayCheckIn.punchDate,
         todayCheckOut.punchDate,
       );
-      if (duration != null) {
-        _elapsed = duration;
-      }
+      setState(() {
+        _elapsed = duration ?? Duration.zero;
+      });
+    } else {
+      // ❌ No check-in today → reset
+      setState(() {
+        _elapsed = Duration.zero;
+      });
     }
   }
+
 
   void _startTimer(DateTime checkInTime) {
     _tick?.cancel();
@@ -92,11 +114,13 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
   void _stopTimer() {
     _tick?.cancel();
+    _tick = null;
   }
 
   // Get today's check-in record
   AttendanceActivity? _getTodayCheckIn() {
-    return _userActivityController.filteredAttendanceActivitiesList.firstWhereOrNull(
+    return _userActivityController.filteredAttendanceActivitiesList
+        .firstWhereOrNull(
           (activity) =>
       AppHelper.isCheckIn(activity.punchType) &&
           AppHelper.isToday(activity.punchDate),
@@ -105,7 +129,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
   // Get today's check-out record
   AttendanceActivity? _getTodayCheckOut() {
-    return _userActivityController.filteredAttendanceActivitiesList.firstWhereOrNull(
+    return _userActivityController.filteredAttendanceActivitiesList
+        .firstWhereOrNull(
           (activity) =>
       AppHelper.isCheckOut(activity.punchType) &&
           AppHelper.isToday(activity.punchDate),
@@ -204,7 +229,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         radiusInMeters: officeRadius ?? 100.0,
       );
 
-      // 👉 Uncomment this when you want to enforce geo-fence
+      // 👉 Uncomment to enforce office geo-fence
       // if (!isInsideOfficeRadius) {
       //   Get.snackbar(
       //     'Outside Office Area',
@@ -221,8 +246,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
       final Map<String, dynamic>? storedDeviceMap =
       _storageService.readMap(AppStrings.deviceInformation);
-      print('storedDeviceMap is the $storedDeviceMap');
-      print('currentDeviceMap is the $currentDeviceMap');
 
       if (storedDeviceMap == null || storedDeviceMap.isEmpty) {
         Get.snackbar(
@@ -244,19 +267,17 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         return null;
       }
 
-      // 4️⃣ Build punch JSON (same format as your existing API)
+      // 4️⃣ Build punch JSON (same format as DB)
       final nowLocal = DateTime.now();
       final punchJson = {
         "userKey": AppHelper.getProfileUser().key,
         "punchType": punchType, // "1" = check-in, "2" = check-out
-        // DB example: punchTime is UTC, punchDate is local
-        "punchTime": nowLocal.toUtc().toIso8601String(),
-        "punchDate": nowLocal.toIso8601String(),
+        "punchTime": nowLocal.toUtc().toIso8601String(), // UTC with Z
+        "punchDate": nowLocal.toIso8601String(), // local
         "lat": userLat.toString(),
         "long": userLng.toString(),
-        "deviceInfo": currentDeviceMap,
+        "deviceInformation": currentDeviceMap,
       };
-
       return AttendanceActivity.fromJson(punchJson);
     } catch (e) {
       print('Punch build error: $e');
@@ -290,13 +311,14 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     setState(() => _busy = true);
 
     // Build punch with location + office radius + device validation
+    LoadingController().start();
     final activity = await _buildPunchActivity("1");
+    LoadingController().hide();
 
     if (activity != null) {
-      final success = await _userController.punch(activity);
+      final success = await _userActivityController.punch(activity);
 
       if (success) {
-        // ✅ Start timer from this activity directly
         final checkInTime = AppHelper.parseDateTime(activity.punchDate);
         if (checkInTime != null) {
           _startTimer(checkInTime);
@@ -336,15 +358,16 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     setState(() => _busy = true);
 
     // Build punch with location + office radius + device validation
+    LoadingController().start();
     final activity = await _buildPunchActivity("2");
+    LoadingController().hide();
 
     if (activity != null) {
-      final success = await _userController.punch(activity);
+      final success = await _userActivityController.punch(activity);
 
       if (success) {
         _stopTimer();
 
-        // ✅ Use punchDate from the checkout activity itself
         final duration = AppHelper.calculateDuration(
           todayCheckIn.punchDate,
           activity.punchDate,
@@ -430,7 +453,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     return Obx(() {
       final todayCheckIn = _getTodayCheckIn();
       final todayCheckOut = _getTodayCheckOut();
@@ -447,11 +469,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
       final checkInTime = AppHelper.parseDateTime(todayCheckIn?.punchDate);
       final checkOutTime = AppHelper.parseDateTime(todayCheckOut?.punchDate);
-
-      print('checkInTime ios the $checkInTime');
-      print('checkOutTime ios the $checkOutTime');
-      print('_elapsed ios the $_elapsed');
-
 
       return SafeArea(
         child: Padding(
@@ -499,8 +516,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                             children: [
                               AppTextWidget.small(
                                 'Today\'s Work Time',
-                                color:
-                                AppThemeColors.textSecondaryColor,
+                                color: AppThemeColors.textSecondaryColor,
                               ),
                               const SizedBox(height: 8),
                               if (!canCheckIn && !isCompleted) ...[
@@ -541,8 +557,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                                 height: 48,
                                 width: 140,
                                 child: ElevatedButton.icon(
-                                  onPressed:
-                                  _busy ? null : _onCheckIn,
+                                  onPressed: _busy ? null : _onCheckIn,
                                   icon: const Icon(
                                     Icons.login_rounded,
                                     color: Colors.white,
@@ -555,11 +570,9 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor:
                                     AppThemeColors.successColor,
-                                    shape:
-                                    RoundedRectangleBorder(
+                                    shape: RoundedRectangleBorder(
                                       borderRadius:
-                                      BorderRadius.circular(
-                                          12),
+                                      BorderRadius.circular(12),
                                     ),
                                     elevation: 0,
                                   ),
@@ -570,8 +583,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                                 height: 48,
                                 width: 140,
                                 child: ElevatedButton.icon(
-                                  onPressed:
-                                  _busy ? null : _onCheckOut,
+                                  onPressed: _busy ? null : _onCheckOut,
                                   icon: const Icon(
                                     Icons.logout_rounded,
                                     color: Colors.white,
@@ -584,11 +596,9 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor:
                                     AppThemeColors.errorColor,
-                                    shape:
-                                    RoundedRectangleBorder(
+                                    shape: RoundedRectangleBorder(
                                       borderRadius:
-                                      BorderRadius.circular(
-                                          12),
+                                      BorderRadius.circular(12),
                                     ),
                                     elevation: 0,
                                   ),
@@ -604,20 +614,17 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                                   borderRadius:
                                   BorderRadius.circular(12),
                                   border: Border.all(
-                                    color: AppThemeColors
-                                        .borderColor,
+                                    color: AppThemeColors.borderColor,
                                   ),
                                 ),
                                 child: Center(
                                   child: Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment
-                                        .center,
+                                    MainAxisAlignment.center,
                                     children: [
                                       Icon(
                                         Icons.check_circle,
-                                        color: AppThemeColors
-                                            .successColor,
+                                        color: AppThemeColors.successColor,
                                         size: 20,
                                       ),
                                       const SizedBox(width: 6),
@@ -713,8 +720,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
-                      color: AppThemeColors.primaryColor
-                          .withOpacity(0.1),
+                      color: AppThemeColors.primaryColor.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: AppTextWidget.verySmall(
@@ -732,8 +738,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 child: todayActivities.isEmpty
                     ? const EmptyActivityState()
                     : ListView.separated(
-                  physics:
-                  const BouncingScrollPhysics(),
+                  physics: const BouncingScrollPhysics(),
                   itemCount: todayActivities.length,
                   separatorBuilder: (_, __) =>
                   const SizedBox(height: 10),

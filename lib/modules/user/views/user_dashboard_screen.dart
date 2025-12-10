@@ -56,6 +56,8 @@ class _UserDashboardScreenState
       case 0:
       // Home tab
         await Get.find<UserHomeController>().refreshHome();
+        await Get.find<UserActivityController>().refreshActivity();
+
         break;
       case 1:
       // Leaves tab

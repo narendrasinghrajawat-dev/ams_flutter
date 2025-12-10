@@ -1,6 +1,11 @@
+import 'package:attedance_management_system/core/constants/app_icons.dart';
 import 'package:attedance_management_system/modules/admin/controller/admin_employees_controller.dart';
+import 'package:attedance_management_system/modules/common/controller/common_controller.dart';
+import 'package:attedance_management_system/modules/models/masterData.dart';
+import 'package:attedance_management_system/widgets/text_and_icon_widgets/app_icon_button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import '../../../../core/constants/app_theme_colors.dart';
 import '../../../../widgets/form_widgets/dropdown_field_widget.dart';
 import '../../../../widgets/form_widgets/text_field_widget.dart';
@@ -21,41 +26,51 @@ class UserForm extends StatefulWidget {
 
 class _UserFormState extends State<UserForm> {
 
+
+  final CommonController _commonController = Get.find<CommonController>();
   final AdminEmployeesController _adminEmployeesController =  Get.find<AdminEmployeesController>();
   final _formKey = GlobalKey<FormState>();
 
   User? editUser;
 
   // controllers
-  late final TextEditingController firstNameC;
-  late final TextEditingController middleNameC;
-  late final TextEditingController lastNameC;
-  late final TextEditingController emailC;
-  late final TextEditingController phoneC;
-  late final TextEditingController usernameC;
-  late final TextEditingController passwordC;
-  late final TextEditingController dobC;
-  late final TextEditingController addressC;
+  final TextEditingController firstNameC = TextEditingController();
+  final TextEditingController middleNameC = TextEditingController();
+  final TextEditingController lastNameC = TextEditingController();
+  final TextEditingController emailC = TextEditingController();
+  final TextEditingController phoneC = TextEditingController();
+  final TextEditingController usernameC = TextEditingController();
+  final TextEditingController passwordC = TextEditingController();
+  final TextEditingController dobC = TextEditingController();
+  final TextEditingController addressC = TextEditingController();
 
-  String role = 'user';
-  DateTime? selectedDob;
+  MasterData? masterData;
+  String? dateOfBirth;
+
+  String? genderId;
+  List genderList = [];
+
+  String? roleId;
+  List roleList = [];
+
+
+
 
   @override
   void initState() {
     super.initState();
     editUser = widget.initialData;
+    masterData = _commonController.masterData.value;
+    genderList = masterData?.gender.map((item) => item.toJson()).toList() ?? [];
+    roleList = masterData?.role.map((item) => item.toJson()).toList() ?? [];
 
-    firstNameC = TextEditingController(text: editUser?.firstName ?? '');
-    middleNameC = TextEditingController(text: editUser?.middleName ?? '');
-    lastNameC = TextEditingController(text: editUser?.lastName ?? '');
-    emailC = TextEditingController(text: editUser?.email ?? '');
-    phoneC = TextEditingController(text: editUser?.phoneNo ?? '');
-    usernameC = TextEditingController(text: editUser?.username ?? '');
-    selectedDob = editUser?.dob is DateTime ? editUser?.dob as DateTime : null;
-    dobC = TextEditingController(text: selectedDob != null ? _formatDate(selectedDob!) : '');
-    role = editUser?.role ?? 'user';
-    addressC = TextEditingController();
-    passwordC = TextEditingController();
+    if(widget.initialData == null){
+      roleId = roleList[0]['id'];
+    }
+
+    if(widget.initialData != null){
+      setEditData();
+    }
   }
 
   @override
@@ -71,6 +86,24 @@ class _UserFormState extends State<UserForm> {
     super.dispose();
   }
 
+
+  setEditData(){
+    firstNameC.text = widget.initialData?.firstName ?? "";
+    middleNameC.text = widget.initialData?.middleName ?? "";
+    lastNameC.text = widget.initialData?.lastName ?? "";
+    emailC.text = widget.initialData?.email ?? "";
+    phoneC.text = widget.initialData?.phoneNo ?? "";
+    genderId = widget.initialData?.genderId;
+    usernameC.text = widget.initialData?.username ?? "";
+    dobC.text = widget.initialData?.dob ?? "";
+    passwordC.text = widget.initialData?.password ?? "";
+    roleId = widget.initialData?.roleId;
+
+  }
+
+
+
+
   String _formatDate(DateTime dt) {
     return '${dt.day.toString().padLeft(2, '0')}/${dt.month.toString().padLeft(2, '0')}/${dt.year}';
   }
@@ -82,7 +115,7 @@ class _UserFormState extends State<UserForm> {
     final last = DateTime(now.year - 12);  // min age 12
     final picked = await showDatePicker(
       context: context,
-      initialDate: selectedDob ?? DateTime(now.year - 20),
+      initialDate: DateTime(now.year - 20),
       firstDate: first,
       lastDate: last,
       builder: (context, child) {
@@ -101,18 +134,20 @@ class _UserFormState extends State<UserForm> {
     );
 
     if (picked != null) {
-      selectedDob = picked;
+      dateOfBirth = picked.toIso8601String();
       dobC.text = _formatDate(picked);
       setState(() {});
     }
   }
 
   Future<void> _save() async {
+
+    print('save called');
     if (_formKey.currentState?.validate() != true) return;
 
     // Build Address (use your actual Address model fields)
     final address = Address(
-      street: '45, Ganesh Nagar',
+      street: addressC.text,
       cityName: 'Jaipur',
       cityId: '7',
       stateName: 'Rajasthan',
@@ -131,16 +166,16 @@ class _UserFormState extends State<UserForm> {
       middleName: middleNameC.text.trim(),
       lastName: lastNameC.text.trim(),
       email: emailC.text.trim(),
-      countryCode: '122',
+      countryCode: '+91',
       phoneNo: phoneC.text.trim(),
       username: usernameC.text.trim(),
       password: passwordC.text, // keep secure handling in real app
-      genderId: '3',
-      departmentId: '3',
-      dob: dobC.text, // DateTime or null
+      genderId: genderId,
+      departmentId: null,
+      dob: dateOfBirth ?? "", // DateTime or null
       address: address,
-      role: role,
-      roleId: role,
+      roleId: roleId,
+
     );
 
     // FIX 1: Declare a single nullable variable outside the blocks to hold the result
@@ -193,207 +228,161 @@ class _UserFormState extends State<UserForm> {
 
   @override
   Widget build(BuildContext context) {
-    // Use a draggable sheet if used as bottom sheet; otherwise it's a responsive card
-    return  DraggableScrollableSheet(
-        initialChildSize: 0.8,
-        minChildSize: 0.45,
-        maxChildSize: 0.95,
-        builder: (context, sc) {
-          return Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppThemeColors.containerBackgroundColor,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-            ),
-            child: SingleChildScrollView(
-              controller: sc,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // grab handle
-                  Center(
-                    child: Container(
-                      height: 6,
-                      width: 60,
-                      margin: const EdgeInsets.only(bottom: 5),
-                      decoration: BoxDecoration(
-                        color: AppThemeColors.dividerColor,
-                        borderRadius: BorderRadius.circular(6),
+
+    return  SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              AppIconButtonWidget.large(icon: AppConstIcons.backIcon, onPressed:  () => Get.back()),
+              AppTextWidget.large(widget.initialData == null ? 'Add' : 'Edit', color: AppThemeColors.textPrimaryColor),
+              AppIconButtonWidget.large(icon: AppConstIcons.saveIcon, onPressed:  () => _save()),
+            ],
+          ),
+
+
+          Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                // Name row: First | Middle | Last
+                TextFieldWidget(
+                  controller: firstNameC,
+                  labelText: 'First Name',
+                  hintText: 'Enter first name',
+                  validator: _validateName,
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextFieldWidget(
+                        controller: middleNameC,
+                        labelText: 'Middle Name',
+                        validator: (v) {
+                          if (v != null && v.trim().isNotEmpty && v.trim().length < 2) return 'Too short';
+                          return null;
+                        },
                       ),
                     ),
-                  ),
-
-                  Row(
-
-                    children: [
-                      IconButton(
-                        onPressed: () => Get.back(),
-                        icon: Icon(Icons.arrow_back,),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: TextFieldWidget(
+                        controller: lastNameC,
+                        labelText: 'Last Name',
+                        validator: _validateName,
                       ),
-                      AppTextWidget.medium(widget.initialData == null ? 'Add New User' : 'Edit User', color: AppThemeColors.textPrimaryColor),
-                    ],
-                  ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 5),
+
+                // Email & Phone
+
+                TextFieldWidget(
+                  controller: emailC,
+                  labelText: 'Email',
+                  keyboardInputType: TextInputType.emailAddress,
+                  validator: _validateEmail,
+                ),
+                const SizedBox(height: 5),
 
 
-                  Form(
-                    key: _formKey,
-                    child: Column(
-                      children: [
-                        // Name row: First | Middle | Last
-                        TextFieldWidget(
-                          controller: firstNameC,
-                          labelText: 'First Name',
-                          hintText: 'Enter first name',
-                          validator: _validateName,
-                        ),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: TextFieldWidget(
-                                controller: middleNameC,
-                                labelText: 'Middle Name',
-                                hintText: 'Optional',
-                                validator: (v) {
-                                  if (v != null && v.trim().isNotEmpty && v.trim().length < 2) return 'Too short';
-                                  return null;
-                                },
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: TextFieldWidget(
-                                controller: lastNameC,
-                                labelText: 'Last Name',
-                                hintText: 'Enter last name',
-                                validator: _validateName,
-                              ),
-                            ),
-                          ],
-                        ),
+                TextFieldWidget(
+                  controller: phoneC,
+                  labelText: 'Phone No',
+                  keyboardInputType: TextInputType.phone,
+                  validator: _validatePhone,
+                ),
 
-                        const SizedBox(height: 5),
+                const SizedBox(height: 5),
 
-                        // Email & Phone
-
-                        TextFieldWidget(
-                          controller: emailC,
-                          labelText: 'Email',
-                          hintText: 'example@mail.com',
-                          keyboardInputType: TextInputType.emailAddress,
-                          validator: _validateEmail,
-                        ),
-                        const SizedBox(height: 5),
+                DropdownFieldWidget(
+                  labelText: 'Gender',
+                  value: genderId,
+                  items: genderList,
+                  onChanged: (v) => setState(() => genderId = v),
+                ),
+                const SizedBox(height: 5),
 
 
-                        TextFieldWidget(
-                          controller: phoneC,
-                          labelText: 'Phone No',
-                          hintText: '+91 99999 99999',
-                          keyboardInputType: TextInputType.phone,
-                          validator: _validatePhone,
-                        ),
-                        const SizedBox(height: 5),
+                // Username & DOB
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextFieldWidget(
+                        controller: usernameC,
+                        labelText: 'Username',
+                        validator: _validateUsername,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: _pickDob,
+                        child: AbsorbPointer(
+                          child: TextFieldWidget(
+                            controller: dobC,
+                            labelText: 'Date of Birth',
+                            readOnly: true,
 
-                        // Username & DOB
-                        Row(
-                          children: [
-                            Expanded(
-                              child: TextFieldWidget(
-                                controller: usernameC,
-                                labelText: 'Username',
-                                hintText: 'username123',
-                                validator: _validateUsername,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: _pickDob,
-                                child: AbsorbPointer(
-                                  child: TextFieldWidget(
-                                    controller: dobC,
-                                    labelText: 'Date of Birth',
-                                    hintText: 'DD/MM/YYYY',
-                                    readOnly: true,
-                                    validator: (v) {
-                                      if (selectedDob == null) return 'Select DOB';
-                                      return null;
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 5),
-
-                        // Address (multiline)
-                        TextFieldWidget(
-                          controller: passwordC,
-                          labelText: 'Password',
-                          hintText: 'Password',
-                          keyboardInputType: TextInputType.multiline,
-                          onChanged: (_) {},
-                          validator: (v) {
-                            if (v == null || v.trim().isEmpty) return 'Enter address';
-                            return null;
-                          },
-                        ),
-
-                        const SizedBox(height: 5),
-
-                        // Address (multiline)
-                        TextFieldWidget(
-                          controller: addressC,
-                          labelText: 'Address',
-                          hintText: 'Street, City, State, ZIP',
-                          keyboardInputType: TextInputType.multiline,
-                          onChanged: (_) {},
-                          validator: (v) {
-                            if (v == null || v.trim().isEmpty) return 'Enter address';
-                            return null;
-                          },
-                        ),
-
-                        const SizedBox(height: 10),
-
-                        // Role dropdown (uses DropdownFieldWidget if you want to reuse it)
-                        DropdownFieldWidget(
-                          labelText: 'Role',
-                          value: role,
-                          items: [
-                            {'id': 'user', 'name': 'User'},
-                            {'id': 'admin', 'name': 'Admin'},
-                          ],
-                          onChanged: (v) => setState(() => role = v ?? 'user'),
-                        ),
-
-                        const SizedBox(height: 18),
-
-                        // Save button
-                        SizedBox(
-                          width: double.infinity,
-                          height: 48,
-                          child: ElevatedButton(
-                            onPressed: _save,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppThemeColors.primaryColor,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                            ),
-                            child: AppTextWidget.medium('Save', color: Colors.white),
                           ),
                         ),
-
-                        const SizedBox(height: 16),
-                      ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
+
+                const SizedBox(height: 5),
+
+                // Address (multiline)
+                TextFieldWidget(
+                  controller: passwordC,
+                  labelText: 'Password',
+                  keyboardInputType: TextInputType.multiline,
+                  onChanged: (_) {},
+                  validator: (v) {
+                    if (v == null || v.trim().isEmpty) return 'Enter address';
+                    return null;
+                  },
+                ),
+
+                const SizedBox(height: 5),
+
+                // Address (multiline)
+                TextFieldWidget(
+                  controller: addressC,
+                  labelText: 'Address',
+                  keyboardInputType: TextInputType.multiline,
+                  onChanged: (_) {},
+                  validator: (v) {
+                    if (v == null || v.trim().isEmpty) return 'Enter address';
+                    return null;
+                  },
+                ),
+
+                const SizedBox(height: 10),
+
+
+                // Role dropdown (uses DropdownFieldWidget if you want to reuse it)
+                DropdownFieldWidget(
+                  labelText: 'Role',
+                  value: roleId,
+                  items: roleList,
+                  onChanged: (v) => setState(() => roleId = v),
+                ),
+
+
+              ],
             ),
-          );
-        },
-      );
+          ),
+
+          SizedBox(height: 10,),
+        ],
+      ),
+    ).paddingSymmetric(horizontal: 10);
   }
 }

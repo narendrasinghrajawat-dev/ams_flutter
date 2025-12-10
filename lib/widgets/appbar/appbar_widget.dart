@@ -61,15 +61,12 @@ class UserAppBar extends StatelessWidget implements PreferredSizeWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    AppTextWidget.medium(
+                    AppTextWidget.large(
                       _fullName,
                       maxLines: 2,
                       color: AppThemeColors.whiteColor,
                     ),
-                    AppTextWidget.small(
-                      user.role,
-                      color: AppThemeColors.whiteColor,
-                    ),
+
                   ],
                 ),
               ),
