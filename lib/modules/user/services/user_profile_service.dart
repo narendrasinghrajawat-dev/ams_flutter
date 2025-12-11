@@ -1,21 +1,24 @@
-
+import 'package:attedance_management_system/core/constants/api_endpoints.dart';
 
 import '../../common/services/api_service.dart';
-import '../../models/user.dart';
 
 class UserProfileService {
   final ApiService _api = ApiService();
 
-  Future<User?> fetchProfile() async {
-    // TODO: Implement when backend is ready
-    // final resp = await _api.get('/user/profile');
-    // return User.fromJson(resp);
-    return null;
-  }
+  /// Calls backend to change password.
+  /// Returns the decoded JSON response (Map) or throws on network error.
+  Future<Map<String, dynamic>?> changePassword(String userKey, String newPassword) async {
+    final body = {
+      'userKey': userKey,
+      'newPassword': newPassword,
+    };
 
-  Future<bool> updateProfile(User user) async {
-    // TODO: Implement when backend is ready
-    // await _api.put('/user/profile', user.toJson());
-    return true;
+    // adapt path if your backend path is different
+    final resp = await _api.post(ApiEndpoints.changePassword, body);
+
+    print('res p is teh $resp');
+
+    // If ApiService already decodes JSON, return it; else decode as needed
+    return resp;
   }
 }

@@ -30,5 +30,6 @@ class ApiEndpoints {
 
   static const applyLeaves = 'user/leaves/applyLeaves/';
   static const cancelLeaves = 'user/leaves/cancel/';
+  static const changePassword = 'user/changePassword';
 
 }

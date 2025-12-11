@@ -25,9 +25,10 @@ class AppStrings {
   static const String loginLong = "login_long";
   static const String deviceInformation = "device_information";
 
-  static const String pendingStatusKey = "1";
-  static const String approvedStatusKey = "2";
-  static const String rejectedStatusKey = "3";
+  static const String pendingLeavesStatusKey = "1";
+  static const String approvedLeavesStatusKey = "2";
+  static const String rejectedLeavesStatusKey = "3";
+  static const String cancelledLeavesStatusKey = "4";
 
 
   static const String fullDayKey = "1";

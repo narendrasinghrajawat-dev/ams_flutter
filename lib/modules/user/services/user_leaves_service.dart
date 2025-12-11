@@ -29,11 +29,10 @@ class UserLeavesService {
       final resp = await _api.get("${ApiEndpoints.getLeaveBalance}$userKey");
 
       // 2. Check if the response is a Map and contains the 'leavesBalance' key.
-      if (resp is Map<String, dynamic> && resp.containsKey('leavesBalance')) {
+      if (resp.containsKey('leavesBalance')) {
 
         // 3. Extract the list from the 'leavesBalance' key.
         final leavesList = resp['leavesBalance'];
-
         // 4. Ensure the extracted data is indeed a list before returning.
         if (leavesList is List) {
           return List<Map<String, dynamic>>.from(leavesList);

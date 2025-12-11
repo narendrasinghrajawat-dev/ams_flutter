@@ -160,19 +160,31 @@ class AppHelper {
     return monthNames[month - 1];
   }
 
+  static String? getLeaveType(String? leaveType){
+    if(isEmptyOrNull(leaveType)){
+      return "";
+    }
+
+    return Get.find<CommonController>().masterData.value?.leaveType.firstWhere((e) => e.id == leaveType).name;
+  }
+
 
   static Color getLeavesStatusColor(String? s) {
 
     if(s == null || s.isEmpty){
-      return AppThemeColors.warningColor;
+      return AppThemeColors.primaryColor;
     }
 
     final lower = s.toLowerCase();
-    if (lower == AppStrings.approvedStatusKey) return AppThemeColors.successColor;
-    if (lower == AppStrings.pendingStatusKey) return AppThemeColors.warningColor;
-    if (lower == AppStrings.rejectedStatusKey) {
+    if (lower == AppStrings.approvedLeavesStatusKey) return AppThemeColors.successColor;
+    if (lower == AppStrings.pendingLeavesStatusKey) return AppThemeColors.warningColor;
+    if (lower == AppStrings.rejectedLeavesStatusKey) {
       return AppThemeColors.errorColor;
     }
+    if (lower == AppStrings.cancelledLeavesStatusKey) {
+      return AppThemeColors.muted;
+    }
+
     return AppThemeColors.muted;
   }
 
@@ -187,11 +199,15 @@ class AppHelper {
     }
 
     final lower = s.toLowerCase();
-    if (lower == AppStrings.approvedStatusKey) return masterData?.leaveStatus.firstWhere((e) => e.id == s).name ?? "";
-    if (lower == AppStrings.pendingStatusKey) return masterData?.leaveStatus.firstWhere((e) => e.id == s).name ?? "";
-    if (lower == AppStrings.rejectedStatusKey) {
+    if (lower == AppStrings.approvedLeavesStatusKey) return masterData?.leaveStatus.firstWhere((e) => e.id == s).name ?? "";
+    if (lower == AppStrings.pendingLeavesStatusKey) return masterData?.leaveStatus.firstWhere((e) => e.id == s).name ?? "";
+    if (lower == AppStrings.rejectedLeavesStatusKey) {
       return masterData?.leaveStatus.firstWhere((e) => e.id == s).name ?? "";
     }
+    if (lower == AppStrings.cancelledLeavesStatusKey) {
+      return masterData?.leaveStatus.firstWhere((e) => e.id == s).name ?? "";
+    }
+
     return "";
   }
 

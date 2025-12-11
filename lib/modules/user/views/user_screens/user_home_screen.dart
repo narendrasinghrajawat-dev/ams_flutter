@@ -4,7 +4,11 @@ import 'dart:async';
 import 'package:attedance_management_system/data/utils/app_helper.dart';
 import 'package:attedance_management_system/modules/common/controller/loading_controller.dart';
 import 'package:attedance_management_system/modules/user/controller/user_activity_controller.dart';
-import 'package:attedance_management_system/modules/user/views/user_screens/user_widgets/user_homepage_widgets.dart';
+import 'package:attedance_management_system/modules/user/views/user_screens/widgets/home/activity_tile.dart';
+import 'package:attedance_management_system/modules/user/views/user_screens/widgets/home/attendance_card.dart';
+import 'package:attedance_management_system/modules/user/views/user_screens/widgets/home/attendance_status_badge.dart';
+import 'package:attedance_management_system/modules/user/views/user_screens/widgets/home/empty_activity_state.dart';
+import 'package:attedance_management_system/modules/user/views/user_screens/widgets/home/stats_card.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -230,22 +234,21 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       );
 
       // 👉 Uncomment to enforce office geo-fence
-      // if (!isInsideOfficeRadius) {
-      //   Get.snackbar(
-      //     'Outside Office Area',
-      //     'You must be within ${officeRadius ?? 100} meters of the office to punch.',
-      //     snackPosition: SnackPosition.BOTTOM,
-      //     backgroundColor: AppThemeColors.warningColor.withOpacity(0.2),
-      //   );
-      //   return null;
-      // }
+      if (!isInsideOfficeRadius) {
+        Get.snackbar(
+          'Outside Office Area',
+          'You must be within ${officeRadius ?? 100} meters of the office to punch.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: AppThemeColors.warningColor.withOpacity(0.2),
+        );
+        return null;
+      }
 
       // 3️⃣ Device validation: must be same as login device
       final Map<String, dynamic> currentDeviceMap =
       await DeviceService.getDeviceInformation();
 
-      final Map<String, dynamic>? storedDeviceMap =
-      _storageService.readMap(AppStrings.deviceInformation);
+      final Map<String, dynamic>? storedDeviceMap = _storageService.readMap(AppStrings.deviceInformation);
 
       if (storedDeviceMap == null || storedDeviceMap.isEmpty) {
         Get.snackbar(

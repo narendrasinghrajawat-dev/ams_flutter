@@ -13,8 +13,8 @@ import '../../../../models/apply_leave_request.dart';
 
 // Helper function to get color based on status
 Color _getStatusColor(String? status) {
-  if (status == AppStrings.approvedStatusKey) return AppThemeColors.successColor;
-  if (status == AppStrings.rejectedStatusKey) return AppThemeColors.errorColor;
+  if (status == AppStrings.approvedLeavesStatusKey) return AppThemeColors.successColor;
+  if (status == AppStrings.rejectedLeavesStatusKey) return AppThemeColors.errorColor;
   return AppThemeColors.warningColor; // Pending or Unknown
 }
 
@@ -33,7 +33,7 @@ class LeaveRequestListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final statusColor = _getStatusColor(leaveRequest.leaveStatus);
-    final isPending = leaveRequest.leaveStatus == AppStrings.pendingStatusKey;
+    final isPending = leaveRequest.leaveStatus == AppStrings.pendingLeavesStatusKey;
 
     return CommonCardWidget(
      child:  Column(
