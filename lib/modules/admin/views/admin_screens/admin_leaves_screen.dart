@@ -54,7 +54,7 @@ class AdminLeavesScreen extends StatelessWidget {
                         onApprove: () {
                           final payload = AdminAction(
                             leavesId: leaveRequest.key!,
-                            leavesStatus: AppStrings.approvedStatusKey,
+                            leavesStatus: AppStrings.approvedLeavesStatusKey,
                             approveByKey: AppHelper.getProfileUser().key!,
                           );
                           _admin.approveLeave(payload);
@@ -63,7 +63,7 @@ class AdminLeavesScreen extends StatelessWidget {
                         onReject: () {
                           final payload = AdminAction(
                             leavesId: leaveRequest.key!,
-                            leavesStatus: AppStrings.rejectedStatusKey,
+                            leavesStatus: AppStrings.rejectedLeavesStatusKey,
                             approveByKey: AppHelper.getProfileUser().key!,
                           );
                           _admin.rejectLeave(payload);

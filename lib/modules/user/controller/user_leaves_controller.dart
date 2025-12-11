@@ -8,7 +8,6 @@ import '../services/user_leaves_service.dart';
 class UserLeavesController extends GetxController {
   final UserLeavesService _service = UserLeavesService();
 
-  final RxBool isLoading = false.obs;
   final RxBool applyingLeave = false.obs;
   final RxBool isCancelling = false.obs;
 
@@ -42,29 +41,23 @@ class UserLeavesController extends GetxController {
 
   Future<void> loadLeavesBalance(String userKey) async {
     try {
-      isLoading.value = true;
-
       // This line now correctly receives a List<Map<String, dynamic>>
-      final List<Map<String, dynamic>> res =
-      await _service.fetchLeavesBalance(userKey);
+      final List<Map<String, dynamic>> res = await _service.fetchLeavesBalance(userKey);
 
       leaveBalance
         ..clear()
       // Mapping from the correct List is now successful
         ..addAll(res.map((e) => LeaveBalance.fromJson(e)));
-
       leaveBalance.refresh();
     } catch (e) {
       // The print line has a typo in the original code, corrected here.
       print('UserLeavesController.loadLeavesBalance error: $e');
     } finally {
-      isLoading.value = false;
     }
   }
 
   Future<void> loadLeavesStatus(String userKey) async {
     try {
-      isLoading.value = true;
       final List<Map<String, dynamic>> res =
       await _service.fetchLeavesStatus(userKey);
       appliedLeaves
@@ -74,7 +67,6 @@ class UserLeavesController extends GetxController {
     } catch (e) {
       print('UserLeavesController.loadLeavesStatus error: $e');
     } finally {
-      isLoading.value = false;
     }
   }
 

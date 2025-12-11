@@ -43,8 +43,7 @@ class AdminLeavesController extends GetxController {
   }
 
   Future<void> approveLeave(AdminAction payload) async {
-    final updatedRequest =
-    await _service.adminActionOnLeave(payload);
+    final updatedRequest = await _service.adminActionOnLeave(payload);
 
     if (updatedRequest != null) {
       final idx = leaveRequestsList.indexWhere(
@@ -73,6 +72,6 @@ class AdminLeavesController extends GetxController {
   }
 
   int get pendingLeaves => leaveRequestsList
-      .where((l) => l.leaveStatus == AppStrings.pendingStatusKey)
+      .where((l) => l.leaveStatus == AppStrings.pendingLeavesStatusKey)
       .length;
 }

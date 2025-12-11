@@ -58,18 +58,18 @@ class AdminHomeController extends GetxController {
   }
 
   int get onLeaveToday => leaveRequestsList.where(
-        (l) => l.leaveStatus == AppStrings.approvedStatusKey,
+        (l) => l.leaveStatus == AppStrings.approvedLeavesStatusKey,
   ).length;
 
   int get pendingLeaves => leaveRequestsList.where(
-        (l) => l.leaveStatus == AppStrings.pendingStatusKey,
+        (l) => l.leaveStatus == AppStrings.pendingLeavesStatusKey,
   ).length;
 
   List<dynamic> get recentActivityList {
     final activity = <dynamic>[
       ...attendanceList.take(5),
       ...leaveRequestsList.where(
-            (l) => l.leaveStatus == AppStrings.pendingStatusKey,
+            (l) => l.leaveStatus == AppStrings.pendingLeavesStatusKey,
       ),
     ];
 
