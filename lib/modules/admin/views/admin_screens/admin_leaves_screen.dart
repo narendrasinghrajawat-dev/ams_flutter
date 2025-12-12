@@ -17,17 +17,12 @@ class AdminLeavesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CommonCardWidget(
-      child: Padding(
-        padding: const EdgeInsets.only(top: 12.0, left: 12.0, right: 12.0),
-        child: Column(
+    return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        child:  Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            AppTextWidget.medium(
-              'Leave Requests'.tr,
-              color: AppThemeColors.textPrimaryColor,
-            ),
-            const SizedBox(height: 16),
+
             Expanded(
               child: Obx(() {
 
@@ -46,9 +41,7 @@ class AdminLeavesScreen extends StatelessWidget {
                   itemCount: list.length,
                   itemBuilder: (_, idx) {
                     final leaveRequest = list[idx];
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 12.0),
-                      child: LeaveRequestListItem(
+                    return LeaveRequestListItem(
                         leaveRequest: leaveRequest,
                         // on approve
                         onApprove: () {
@@ -68,15 +61,13 @@ class AdminLeavesScreen extends StatelessWidget {
                           );
                           _admin.rejectLeave(payload);
                         },
-                      ),
-                    );
+                    ).marginOnly(bottom: 10);
                   },
                 );
               }),
             ),
           ],
         ),
-      ),
     );
   }
 }

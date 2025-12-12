@@ -66,9 +66,11 @@ class LeaveCard extends StatelessWidget {
                 },
                 minTileHeight: 30,
                 tilePadding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
-                collapsedBackgroundColor:  AppThemeColors.whiteColor,
-                collapsedIconColor:AppThemeColors.whiteColor,
-                iconColor: AppThemeColors.iconColor,
+                collapsedBackgroundColor:  AppThemeColors.collapsedBackgroundColor,
+                collapsedIconColor:AppThemeColors.collapsedIconColor,
+                iconColor: AppThemeColors.collapsedIconColor,
+
+
                 title: AppTextWidget.medium("Expand"),
                 children: [
                   Column(
@@ -76,7 +78,7 @@ class LeaveCard extends StatelessWidget {
                       // Divider
                       Divider(height: 1, thickness: 1, color: Colors.grey.shade200),
 
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 5),
 
                       // Leave Type & Action Date Row
                       Row(
@@ -88,8 +90,7 @@ class LeaveCard extends StatelessWidget {
                         ],
                       ),
 
-                      const SizedBox(height: 16),
-
+                      SizedBox(height: 10,),
                       // Info Grid
                       _InfoGrid(
                         numberOfLeaves: leave.numberOfLeaves.toString(),
@@ -170,7 +171,6 @@ class _DateRangeWidget extends StatelessWidget {
       children: [
         AppTextWidget.medium(
           AppHelper.formatDateString(startDate),
-          color: Colors.grey.shade900,
         ),
         const SizedBox(height: 4),
         Row(
@@ -179,7 +179,6 @@ class _DateRangeWidget extends StatelessWidget {
             const SizedBox(width: 4),
             AppTextWidget.small(
               AppHelper.formatDateString(endDate),
-              color: Colors.grey.shade600,
             ),
           ],
         ),
@@ -222,14 +221,9 @@ class _StatusBadge extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 7),
-          Text(
+          AppTextWidget.small(
             status,
-            style: TextStyle(
-              color: color,
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0.3,
-            ),
+            color: color,
           ),
         ],
       ),
@@ -244,14 +238,8 @@ class _LeaveTypeChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.blue.shade50,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.blue.shade200, width: 1),
-      ),
-      child: Row(
+    return CommonCardWidget(
+      child:Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
@@ -260,13 +248,8 @@ class _LeaveTypeChip extends StatelessWidget {
             color: Colors.blue.shade700,
           ),
           const SizedBox(width: 7),
-          Text(
+          AppTextWidget.small(
             leaveType,
-            style: TextStyle(
-              color: Colors.blue.shade800,
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-            ),
           ),
         ],
       ),
@@ -281,13 +264,7 @@ class _ActionDateChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Row(
+    return Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
@@ -296,16 +273,10 @@ class _ActionDateChip extends StatelessWidget {
             color: Colors.grey.shade600,
           ),
           const SizedBox(width: 5),
-          Text(
+          AppTextWidget.small(
             AppHelper.formatDateString(actionDate),
-            style: TextStyle(
-              color: Colors.grey.shade700,
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
           ),
         ],
-      ),
     );
   }
 }
@@ -324,13 +295,7 @@ class _InfoGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(0),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200, width: 1),
-      ),
+    return CommonCardWidget(
       child: Row(
         children: [
           Expanded(
@@ -403,26 +368,12 @@ class _InfoColumn extends StatelessWidget {
           child: Icon(icon, size: 20, color: iconColor),
         ),
         const SizedBox(height: 8),
-        Text(
+        AppTextWidget.small(
           title,
-          style: TextStyle(
-            color: Colors.grey.shade600,
-            fontSize: 11,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.3,
-          ),
         ),
         const SizedBox(height: 4),
-        Text(
+        AppTextWidget.medium(
           value,
-          style: TextStyle(
-            fontWeight: FontWeight.w700,
-            fontSize: 14,
-            color: Colors.grey.shade900,
-          ),
-          textAlign: TextAlign.center,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
         ),
       ],
     );
@@ -436,15 +387,7 @@ class _ReasonSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.amber.shade50,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.amber.shade200, width: 1),
-      ),
-      child: Column(
+    return  Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
@@ -452,12 +395,9 @@ class _ReasonSection extends StatelessWidget {
               Expanded(
                 child: Row(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: Colors.amber.shade100,
-                        shape: BoxShape.circle,
-                      ),
+                    CommonCardWidget(
+                      color: Colors.amber.shade100,
+
                       child: Icon(
                         Icons.comment,
                         size: 14,
@@ -465,33 +405,22 @@ class _ReasonSection extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    Text(
+                    AppTextWidget.medium(
                       'Reason',
-                      style: TextStyle(
-                        color: Colors.amber.shade900,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.5,
-                      ),
+                      color: Colors.amber.shade900,
                     ),
                   ],
                 ),
               ),
 
-              Text(
+              AppTextWidget.small(
                 reason,
-                style: TextStyle(
-                  color: Colors.grey.shade800,
-                  fontSize: 13,
-                  height: 1.5,
-                ),
               ),
 
             ],
           ),
 
         ],
-      ),
     );
   }
 }
@@ -516,13 +445,9 @@ class _CancelButton extends StatelessWidget {
           ),
         ),
         icon: Icon(Icons.cancel_outlined, size: 20, color: Colors.red.shade600),
-        label: Text(
+        label: AppTextWidget.medium(
           'Cancel Request',
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 15,
-            color: Colors.red.shade600,
-          ),
+          color: Colors.red.shade600,
         ),
       ),
     );

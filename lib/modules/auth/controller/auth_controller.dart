@@ -2,6 +2,7 @@ import 'package:attedance_management_system/core/constants/const_strings.dart';
 import 'package:attedance_management_system/routes/app_routes.dart';
 import 'package:get/get.dart';
 
+import '../../common/controller/loading_controller.dart';
 import '../../common/services/storage_service.dart';
 import '../../models/login.dart';
 import '../../models/user.dart';
@@ -10,44 +11,58 @@ import '../services/auth_services.dart';
 class AuthController extends GetxController {
   final AuthServices _authServices = AuthServices();
   final StorageService _storage = StorageService();
+  final LoadingController _loadingController = Get.find<LoadingController>();
 
   final Rxn<User> currentUser = Rxn<User>();
-  final RxBool loading = false.obs;
 
   bool get isLoggedIn => currentUser.value != null;
   bool get isAdmin => currentUser.value?.roleId == AppStrings.appRoleAdminId;
 
 // Change the signature to accept the Login model
+// Change the signature to accept the Login model
   Future<void> login(Login loginPayload) async {
-    loading.value = true;
+    _loadingController.start();
+    try {
+      // Call your service
+      final res = await _authServices.login(loginPayload);
 
-    // Call the service, passing the JSON representation of the Login model
-    final res = await _authServices.login(loginPayload);
+      if (res != null && res.isNotEmpty) {
+        // If your API follows `{ data: {...}, token: ... }` format
+        final data = res['data'] ?? res;
 
-    loading.value = false;
+        // Convert response to User model
+        final user = User.fromJson(data);
+        currentUser.value = user;
 
-    if (res.isNotEmpty) {
-      // expected res['data'] contains user profile and token
-      final data = res; // Assuming the server response wraps data in a 'data' key
-      final user = User.fromJson(data);
-      currentUser.value = user;
-      _storage.saveMap(AppStrings.profileJson, user.toJson());
+        // Save profile locally
+        _storage.saveMap(AppStrings.profileJson, user.toJson());
 
-      // token save if provided
-      if (data['token'] != null) {
-        _storage.saveString(AppStrings.token, data['token']);
-      }
+        // Save token if provided
+        if (res['token'] != null) {
+          _storage.saveString(AppStrings.token, res['token']);
+        }
 
-      // redirect based on role
-      if (isAdmin) {
-        Get.offAllNamed(AppRoutes.adminDashboard);
+        // Redirect user based on role
+        if (isAdmin) {
+          Get.offAllNamed(AppRoutes.adminDashboard);
+        } else {
+          Get.offAllNamed(AppRoutes.userDashboard);
+        }
       } else {
-        Get.offAllNamed(AppRoutes.userDashboard);
+        // If server returned error structure or empty map
+        Get.snackbar('Error', res['message'] ?? 'Login failed');
       }
-    } else {
-      Get.snackbar('Error', res['message'] ?? 'Login failed');
+
+    } catch (e) {
+      // Catch any exceptions (network failures, parsing errors, etc.)
+      Get.snackbar('Error', e.toString());
+
+    } finally {
+      // ALWAYS hide loader even when errors happen
+      _loadingController.hide();
     }
   }
+
 
   void loadFromStorage() {
     final map = _storage.readMap(AppStrings.profileJson);

@@ -7,6 +7,7 @@ import 'modules/common/controller/loading_controller.dart';
 import 'core/bindings/app_binding.dart';
 import 'core/localization/translation.dart';
 import 'core/theme/theme_service.dart';
+import 'modules/common/controller/settings_controller.dart';
 
 class App extends StatelessWidget {
   App({Key? key}) : super(key: key);
@@ -22,11 +23,12 @@ class App extends StatelessWidget {
       title: 'AMS',
       initialBinding: AppBinding(),
       translations: TranslationService(),
-      locale: TranslationService.locale,
+      locale: Locale(Get.find<SettingsController>().language.value),
       fallbackLocale: TranslationService.fallbackLocale,
       theme: _themeService.lightTheme,
       darkTheme: _themeService.darkTheme,
-      themeMode: _themeService.themeMode,
+      themeMode: Get.find<SettingsController>().isDark.value ? ThemeMode.dark : ThemeMode.light,
+
       getPages: AppPages.pages,
       initialRoute: AppRoutes.splashScreen,
       debugShowCheckedModeBanner: false,

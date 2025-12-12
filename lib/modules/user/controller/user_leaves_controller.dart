@@ -2,11 +2,13 @@ import 'package:attedance_management_system/data/utils/app_helper.dart';
 import 'package:attedance_management_system/modules/models/leave_balance.dart';
 import 'package:get/get.dart';
 
+import '../../common/controller/loading_controller.dart';
 import '../../models/apply_leave_request.dart';
 import '../services/user_leaves_service.dart';
 
 class UserLeavesController extends GetxController {
   final UserLeavesService _service = UserLeavesService();
+  final LoadingController _loadingController = Get.find<LoadingController>();
 
   final RxBool applyingLeave = false.obs;
   final RxBool isCancelling = false.obs;
@@ -40,6 +42,8 @@ class UserLeavesController extends GetxController {
   // Controller Class Method
 
   Future<void> loadLeavesBalance(String userKey) async {
+    _loadingController.start();
+
     try {
       // This line now correctly receives a List<Map<String, dynamic>>
       final List<Map<String, dynamic>> res = await _service.fetchLeavesBalance(userKey);
@@ -53,10 +57,13 @@ class UserLeavesController extends GetxController {
       // The print line has a typo in the original code, corrected here.
       print('UserLeavesController.loadLeavesBalance error: $e');
     } finally {
+      _loadingController.hide();
     }
   }
 
   Future<void> loadLeavesStatus(String userKey) async {
+    _loadingController.start();
+
     try {
       final List<Map<String, dynamic>> res =
       await _service.fetchLeavesStatus(userKey);
@@ -67,10 +74,12 @@ class UserLeavesController extends GetxController {
     } catch (e) {
       print('UserLeavesController.loadLeavesStatus error: $e');
     } finally {
+      _loadingController.hide();
     }
   }
 
   Future<bool> applyLeave(ApplyLeaveRequest request) async {
+    _loadingController.start();
     applyingLeave.value = true;
 
     try {
@@ -86,10 +95,12 @@ class UserLeavesController extends GetxController {
       return false;
     } finally {
       applyingLeave.value = false;
+      _loadingController.hide();
     }
   }
 
   Future<void> onCancelLeave(ApplyLeaveRequest leave) async {
+
     final confirm = await Get.defaultDialog<bool>(
       title: 'Cancel Leave',
       middleText: 'Do you really want to cancel this leave request?',
@@ -107,6 +118,8 @@ class UserLeavesController extends GetxController {
     }
 
     isCancelling.value = true;
+    _loadingController.start();
+
     try {
       await _service.cancelLeave(leave.key!);
 
@@ -126,6 +139,8 @@ class UserLeavesController extends GetxController {
       );
     } finally {
       isCancelling.value = false;
+      _loadingController.hide();
+
     }
   }
 }

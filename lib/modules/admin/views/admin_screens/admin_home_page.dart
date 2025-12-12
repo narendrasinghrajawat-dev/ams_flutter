@@ -3,131 +3,194 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../../../core/constants/app_theme_colors.dart';
-import '../../../../../widgets/refresh_screen_widget/icecream_indicator.dart';
-import '../../../../../widgets/text_and_icon_widgets/app_icons_type.dart';
 import '../../../../../widgets/text_and_icon_widgets/app_text_type.dart';
-
 import '../../controller/admin_home_controller.dart';
 import 'admin_widgets/admin_homepage_widgets.dart';
+import '../../../../../widgets/refresh_screen_widget/icecream_indicator.dart';
 
 class AdminHomePage extends StatelessWidget {
   const AdminHomePage({Key? key}) : super(key: key);
 
-  // controller
   AdminHomeController get _admin => Get.find<AdminHomeController>();
-
-  Future<void> _refreshData() async {
-    await _admin.refreshHome();
-  }
 
   @override
   Widget build(BuildContext context) {
-    return
-      // RefreshIndicatorWidget(
-      // onRefresh: _refreshData,
-      // child:
-      Obx(() {
-        final hasAnyData =
-            _admin.users.isNotEmpty ||
-                _admin.attendanceList.isNotEmpty ||
-                _admin.leaveRequestsList.isNotEmpty;
-
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+    return Obx(() {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+        child: RefreshIndicator(
+          onRefresh: () => _admin.refreshHome(),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildStatsGrid(),
-              const SizedBox(height: 15),
-              _buildQuickActions(),
-              const SizedBox(height: 10),
-              Expanded(child: _buildRecentActivity()),
+              _buildHeader(),
+              const SizedBox(height: 16),
+              _buildStatsSection(),
+              const SizedBox(height: 20),
+              _buildQuickActionsSection(),
+              const SizedBox(height: 5),
+              Expanded(child: _buildRecentActivitySection()),
             ],
           ),
-        );
-      }
-      // ),
-    );
+        ),
+      );
+    });
   }
 
-  Widget _buildStatsGrid() {
-    print('_admin.totalEmployees ${_admin.totalEmployees}');
-
-    return GridView.count(
-      shrinkWrap: true,
-      crossAxisCount: 2,
-      childAspectRatio: 1.2,
-      crossAxisSpacing: 16,
-      mainAxisSpacing: 16,
-      children: [
-        StatCard(
-          title: 'Total Employees',
-          value: _admin.totalEmployees.toString(),
-          subtitle: 'Total registered staff',
-          icon: Icons.people_alt_rounded,
-        ),
-        StatCard(
-          title: 'Present Today',
-          value: _admin.presentToday.toString(),
-          subtitle:
-          '${(_admin.totalEmployees > 0 ? (_admin.presentToday / _admin.totalEmployees) * 100 : 0).toStringAsFixed(1)}% attendance',
-          icon: Icons.check_circle_rounded,
-        ),
-        StatCard(
-          title: 'On Leave',
-          value: _admin.onLeaveToday.toString(),
-          subtitle: '${_admin.pendingLeaves} pending approval',
-          icon: Icons.beach_access_rounded,
-        ),
-        StatCard(
-          title: 'Late Arrivals',
-          value: _admin.lateArrivalsToday.toString(),
-          subtitle: 'Attendance issues today',
-          icon: Icons.schedule_rounded,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildQuickActions() {
+  // ------------------------------
+  // HEADER (Title + Summary)
+  // ------------------------------
+  Widget _buildHeader() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         AppTextWidget.large(
-          'Quick Actions',
+          'Admin Dashboard',
           color: AppThemeColors.textPrimaryColor,
         ),
-        const SizedBox(height: 16),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
+        const SizedBox(height: 4),
+        AppTextWidget.small(
+          'Overview of today’s attendance & activities',
+          color: AppThemeColors.textSecondaryColor,
+        ),
+      ],
+    );
+  }
+
+  // ------------------------------
+  // STATS SECTION (New clean design)
+  // ------------------------------
+  Widget _buildStatsSection() {
+    return GridView(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 14,
+        mainAxisSpacing: 14,
+        childAspectRatio: 2.5,
+      ),
+      children: [
+        _statCard(
+          title: "Total Employees",
+          value: _admin.totalEmployees.toString(),
+          icon: Icons.people_alt_rounded,
+          color: Colors.blue,
+        ),
+        _statCard(
+          title: "Present Today",
+          value: _admin.presentToday.toString(),
+          icon: Icons.check_circle_rounded,
+          color: Colors.green,
+        ),
+        _statCard(
+          title: "On Leave",
+          value: _admin.onLeaveToday.toString(),
+          icon: Icons.beach_access_rounded,
+          color: Colors.orange,
+        ),
+        _statCard(
+          title: "Late Arrivals",
+          value: _admin.lateArrivalsToday.toString(),
+          icon: Icons.schedule_rounded,
+          color: Colors.red,
+        ),
+      ],
+    );
+  }
+
+  Widget _statCard({
+    required String title,
+    required String value,
+    required IconData icon,
+    required Color color,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        gradient: LinearGradient(
+          colors: [
+            color.withOpacity(0.15),
+            color.withOpacity(0.05),
+          ],
+        ),
+      ),
+      child: CommonCardWidget(
+        color: Colors.transparent,
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.12),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: color, size: 26),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  AppTextWidget.verySmall(
+                    title,
+                    color: AppThemeColors.textSecondaryColor,
+                  ),
+                  const SizedBox(height: 4),
+                  AppTextWidget.large(
+                    value,
+                    color: AppThemeColors.textPrimaryColor,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ------------------------------
+  // QUICK ACTIONS (New modern style)
+  // ------------------------------
+  Widget _buildQuickActionsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AppTextWidget.medium(
+          "Quick Actions",
+          color: AppThemeColors.textPrimaryColor,
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 110,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
             children: [
-              ActionCard(
+              _quickActionCard(
                 icon: Icons.person_add_alt_1_rounded,
-                title: 'Add Employee',
+                title: "Add Employee",
                 color: AppThemeColors.primaryColor,
                 onTap: () => Get.toNamed('/add-employee'),
               ),
-              const SizedBox(width: 12),
-              ActionCard(
-                icon: Icons.calendar_today_rounded,
-                title: 'Manage Leaves',
+              _quickActionCard(
+                icon: Icons.calendar_month_rounded,
+                title: "Manage Leaves",
                 color: Colors.green,
                 onTap: () => Get.toNamed('/admin-leaves'),
               ),
-              const SizedBox(width: 12),
-              ActionCard(
+              _quickActionCard(
                 icon: Icons.bar_chart_rounded,
-                title: 'Reports',
+                title: "Reports",
                 color: Colors.purple,
                 onTap: () {},
               ),
-              const SizedBox(width: 12),
-              ActionCard(
+              _quickActionCard(
                 icon: Icons.settings_rounded,
-                title: 'Settings',
+                title: "Settings",
                 color: Colors.blueGrey,
-                onTap: () {},
+                onTap: () => Get.toNamed('/settings'),
               ),
             ],
           ),
@@ -136,7 +199,51 @@ class AdminHomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildRecentActivity() {
+  Widget _quickActionCard({
+    required IconData icon,
+    required String title,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 12),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: onTap,
+        child: Container(
+          width: 120,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            color: color.withOpacity(0.1),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: color.withOpacity(0.2),
+                ),
+                child: Icon(icon, color: color, size: 22),
+              ),
+              const SizedBox(height: 8),
+              AppTextWidget.small(
+                title,
+                color: AppThemeColors.textPrimaryColor,
+                align: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ------------------------------
+  // RECENT ACTIVITY LIST
+  // ------------------------------
+  Widget _buildRecentActivitySection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -144,13 +251,13 @@ class AdminHomePage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             AppTextWidget.medium(
-              'Recent Activity',
+              "Recent Activity",
               color: AppThemeColors.textPrimaryColor,
             ),
             TextButton(
-              onPressed: () => Get.toNamed('/activity-log'),
+              onPressed: () => null,
               child: AppTextWidget.small(
-                'View All',
+                "View All",
                 color: AppThemeColors.primaryColor,
               ),
             ),
@@ -158,26 +265,26 @@ class AdminHomePage extends StatelessWidget {
         ),
         Expanded(
           child: Obx(() {
-            final list = _admin.recentActivityList;
+            final items = _admin.recentActivityList;
 
-            if (list.isEmpty) {
+            if (items.isEmpty) {
               return Center(
                 child: AppTextWidget.small(
-                  'No recent activity found.',
+                  "No recent activity found.",
                   color: AppThemeColors.muted,
                 ),
               );
             }
-            return ListView.builder(
-              padding: EdgeInsets.zero,
-              itemCount: list.length,
-              itemBuilder: (_, idx) {
-                final activity = list[idx];
-                return ActivityItem.fromActivity(activity);
+
+            return ListView.separated(
+              itemCount: items.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 6),
+              itemBuilder: (_, i) {
+                return ActivityItem.fromActivity(items[i]); // Uses your updated navigation logic
               },
             );
           }),
-        ),
+        )
       ],
     );
   }

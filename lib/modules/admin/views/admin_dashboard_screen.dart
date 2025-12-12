@@ -93,6 +93,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     final showFab = _currentIndex == 1; // show FAB only on Employees tab
 
     return Scaffold(
+
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: AppThemeColors.appbarBackgroundColor,

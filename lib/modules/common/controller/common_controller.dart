@@ -1,11 +1,14 @@
 import 'package:get/get.dart';
 import '../../models/masterData.dart';
-import '../services/common_service.dart'; // Using package:get/get.dart for simplicity
+import '../services/common_service.dart';
+import 'loading_controller.dart'; // Using package:get/get.dart for simplicity
 
 
 class CommonController extends GetxController {
 
   final CommonService _service = CommonService();
+  final LoadingController _loadingController = Get.find<LoadingController>();
+
 
   // FIX: Use Rx<MasterData?> to hold a single nullable MasterData object.
   // Initialize with null or an empty MasterData object.
@@ -24,6 +27,7 @@ class CommonController extends GetxController {
 
   // FIX: Changed return type to Future<void> as the function updates an Rx variable.
   Future<void> getAllMasterData() async {
+    _loadingController.start();
 
     try {
       final Map<String, dynamic> res = await _service.fetchMasterData();
@@ -35,6 +39,9 @@ class CommonController extends GetxController {
     } catch (e) {
       print('Error loading master data: $e');
       // In a real app, you might set an error state here.
+    } finally{
+      _loadingController.hide();
     }
+
   }
 }

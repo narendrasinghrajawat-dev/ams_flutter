@@ -1,11 +1,14 @@
 import 'package:get/get.dart';
 import 'package:attedance_management_system/data/utils/app_helper.dart';
 
+import '../../common/controller/loading_controller.dart';
 import '../../models/user.dart';
 import '../services/admin_employees_service.dart';
 
 class AdminEmployeesController extends GetxController {
   final AdminEmployeesService _service = AdminEmployeesService();
+  final LoadingController _loadingController = Get.find<LoadingController>();
+
 
   final RxList<User> users = <User>[].obs;
   List<User> get filteredUsers => users;
@@ -22,6 +25,7 @@ class AdminEmployeesController extends GetxController {
 
   Future<void> loadUsers() async {
     users.clear();
+    _loadingController.start();
 
     try {
       final res = await _service.fetchUsersList();
@@ -32,10 +36,13 @@ class AdminEmployeesController extends GetxController {
     } catch (e) {
       print('AdminEmployeesController.loadUsers error: $e');
     } finally {
+      _loadingController.hide();
     }
   }
 
   Future<User?> addUser(User user) async {
+    _loadingController.start();
+
     try {
       final res = await _service.createUser(user.toJson());
       if (res != null) {
@@ -49,10 +56,14 @@ class AdminEmployeesController extends GetxController {
       print('AdminEmployeesController.addUser error: $e');
       return null;
     } finally {
+      _loadingController.hide();
+
     }
   }
 
   Future<User?> updateUser(String key, User user) async {
+    _loadingController.start();
+
     try {
       final res = await _service.updateUser(key, user.toJson());
       if (res != null) {
@@ -71,10 +82,14 @@ class AdminEmployeesController extends GetxController {
       print('AdminEmployeesController.updateUser error: $e');
       return null;
     } finally {
+      _loadingController.hide();
+
     }
   }
 
   Future<bool> deleteUser(String key) async {
+    _loadingController.start();
+
     try {
       final ok = await _service.deleteUser(key);
       if (ok) {
@@ -87,6 +102,8 @@ class AdminEmployeesController extends GetxController {
       print('AdminEmployeesController.deleteUser error: $e');
       return false;
     } finally {
+      _loadingController.hide();
+
     }
   }
 }

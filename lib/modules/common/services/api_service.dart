@@ -47,7 +47,7 @@ class ApiService {
     final loader = _loaderOrNull;
 
     if (showLoader && loader != null) {
-      loader.show();
+      // loader.show();
     }
 
 
@@ -60,7 +60,7 @@ class ApiService {
       throw Exception("Network error: $e");
     } finally {
       if (showLoader && loader != null) {
-        loader.hide();
+        // loader.hide();
       }
     }
   }

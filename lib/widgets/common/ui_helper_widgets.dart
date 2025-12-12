@@ -75,4 +75,15 @@ class UIHelper {
   static void showWarning(String message, {String title = 'Warning'}) {
     showSnackbar(title, message, type: SnackbarType.warning);
   }
+
+
+  static Widget showDivider() {
+   return Container(
+      height: 1,
+      margin: const EdgeInsets.symmetric(horizontal: 12),
+      color: AppThemeColors.dividerColor,
+    );
+  }
+
+
 }
