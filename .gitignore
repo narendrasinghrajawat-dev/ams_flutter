@@ -45,9 +45,8 @@ app.*.map.json
 /android/app/release
 
 # env file
-env
-/env/
-/.env/
-/.env.dev/
-/.env.prod/
-/.env.test/
+/env/       # Ignores the folder 'project-env' (your requirement)
+.env        # Ignores the common hidden file '.env' in the root
+.env.dev    # Ignores the file '.env.dev'
+.env.prod   # Ignores the file '.env.prod'
+.env.test   # Ignores the file '.env.test'
