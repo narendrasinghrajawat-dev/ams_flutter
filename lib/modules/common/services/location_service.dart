@@ -1,7 +1,10 @@
 // lib/services/location/location_service.dart
 import 'dart:async';
 import 'dart:math' as math;
+import 'package:attedance_management_system/modules/common/controller/loading_controller.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 
 class LocationResult {
   final bool ok;
@@ -13,12 +16,14 @@ class LocationResult {
 class LocationService {
   LocationService._private();
   static final LocationService instance = LocationService._private();
+  final LoadingController _loadingController = Get.find<LoadingController>();
+
 
   Duration timeout = const Duration(seconds: 12);
 
   Future<LocationResult> getCurrentLocation({Duration? timeoutOverride}) async {
     final Duration effective = timeoutOverride ?? timeout;
-
+    _loadingController.start();
     try {
       // 1) Is location service enabled?
       final serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -68,6 +73,10 @@ class LocationService {
       }
       return LocationResult(ok: false, message: 'Failed to get location: $e');
     }
+     finally{
+       _loadingController.hide();
+
+     }
   }
 
   double _degToRad(double deg) => deg * (math.pi / 180.0);

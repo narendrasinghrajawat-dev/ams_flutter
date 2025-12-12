@@ -43,7 +43,7 @@ class AppThemeColors {
 
   static const Color primaryDarkProdColor = Color(0xFF002171);
   static const Color primaryDarkTestColor = Color(0xFF0B3A87);
-  static const Color primaryDarkDevColor = Color(0xFF0059B2);
+  static const Color primaryDarkDevColor = Color(0xFF141414);
 
   // ============================================================
   // ENVIRONMENT-BASED PRIMARY COLORS
@@ -78,7 +78,7 @@ class AppThemeColors {
 
   static Color get buttonBgColor => isDark ? primaryDarkColor : primaryLightColor;
 
-  static Color get loaderColor => isDark ? primaryDarkColor : primaryLightColor;
+  static Color get loaderColor => isDark ? Colors.white : primaryLightColor;
 
   static Color get containerBackgroundColor => isDark ? const Color(0xFF121212) : const Color(0xFFF5F5F5);
 
@@ -136,7 +136,7 @@ class AppThemeColors {
   // ICON COLORS
   // ============================================================
 
-  static Color get iconColor => isDark ? primaryDarkColor : primaryLightColor;
+  static Color get iconColor => isDark ? primaryLightColor : primaryLightColor;
 
   static Color get iconActiveColor => primaryColor;
 
@@ -144,7 +144,7 @@ class AppThemeColors {
   // DIVIDER / BORDER COLORS
   // ============================================================
 
-  static Color get dividerColor => isDark ? const Color(0xFF2C2C2C) : const Color(0xFFE0E0E0);
+  static Color get dividerColor => isDark ? primaryLightColor.withOpacity(.1) : primaryLightColor;
 
   static Color get borderColor => isDark ? const Color(0xFF2C2C2C) : const Color(0xFFBDBDBD);
 
@@ -181,7 +181,7 @@ class AppThemeColors {
   /// Color for icons inside the prefix position (more subtle).
   static Color get prefixIconColor => Get.isDarkMode ? const Color(0xFFB0BEC5) : const Color(0xFF90A4AE);
   /// Color for the border when the field is enabled but not focused.
-  static Color get enableBorderColor => Get.isDarkMode ? const Color(0xFF455A64) : const Color(0xFFCFD8DC);
+  // static Color get enableBorderColor => Get.isDarkMode ? const Color(0xFF455A64) : const Color(0xFFCFD8DC);
   /// Color for the border when the field is actively focused.
   static Color get focusBorderColor => Get.isDarkMode ? const Color(0xFF42A5F5) : const Color(0xFF1976D2);
   /// Color for the border when a validation error occurs.
@@ -190,6 +190,7 @@ class AppThemeColors {
   static Color get disableBorderColor => Get.isDarkMode ? const Color(0xFF616161) : const Color(0xFFBDBDBD);
   /// Color for the label/hint text when the field is disabled.
   static Color get disableLabelColor => Get.isDarkMode ? const Color(0xFF757575) : const Color(0xFF9E9E9E);
+  static Color get enableBorderColor => isDark ? primaryLightColor : primaryDarkColor;
 
 
   static Color get datePickerBackgroundColor => Get.isDarkMode ? const Color(0xFF757575) :  Color(0xFFFFFFFF);
@@ -247,5 +248,7 @@ class AppThemeColors {
   static Color get snackBarWarningColor => isDark ? Colors.yellow : Colors.green;
   static Color get snackBarInfoColor => isDark ? Colors.green : Colors.green;
 
+  static Color get collapsedBackgroundColor => isDark ? primaryDarkColor : primaryLightColor.withOpacity(.01);
+  static Color get collapsedIconColor => isDark ? primaryLightColor : primaryDarkColor;
 
 }

@@ -12,7 +12,8 @@ class SegmentedTabs extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(color: Colors.grey.shade50, borderRadius: BorderRadius.circular(10)),
+
+      decoration: BoxDecoration(color: AppThemeColors.containerBackgroundColor, borderRadius: BorderRadius.circular(10)),
       padding: const EdgeInsets.all(6),
       child: Row(
         children: List.generate(labels.length, (i) {

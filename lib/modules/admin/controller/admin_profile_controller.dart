@@ -1,14 +1,17 @@
+
+
+
 import 'package:attedance_management_system/data/utils/app_helper.dart';
+import 'package:attedance_management_system/modules/admin/services/admin_profile_service.dart';
 import 'package:attedance_management_system/widgets/common/ui_helper_widgets.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 
 import '../../common/controller/loading_controller.dart';
 import '../../models/user.dart';
-import '../services/user_profile_service.dart';
 
-class UserProfileController extends GetxController {
-  final UserProfileService _service = UserProfileService();
+class AdminProfileController extends GetxController {
+  final AdminProfileService _service = AdminProfileService();
   final LoadingController _loadingController = Get.find<LoadingController>();
 
   final Rx<User?> user = Rx<User?>(null);

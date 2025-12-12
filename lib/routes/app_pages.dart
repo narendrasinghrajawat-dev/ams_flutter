@@ -1,3 +1,7 @@
+import 'package:attedance_management_system/modules/admin/views/admin_screens/admin_employees_list.dart';
+import 'package:attedance_management_system/modules/admin/views/admin_screens/admin_home_page.dart';
+import 'package:attedance_management_system/modules/admin/views/admin_screens/admin_leaves_screen.dart';
+import 'package:attedance_management_system/modules/admin/views/admin_screens/admin_profile_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import '../modules/admin/binding/admin_root_binding.dart';
@@ -26,18 +30,15 @@ class AppPages {
     GetPage(name: AppRoutes.login, page: () => LoginScreen()),
     GetPage(name: AppRoutes.splashScreen, page: () => SplashScreen()),
     GetPage(name: AppRoutes.settingsScreen, page: () => SettingsScreen(), middlewares: [RoleMiddleware()]),
+    GetPage(name: AppRoutes.userDashboard, page: () => const UserDashboardScreen(), binding: UserRootBinding(),),
 
-    GetPage(
-      name: AppRoutes.userDashboard,
-      page: () => const UserDashboardScreen(),
-      binding: UserRootBinding(),
-    ),
 
-    GetPage(
-      name: AppRoutes.adminDashboard,
-      page: () => const AdminDashboardScreen(),
-      binding: AdminRootBinding(),
-    ),
+    // admin pages
+    GetPage(name: AppRoutes.adminDashboard, page: () => const AdminDashboardScreen(), binding: AdminRootBinding(),),
+    GetPage(name: AppRoutes.adminHomeScreen, page: () => const AdminHomePage(), binding: AdminRootBinding(),),
+    GetPage(name: AppRoutes.adminEmployeeScreen, page: () => const AdminEmployeesList(), binding: AdminRootBinding(),),
+    GetPage(name: AppRoutes.adminLeavesScreen, page: () => const AdminLeavesScreen(), binding: AdminRootBinding(),),
+    GetPage(name: AppRoutes.adminProfileScreen, page: () => const AdminProfileScreen(), binding: AdminRootBinding(),),
 
 
   ];

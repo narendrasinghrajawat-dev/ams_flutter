@@ -1,5 +1,6 @@
 // lib/views/user/user_profile_screen.dart
 import 'package:attedance_management_system/core/constants/app_icons.dart';
+import 'package:attedance_management_system/widgets/common/ui_helper_widgets.dart';
 import 'package:attedance_management_system/widgets/text_and_icon_widgets/app_icons_type.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -30,32 +31,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     return  SingleChildScrollView(
       child: Column(
         children: [
-          // Profile Header Card
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: AppThemeColors.whiteColor,
-            ),
-            child: Column(
+               Column(
               children: [
+
+                SizedBox(height: 20,),
                 // Avatar with Edit Button
                 Stack(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: LinearGradient(
-                          colors: [
-                            AppThemeColors.primaryColor.withOpacity(0.3),
-                            AppThemeColors.primaryColor.withOpacity(0.1),
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                      ),
-                      child: Container(
+                   Container(
                         padding: const EdgeInsets.all(3),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
@@ -67,7 +50,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           backgroundColor: Colors.grey.shade200,
                         ),
                       ),
-                    ),
                     Positioned(
                       top: 5,
                       right: 0,
@@ -101,7 +83,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
               ],
             ),
-          ),
 
 
 
@@ -111,7 +92,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _SectionHeader(title: 'Basic Information'),
                 const SizedBox(height: 12),
                 CommonCardWidget(
                   child: Column(
@@ -122,7 +102,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         label: 'Name',
                         value: "${user?.firstName ?? ""} ${user?.middleName ?? ""} ${user?.lastName ?? ""}",
                       ),
-                      _Divider(),
+                      UIHelper.showDivider(),
 
                       _InfoRow(
                         icon: Icons.email_rounded,
@@ -130,21 +110,21 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         label: 'Email',
                         value: user?.email ?? 'michael@example.com',
                       ),
-                      _Divider(),
+                      UIHelper.showDivider(),
                       _InfoRow(
                         icon: Icons.phone_rounded,
                         iconColor: Colors.green.shade600,
                         label: 'Phone',
                         value: user?.phoneNo ?? '+91 98765 43210',
                       ),
-                      _Divider(),
+                      UIHelper.showDivider(),
                       _InfoRow(
                         icon: Icons.location_on_rounded,
                         iconColor: Colors.red.shade600,
                         label: 'Location',
                         value: user?.address?.street ?? 'Jaipur, Rajasthan',
                       ),
-                      _Divider(),
+                      UIHelper.showDivider(),
                       _InfoRow(
                         icon: Icons.badge_rounded,
                         iconColor: Colors.purple.shade600,
@@ -233,7 +213,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     await showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Change Password'),
+        title: AppTextWidget.medium('Change Password'),
         content: Form(
           key: formKey,
           child: Column(
@@ -264,7 +244,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         actions: [
           TextButton(
               onPressed: Get.back,
-              child: const Text('Cancel'),
+              child: AppTextWidget.small('Cancel'),
            ),
            ElevatedButton(
               onPressed: () async {
@@ -273,7 +253,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   await ctrl.changePassword(newPassCtrl.text.trim());
                 }
               },
-              child: const Text('Change'),
+              child: AppTextWidget.small('Change'),
           ),
         ],
       ),
@@ -298,14 +278,8 @@ class _SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(left: 4),
-      child: Text(
+      child: AppTextWidget.medium(
         title,
-        style: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w700,
-          color: Colors.grey.shade800,
-          letterSpacing: 0.3,
-        ),
       ),
     );
   }
@@ -344,22 +318,12 @@ class _InfoRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                AppTextWidget.small(
                   label,
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: Colors.grey.shade600,
-                    fontWeight: FontWeight.w600,
-                  ),
                 ),
                 const SizedBox(height: 4),
-                Text(
+                AppTextWidget.medium(
                   value,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey.shade900,
-                    fontWeight: FontWeight.w600,
-                  ),
                 ),
               ],
             ),
@@ -370,19 +334,6 @@ class _InfoRow extends StatelessWidget {
   }
 }
 
-// Divider Widget
-class _Divider extends StatelessWidget {
-  const _Divider();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 1,
-      margin: const EdgeInsets.symmetric(horizontal: 12),
-      color: Colors.grey.shade200,
-    );
-  }
-}
 
 // Settings Tile Widget
 class _SettingsTile extends StatelessWidget {
@@ -413,13 +364,8 @@ class _SettingsTile extends StatelessWidget {
           ),
           child: Icon(icon, color: iconColor, size: 22),
         ),
-        title: Text(
+        title: AppTextWidget.medium(
           title,
-          style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
-            color: Colors.grey.shade900,
-          ),
         ),
         trailing: Icon(
           Icons.chevron_right_rounded,
@@ -456,13 +402,9 @@ class _LogoutButton extends StatelessWidget {
                   size: 22,
                 ),
                 const SizedBox(width: 10),
-                Text(
+                AppTextWidget.large(
                   'Logout',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.red.shade600,
-                  ),
+                  color: Colors.red.shade600,
                 ),
               ],
             ),
@@ -498,13 +440,9 @@ class _ForgotPasswordButton extends StatelessWidget {
                   size: 22,
                 ),
                 const SizedBox(width: 10),
-                Text(
+                AppTextWidget.large(
                   'Forgot Password',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
                     color: Colors.orange.shade600,
-                  ),
                 ),
               ],
             ),

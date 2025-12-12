@@ -69,7 +69,7 @@ class _TextFieldWidgetState extends State<TextFieldWidget> {
                 borderSide: BorderSide(color: !widget.enabled ? AppThemeColors.disableBorderColor : AppThemeColors.focusBorderColor)
             ),
             enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: !widget.enabled ? AppThemeColors.disableBorderColor : Colors.black)
+                borderSide: BorderSide(color: !widget.enabled ? AppThemeColors.disableBorderColor : AppThemeColors.enableBorderColor)
             ),
             contentPadding: const EdgeInsets.symmetric(vertical: 14,horizontal: 10),
             prefix: widget.prefix,

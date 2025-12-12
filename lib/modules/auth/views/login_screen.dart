@@ -154,7 +154,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     await _auth.login(loginPayload);
 
-    if (!_auth.isLoggedIn && !_auth.loading.value) {
+    if (!_auth.isLoggedIn) {
       Get.snackbar(
         'Login failed',
         'Please check credentials',
@@ -207,15 +207,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 22),
 
                 // Card with form
-                CommonContainerWidget(
-                  child: Padding(
-                    padding: EdgeInsets.only(top: 20, right: 18, left: 18, bottom: 5),
-                    child: Form(
+                CommonCardWidget(
+                  color: AppThemeColors.whiteColor,
+                  child: Form(
                       key: _formKey,
                       child: Column(
                         children: [
                           // Email
-
+                          SizedBox(height: 20,),
                            TextFieldWidget(
                               controller: emailC,
                               keyboardInputType: TextInputType.emailAddress,
@@ -286,8 +285,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppThemeColors.buttonBgColor,
                                   foregroundColor: AppThemeColors.buttonTextColor,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), side: BorderSide(color: AppThemeColors.enableBorderColor)),
                                   elevation: 1.5,
+
                                 ),
                                 child: AppTextWidget.medium('login'.tr, color: Colors.white),
                               ),
@@ -315,7 +315,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         ],
                       ),
                     ),
-                  ),
                 ),
 
                 const SizedBox(height: 20),

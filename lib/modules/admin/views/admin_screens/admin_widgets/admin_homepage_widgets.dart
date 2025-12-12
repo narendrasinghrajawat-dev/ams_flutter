@@ -1,5 +1,8 @@
 
 
+import 'package:attedance_management_system/core/constants/const_strings.dart';
+import 'package:attedance_management_system/data/utils/app_helper.dart';
+import 'package:attedance_management_system/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../../../core/constants/app_theme_colors.dart';
@@ -13,13 +16,11 @@ import '../../../../models/attendance_activity.dart';
 class StatCard extends StatelessWidget {
   final String title;
   final String value;
-  final String subtitle;
   final IconData icon;
 
   const StatCard({
     required this.title,
     required this.value,
-    required this.subtitle,
     required this.icon,
     Key? key,
   }) : super(key: key);
@@ -29,13 +30,12 @@ class StatCard extends StatelessWidget {
     return CommonCardWidget(
       color: AppThemeColors.dashboardCardBackgroundColor,
       child: Padding(
-        padding: const EdgeInsets.all(16), // Adjusted padding here for better spacing
+        padding: const EdgeInsets.all(0), // Adjusted padding here for better spacing
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Container(
                   padding: const EdgeInsets.all(8),
@@ -45,7 +45,7 @@ class StatCard extends StatelessWidget {
                   ),
                   child: Icon(icon, color: AppThemeColors.primaryColor, size: 24),
                 ),
-                AppTextWidget.veryLarge(
+                AppTextWidget.medium(
                   value,
                   color: AppThemeColors.textPrimaryColor,
                 ),
@@ -55,11 +55,6 @@ class StatCard extends StatelessWidget {
             AppTextWidget.small(
               title,
               color: AppThemeColors.textPrimaryColor,
-              maxLines: 1,
-            ),
-            AppTextWidget.verySmall(
-              subtitle,
-              color: AppThemeColors.textSecondaryColor,
               maxLines: 1,
             ),
           ],
@@ -132,33 +127,36 @@ class ActivityItem extends StatelessWidget {
   final String title;
   final String subtitle;
   final Color color;
+  final VoidCallback? onTap; // <--- optional tap callback
 
   const ActivityItem({
     required this.icon,
     required this.title,
     required this.subtitle,
     required this.color,
+    this.onTap,
     Key? key,
   }) : super(key: key);
 
-// ... inside ActivityItem class ...
-
+  /// Factory that creates an ActivityItem for a domain object and attaches a navigation onTap.
   factory ActivityItem.fromActivity(dynamic activity) {
     if (activity is ApplyLeaveRequest) {
-      // ... (Leave logic remains the same)
-      return ActivityItem(
+      final item = ActivityItem(
         icon: Icons.beach_access_rounded,
         title: '${activity.userName ?? 'Employee'} applied for leave',
-        subtitle: 'From ${activity.startDate} to ${activity.endDate}',
+        subtitle: 'From ${AppHelper.formatDateString(activity.startDate)} to ${AppHelper.formatDateString(activity.endDate)}',
         color: AppThemeColors.warningColor,
+        // onTap: () {
+        //   // Navigate to admin leave detail screen.
+        //   // Replace '/admin/leave_detail' with your actual route.
+        //   // We pass the whole activity as arguments so destination can use Get.arguments
+        //   Get.toNamed(AppRoutes.adminLeavesScreen, arguments: activity);
+        // },
       );
+      return item;
     } else if (activity is AttendanceActivity) {
-      // --- UPDATED LOGIC HERE ---
       final isClockIn = activity.punchType == 'IN';
-      final time = activity.punchTime ?? 'N/A';
-
-      // Simple late check (Assumes punchTime format is comparable to '09:00:00')
-      // This is less robust than the controller's logic but necessary for display
+      final time = AppHelper.formatTimeString(activity.punchTime) ?? 'N/A';
       final isLate = isClockIn && (time.compareTo('09:00:00') > 0);
 
       Color color;
@@ -177,59 +175,72 @@ class ActivityItem extends StatelessWidget {
         title: title,
         subtitle: 'At $time',
         color: color,
+        // onTap: () {
+        //   // Navigate to general activity / attendance screen.
+        //   // Replace '/activity-log' with the route that shows attendance details.
+        //   Get.toNamed(AppRoutes.adminEmployeeScreen, arguments: {
+        //     'activity': activity,
+        //     // Optional: you can pass additional info so the screen can open filtered view
+        //     'focusType': 'attendance',
+        //   });
+        // },
       );
     }
-    // Fallback for unknown type
+
+    // Fallback
     return const ActivityItem(
       icon: Icons.help_outline,
       title: 'Unknown Activity',
       subtitle: 'Data type error',
       color: Colors.grey,
+      onTap: null,
     );
   }
 
-// ... rest of the widget ...
-
   @override
   Widget build(BuildContext context) {
-    return CommonCardWidget(
-      color: AppThemeColors.cardBackgroundColor,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10), // Adjusted padding
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(10),
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: CommonCardWidget(
+        color: AppThemeColors.cardBackgroundColor,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(icon, color: color, size: 20),
               ),
-              child: Icon(icon, color: color, size: 20),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  AppTextWidget.small( // Changed to small for list context
-                    title,
-                    color: AppThemeColors.textPrimaryColor,
-                    maxLines: 1,
-                  ),
-                  const SizedBox(height: 2),
-                  AppTextWidget.verySmall(
-                    subtitle,
-                    color: AppThemeColors.textSecondaryColor,
-                    maxLines: 1,
-                  ),
-                ],
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AppTextWidget.small(
+                      title,
+                      color: AppThemeColors.textPrimaryColor,
+                      maxLines: 1,
+                    ),
+                    const SizedBox(height: 2),
+                    AppTextWidget.verySmall(
+                      subtitle,
+                      color: AppThemeColors.textSecondaryColor,
+                      maxLines: 1,
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Icon(
-              Icons.chevron_right_rounded,
-              color: Colors.grey.withOpacity(0.5),
-            ),
-          ],
+              Icon(
+                Icons.chevron_right_rounded,
+                color: Colors.grey.withOpacity(0.5),
+              ),
+            ],
+          ),
         ),
       ),
     ).marginOnly(bottom: 8);

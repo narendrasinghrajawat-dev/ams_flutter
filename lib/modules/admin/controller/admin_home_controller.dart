@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:attedance_management_system/core/constants/const_strings.dart';
 import 'package:attedance_management_system/data/utils/app_helper.dart';
 
+import '../../common/controller/loading_controller.dart';
 import '../../models/apply_leave_request.dart';
 import '../../models/attendance_activity.dart';
 import '../../models/user.dart';
@@ -10,6 +11,7 @@ import '../services/admin_home_service.dart';
 
 class AdminHomeController extends GetxController {
   final AdminHomeService _service = AdminHomeService();
+  final LoadingController _loadingController = Get.find<LoadingController>();
 
   // Data
   final RxList<User> users = <User>[].obs;
@@ -36,7 +38,7 @@ class AdminHomeController extends GetxController {
 
   int get presentToday {
     final todayAttendance = attendanceList.where(
-          (a) => a.punchDate == _todayDateString && a.punchType == 'IN',
+          (a) => a.punchDate == _todayDateString && a.punchType == '1',
     );
     return todayAttendance.map((a) => a.userKey).toSet().length;
   }
@@ -115,6 +117,8 @@ class AdminHomeController extends GetxController {
 
     print('_loadUsersList called');
 
+    _loadingController.start();
+
     try {
       final res = await _service.fetchUsersList();
       print('res iseth $res');
@@ -126,10 +130,14 @@ class AdminHomeController extends GetxController {
       users.refresh();
     } catch (e) {
       print('AdminHomeController _loadUsersList error: $e');
+    } finally{
+      _loadingController.hide();
     }
   }
 
   Future<void> _loadAllAttendanceList() async {
+    _loadingController.start();
+
     try {
       final res = await _service.fetchAttendanceList();
       attendanceList
@@ -138,10 +146,14 @@ class AdminHomeController extends GetxController {
       attendanceList.refresh();
     } catch (e) {
       print('AdminHomeController _loadAllAttendanceList error: $e');
+    } finally{
+      _loadingController.hide();
     }
   }
 
   Future<void> _loadAllLeavesRequestList() async {
+    _loadingController.start();
+
     try {
       final res = await _service.fetchLeavesList();
       leaveRequestsList
@@ -150,6 +162,9 @@ class AdminHomeController extends GetxController {
       leaveRequestsList.refresh();
     } catch (e) {
       print('AdminHomeController _loadAllLeavesRequestList error: $e');
+    } finally{
+      _loadingController.hide();
+
     }
   }
 }

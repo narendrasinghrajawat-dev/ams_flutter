@@ -21,7 +21,7 @@ class AdminEmployeesList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       child: Obx(() {
 
         final list = _admin.filteredUsers;
@@ -91,9 +91,9 @@ class _UserTile extends StatelessWidget {
             radius: 20,
             backgroundColor:
             AppThemeColors.primaryLightColor.withOpacity(0.3),
-            child: Text(
+            child: AppTextWidget.small(
               name.isNotEmpty ? name[0].toUpperCase() : 'U',
-              style: TextStyle(color: AppThemeColors.primaryColor),
+                color: AppThemeColors.primaryColor
             ),
           ),
           const SizedBox(width: 12),
@@ -106,7 +106,8 @@ class _UserTile extends StatelessWidget {
                   color: AppThemeColors.textPrimaryColor,
                 ),
                 const SizedBox(height: 4),
-                Row(children: [
+                Row(
+                    children: [
                   Icon(Icons.email_outlined,
                       size: 14, color: AppThemeColors.iconColor),
                   const SizedBox(width: 6),

@@ -36,7 +36,7 @@ class _UserLeavesScreenState extends State<UserLeavesScreen> {
       children: [
         SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 12),
             child: Column(
               children: [
                 _buildBalancesList(),
@@ -90,7 +90,7 @@ class _UserLeavesScreenState extends State<UserLeavesScreen> {
           crossAxisCount: 2,
           crossAxisSpacing: 10,
           mainAxisSpacing: 10,
-          childAspectRatio: 2.7,
+          childAspectRatio: 1.2,
         ),
         itemBuilder: (ctx, idx) {
           final balance = list[idx];
@@ -160,7 +160,7 @@ class _UserLeavesScreenState extends State<UserLeavesScreen> {
               )
           ),
 
-          const SizedBox(height: 5),
+          const SizedBox(height: 10),
 
           SegmentedTabs(
             labels: const ['Approved', 'Pending', 'Rejected', 'Cancelled'],

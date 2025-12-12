@@ -27,7 +27,7 @@ class _UserActivityScreenState extends State<UserActivityScreen> {
           Expanded(
             child: Obx(
                   () => ListView.separated(
-                padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 12),
                 itemCount: _userActivityController.filteredAttendanceActivitiesList.length,
                 separatorBuilder: (_, __) => const SizedBox(height: 10),
                 itemBuilder: (_, idx) {
@@ -64,8 +64,6 @@ class _UserActivityScreenState extends State<UserActivityScreen> {
   Widget _buildActivityTile({required String time, required String date, required bool isCheckIn,}) {
     final Color color =
     isCheckIn ? AppThemeColors.successColor : AppThemeColors.errorColor;
-    print(time);
-
 
     final IconData icon =
     isCheckIn ? Icons.login_rounded : Icons.logout_rounded;

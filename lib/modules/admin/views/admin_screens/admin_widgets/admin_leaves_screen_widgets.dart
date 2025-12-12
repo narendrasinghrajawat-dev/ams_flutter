@@ -4,6 +4,7 @@ import 'package:attedance_management_system/core/constants/app_theme_colors.dart
 import 'package:attedance_management_system/core/constants/const_strings.dart';
 import 'package:attedance_management_system/data/utils/app_helper.dart';
 import 'package:attedance_management_system/widgets/card/common_card.dart';
+import 'package:attedance_management_system/widgets/common/ui_helper_widgets.dart';
 import 'package:attedance_management_system/widgets/container/common_container.dart';
 import 'package:attedance_management_system/widgets/text_and_icon_widgets/app_text_type.dart';
 import 'package:flutter/material.dart';
@@ -45,7 +46,6 @@ class LeaveRequestListItem extends StatelessWidget {
             children: [
               AppTextWidget.medium(
                   leaveRequest.userName ?? 'N/A',
-                  color: AppThemeColors.textPrimaryColor
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -53,8 +53,9 @@ class LeaveRequestListItem extends StatelessWidget {
                   color: statusColor.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(6),
                 ),
-                child: AppTextWidget.verySmall(
-                  leaveRequest.leaveType.capitalizeFirst ?? leaveRequest.leaveType,
+                child: AppTextWidget.small(
+                  AppHelper.getLeaveType(leaveRequest.leaveType) ?? "",
+                  // leaveRequest.leaveType.capitalizeFirst ?? leaveRequest.leaveType,
                   color: statusColor,
                 ),
               ),
@@ -90,15 +91,13 @@ class LeaveRequestListItem extends StatelessWidget {
 
           // 3. Reason (Expanded Description)
           AppTextWidget.small(
-            'Reason: ${leaveRequest.reason}',
+            'Reason : ${leaveRequest.reason}',
             color: AppThemeColors.muted,
             maxLines: 2,
           ),
 
-          // 4. Action/Status Bar (Bottom Row)
-          const SizedBox(height: 12),
-          Divider(color: AppThemeColors.dividerColor.withOpacity(0.5), height: 1),
-          const SizedBox(height: 12),
+
+          UIHelper.showDivider().marginSymmetric(vertical: 10),
 
           isPending
               ? _buildPendingActions()

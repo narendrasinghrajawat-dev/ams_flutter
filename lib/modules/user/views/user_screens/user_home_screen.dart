@@ -196,6 +196,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       final double userLat = locRes.position!.latitude;
       final double userLng = locRes.position!.longitude;
 
+
       // 2️⃣ Master data & office radius
       final MasterData? masterData = _commonController.masterData.value;
 
@@ -475,8 +476,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
       return SafeArea(
         child: Padding(
-          padding:
-          const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 12),
           child: Column(
             children: [
               // Header Section
