@@ -399,10 +399,10 @@ class _LogoutButton extends StatelessWidget {
                 Icon(
                   Icons.logout_rounded,
                   color: Colors.red.shade600,
-                  size: 22,
+                  size: 18,
                 ),
                 const SizedBox(width: 10),
-                AppTextWidget.large(
+                AppTextWidget.medium(
                   'Logout',
                   color: Colors.red.shade600,
                 ),
@@ -437,10 +437,10 @@ class _ForgotPasswordButton extends StatelessWidget {
                 Icon(
                   Icons.password,
                   color: Colors.orange.shade600,
-                  size: 22,
+                  size: 18,
                 ),
                 const SizedBox(width: 10),
-                AppTextWidget.large(
+                AppTextWidget.medium(
                   'Forgot Password',
                     color: Colors.orange.shade600,
                 ),

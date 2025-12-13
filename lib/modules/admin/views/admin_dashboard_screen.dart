@@ -1,4 +1,5 @@
 import 'package:attedance_management_system/core/constants/app_icons.dart';
+import 'package:attedance_management_system/modules/admin/controller/admin_activity_controller.dart';
 import 'package:attedance_management_system/modules/admin/views/user_form_screen.dart';
 import 'package:attedance_management_system/widgets/common/common_dialong_box.dart';
 import 'package:attedance_management_system/widgets/text_and_icon_widgets/app_icon_button.dart';
@@ -11,9 +12,13 @@ import '../../../../widgets/text_and_icon_widgets/app_icons_type.dart';
 import '../../../../widgets/text_and_icon_widgets/app_text_type.dart';
 
 // Screens
+import '../../../data/utils/app_helper.dart';
+import '../../../widgets/appbar/appbar_widget.dart';
+import '../../models/user.dart';
 import '../controller/admin_employees_controller.dart';
 import '../controller/admin_home_controller.dart';
 import '../controller/admin_leaves_controller.dart';
+import 'admin_screens/admin_activity_screen.dart';
 import 'admin_screens/admin_employees_list.dart';
 import 'admin_screens/admin_home_page.dart';
 import 'admin_screens/admin_leaves_screen.dart';
@@ -29,8 +34,11 @@ class AdminDashboardScreen extends StatefulWidget {
 class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   int _currentIndex = 0;
 
+  final User user = AppHelper.getProfileUser();
+
   final List<Widget> _pages = [
     AdminHomePage(),
+    AdminActivityScreen(), // 🔥 new
     AdminEmployeesList(),
     AdminLeavesScreen(),
     const AdminProfileScreen(),
@@ -63,26 +71,34 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     // HOME TAB
       case 0:
         if (Get.isRegistered<AdminHomeController>()) {
-          await Get.find<AdminHomeController>().refreshHome();
+          Get.find<AdminHomeController>().resetToToday();
+        }
+        break;
+
+
+    // Activity TAB
+      case 1:
+        if (Get.isRegistered<AdminActivityController>()) {
+          Get.find<AdminActivityController>().resetToToday();
         }
         break;
 
     // EMPLOYEES TAB
-      case 1:
+      case 2:
         if (Get.isRegistered<AdminEmployeesController>()) {
           await Get.find<AdminEmployeesController>().refreshEmployees();
         }
         break;
 
     // LEAVES TAB
-      case 2:
+      case 3:
         if (Get.isRegistered<AdminLeavesController>()) {
           await Get.find<AdminLeavesController>().refreshLeaves();
         }
         break;
 
     // PROFILE TAB
-      case 3:
+      case 4:
       // Add AdminProfileController refresh here later if needed
         break;
     }
@@ -90,29 +106,17 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final showFab = _currentIndex == 1; // show FAB only on Employees tab
+    final showFab = _currentIndex == 2; // show FAB only on Employees tab
 
     return Scaffold(
 
-      appBar: AppBar(
-        centerTitle: true,
-        backgroundColor: AppThemeColors.appbarBackgroundColor,
-        title: AppTextWidget.large(
-          _titles[_currentIndex],
-          color: AppThemeColors.whiteColor,
-        ),
-        actions: [
-          AppIconButtonWidget.large(
-            icon: AppConstIcons.settingsIcon,
-            color: Colors.white,
-            onPressed: () {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                Get.toNamed(AppRoutes.settingsScreen);
-              });
-            },
-          ).marginOnly(right: 10),
-        ],
+      appBar: PreferredSize(
+        preferredSize:
+        const Size.fromHeight(80.0),
+        child: UserAppBar(user: user),
       ),
+
+
       body: IndexedStack(
         index: _currentIndex,
         children: _pages,
@@ -137,16 +141,14 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         unselectedItemColor: AppThemeColors.muted,
         onTap: _onTabChanged, // 👈 controller-based handler
         items: [
-          BottomNavigationBarItem(
-              icon: const Icon(Icons.home_outlined), label: 'Home'.tr),
-          BottomNavigationBarItem(
-              icon: const Icon(Icons.group_outlined), label: 'Employees'.tr),
-          BottomNavigationBarItem(
-              icon: const Icon(Icons.beach_access_outlined), label: 'Leaves'.tr),
-          BottomNavigationBarItem(
-              icon: const Icon(Icons.person), label: 'Profile'.tr),
+          BottomNavigationBarItem(icon: const Icon(Icons.home_outlined), label: 'Home'.tr),
+          BottomNavigationBarItem(icon: const Icon(Icons.timeline_outlined), label: 'Activity'.tr),
+          BottomNavigationBarItem(icon: const Icon(Icons.group_outlined), label: 'Employees'.tr),
+          BottomNavigationBarItem(icon: const Icon(Icons.beach_access_outlined), label: 'Leaves'.tr),
+          BottomNavigationBarItem(icon: const Icon(Icons.person), label: 'Profile'.tr),
         ],
       ),
     );
   }
 }
+

@@ -19,6 +19,9 @@ class ApiEndpoints {
   static const getTotalAttendance = 'admin/getTotalAttendance/';
   static const getAllLeavesRequests = 'admin/getAllLeavesRequests';
   static const adminActionOnLeaveRequest = 'admin/adminActionOnLeaveRequest/';
+  static const fetchLeavesByDate = 'admin/fetchLeavesByDate/';
+  static const fetchAttendanceByDate = 'admin/fetchAttendanceByDate/';
+  static const fetchActivitiesByDate = 'admin/fetchActivitiesByDate/';
 
 
 

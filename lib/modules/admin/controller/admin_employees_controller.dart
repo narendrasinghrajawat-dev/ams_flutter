@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:attedance_management_system/data/utils/app_helper.dart';
 
@@ -16,7 +17,9 @@ class AdminEmployeesController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    loadUsers();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      loadUsers();
+    });
   }
 
   Future<void> refreshEmployees() async {
@@ -25,7 +28,7 @@ class AdminEmployeesController extends GetxController {
 
   Future<void> loadUsers() async {
     users.clear();
-    _loadingController.start();
+    _loadingController.show();
 
     try {
       final res = await _service.fetchUsersList();

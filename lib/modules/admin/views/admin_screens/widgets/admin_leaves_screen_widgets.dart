@@ -36,6 +36,9 @@ class LeaveRequestListItem extends StatelessWidget {
     final statusColor = _getStatusColor(leaveRequest.leaveStatus);
     final isPending = leaveRequest.leaveStatus == AppStrings.pendingLeavesStatusKey;
 
+    print(leaveRequest.startDate);
+    
+
     return CommonCardWidget(
      child:  Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -74,7 +77,7 @@ class LeaveRequestListItem extends StatelessWidget {
                   Icon(Icons.calendar_today, size: 14, color: AppThemeColors.muted),
                   const SizedBox(width: 4),
                   AppTextWidget.small(
-                    '${leaveRequest.startDate} → ${leaveRequest.endDate}',
+                    '${AppHelper.formatDateString(leaveRequest.startDate)} → ${AppHelper.formatDateString(leaveRequest.endDate)}',
                     color: AppThemeColors.textSecondaryColor,
                   ),
                 ],
