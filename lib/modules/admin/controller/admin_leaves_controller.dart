@@ -21,7 +21,9 @@ class AdminLeavesController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    loadLeaves();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      loadLeaves();
+    });
   }
 
   Future<void> refreshLeaves() async {
@@ -30,7 +32,7 @@ class AdminLeavesController extends GetxController {
 
   Future<void> loadLeaves() async {
     leaveRequestsList.clear();
-    _loadingController.start();
+    _loadingController.show();
 
     try {
       final res = await _service.fetchLeavesList();
@@ -66,7 +68,7 @@ class AdminLeavesController extends GetxController {
       // optional: print/stash stacktrace
       debugPrint('approveLeave error: $e\n$st');
     } finally {
-      _loadingController.stop();
+      _loadingController.hide();
     }
   }
 
@@ -86,7 +88,7 @@ class AdminLeavesController extends GetxController {
       Get.snackbar('Error', 'Unable to reject leave: ${e.toString()}');
       debugPrint('rejectLeave error: $e\n$st');
     } finally {
-      _loadingController.stop();
+      _loadingController.hide();
     }
   }
 

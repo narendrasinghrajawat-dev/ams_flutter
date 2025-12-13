@@ -71,7 +71,7 @@ class LeaveCard extends StatelessWidget {
                 iconColor: AppThemeColors.collapsedIconColor,
 
 
-                title: AppTextWidget.medium("Expand"),
+                title: AppTextWidget.medium("More Details"),
                 children: [
                   Column(
                     children: [

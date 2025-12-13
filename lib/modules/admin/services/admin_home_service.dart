@@ -39,8 +39,7 @@ class AdminHomeService {
 
   Future<List<Map<String, dynamic>>> fetchAttendanceList() async {
     try {
-      final apiResponse =
-      await apiService.get(ApiEndpoints.getTotalAttendance);
+      final apiResponse = await apiService.get(ApiEndpoints.getTotalAttendance);
       if (apiResponse is List) {
         final List<Map<String, dynamic>> validatedList = [];
         for (final item in apiResponse) {
@@ -88,4 +87,19 @@ class AdminHomeService {
       return [];
     }
   }
+
+
+
+  /// 🔥 DATE-BASED ATTENDANCE
+  Future<List<dynamic>> fetchAttendanceByDate(String date) async {
+    return await apiService.get('${ApiEndpoints.fetchAttendanceByDate}$date');
+  }
+
+  /// 🔥 DATE-BASED LEAVES
+  Future<List<dynamic>> fetchLeavesByDate(String date) async {
+    return await apiService.get('${ApiEndpoints.fetchLeavesByDate}$date');
+  }
+
+
+
 }

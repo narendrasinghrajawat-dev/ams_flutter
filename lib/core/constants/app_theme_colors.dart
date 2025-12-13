@@ -131,6 +131,8 @@ class AppThemeColors {
   // ============================================================
   static Color get containerBgColor => isDark ? Colors.white70 : Colors.white70;
 
+  // Circle Avatar Colors
+  static Color get circleAvatarBackgroundColor => isDark ? Colors.white : Colors.white;
 
   // ============================================================
   // ICON COLORS

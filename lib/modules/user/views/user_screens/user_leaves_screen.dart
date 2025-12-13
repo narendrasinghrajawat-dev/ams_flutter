@@ -119,7 +119,7 @@ class _UserLeavesScreenState extends State<UserLeavesScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(child: AppTextWidget.small("Total"),),
+                Expanded(child: AppTextWidget.small("Total Applied"),),
                 AppTextWidget.medium(all.length.toString(), color: AppHelper.getLeavesStatusColor(""),),
               ],
             ),

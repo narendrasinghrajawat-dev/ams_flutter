@@ -1,14 +1,12 @@
 import 'package:attedance_management_system/core/constants/const_strings.dart';
 import 'package:attedance_management_system/data/utils/app_helper.dart';
+import 'package:attedance_management_system/modules/admin/views/admin_screens/widgets/admin_leaves_screen_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
-import '../../../../../widgets/card/common_card.dart';
 import '../../../../../widgets/text_and_icon_widgets/app_text_type.dart';
 import '../../../../core/constants/app_theme_colors.dart';
 import '../../../models/admin_action.dart';
 import '../../controller/admin_leaves_controller.dart';
-import 'admin_widgets/admin_leaves_screen_widgets.dart';
 
 class AdminLeavesScreen extends StatelessWidget {
   const AdminLeavesScreen({Key? key}) : super(key: key);

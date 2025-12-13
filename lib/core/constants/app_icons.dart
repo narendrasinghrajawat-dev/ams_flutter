@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 
 class AppConstIcons{
 
+  static const personIcon = Icons.person;
+
+
   static const appStaticIcon = Icons.fingerprint;
 
   static const settingsIcon = Icons.settings;

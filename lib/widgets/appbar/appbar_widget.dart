@@ -1,4 +1,5 @@
 
+import 'package:attedance_management_system/widgets/text_and_icon_widgets/app_icons_type.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -29,14 +30,14 @@ class UserAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   String networkImage = 'https://t4.ftcdn.net/jpg/03/26/98/51/360_F_326985142_1aaKcEjMQW6ULp6oI9MYuv8lN9f8sFmj.jpg';
-
+    
   @override
   Widget build(BuildContext context) {
 
     return AppBar(
       backgroundColor: AppThemeColors.appbarBackgroundColor,
-
       elevation: 0,
+      actionsPadding: EdgeInsets.all(0),
       flexibleSpace: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -49,8 +50,9 @@ class UserAppBar extends StatelessWidget implements PreferredSizeWidget {
                   border: Border.all(color: AppThemeColors.primaryLightColor, width: 2.5),
                 ),
                 child: CircleAvatar(
-                  backgroundImage: NetworkImage(networkImage),
-                  radius: 25, // Specify the radius of the avatar, which controls its size
+                  backgroundColor: AppThemeColors.circleAvatarBackgroundColor,
+                  radius: 22,
+                  child: AppIconWidget.veryLarge(AppConstIcons.personIcon), // Specify the radius of the avatar, which controls its size
                 ),
               ),
 
@@ -61,8 +63,14 @@ class UserAppBar extends StatelessWidget implements PreferredSizeWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    AppTextWidget.large(
+                    AppTextWidget.medium(
                       _fullName,
+                      maxLines: 2,
+                      color: AppThemeColors.whiteColor,
+                    ),
+
+                    AppTextWidget.small(
+                      user.email,
                       maxLines: 2,
                       color: AppThemeColors.whiteColor,
                     ),
@@ -71,7 +79,7 @@ class UserAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
               ),
 
-                AppIconButtonWidget.large(icon: AppConstIcons.settingsIcon, color: Colors.white, onPressed: (){
+              AppIconButtonWidget.large(icon: AppConstIcons.settingsIcon, color: Colors.white, onPressed: (){
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     Get.toNamed(AppRoutes.settingsScreen);
                   });

@@ -1,8 +1,5 @@
-import 'package:attedance_management_system/modules/user/controller/user_activity_controller.dart';
 import 'package:attedance_management_system/modules/user/services/user_activity_service.dart';
-import 'package:attedance_management_system/modules/user/views/user_screens/user_activity_screen.dart';
 import 'package:get/get.dart';
-
 import '../../models/attendance_activity.dart';
 import '../services/user_home_service.dart';
 
@@ -20,7 +17,6 @@ class UserHomeController extends GetxController {
   @override
   void onReady() {
     super.onReady();
-
   }
 
   Future<void> refreshHome() async {
@@ -29,3 +25,5 @@ class UserHomeController extends GetxController {
 
 
 }
+
+
