@@ -1,5 +1,6 @@
 
 
+import 'package:attedance_management_system/modules/admin/controller/admin_activity_controller.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/bindings_interface.dart';
@@ -14,6 +15,8 @@ class AdminRootBinding extends Bindings {
     Get.lazyPut<AdminHomeController>(() => AdminHomeController(), fenix: true);
     Get.lazyPut<AdminEmployeesController>(() => AdminEmployeesController(), fenix: true);
     Get.lazyPut<AdminLeavesController>(() => AdminLeavesController(), fenix: true);
+    Get.lazyPut<AdminActivityController>(() => AdminActivityController(), fenix: true);
+
     // AdminProfileScreen just uses AuthController for now
   }
 }

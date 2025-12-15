@@ -1,7 +1,9 @@
 import 'package:attedance_management_system/core/constants/app_icons.dart';
+import 'package:attedance_management_system/data/utils/app_helper.dart';
 import 'package:attedance_management_system/modules/admin/controller/admin_employees_controller.dart';
 import 'package:attedance_management_system/modules/common/controller/common_controller.dart';
 import 'package:attedance_management_system/modules/models/masterData.dart';
+import 'package:attedance_management_system/widgets/common/ui_helper_widgets.dart';
 import 'package:attedance_management_system/widgets/text_and_icon_widgets/app_icon_button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -95,7 +97,9 @@ class _UserFormState extends State<UserForm> {
     phoneC.text = widget.initialData?.phoneNo ?? "";
     genderId = widget.initialData?.genderId;
     usernameC.text = widget.initialData?.username ?? "";
-    dobC.text = widget.initialData?.dob ?? "";
+    dateOfBirth = widget.initialData?.dob;
+    dobC.text = AppHelper.formatDateString(widget.initialData?.dob);
+
     passwordC.text = widget.initialData?.password ?? "";
     roleId = widget.initialData?.roleId;
 
@@ -194,11 +198,11 @@ class _UserFormState extends State<UserForm> {
     // FIX 2: Check the 'result' variable instead of the out-of-scope 'created' variable.
     if (result != null) {
       Get.back(); // close sheet
-      Get.snackbar('Success', successMessage, snackPosition: SnackPosition.BOTTOM);
+      UIHelper.showSnackbar("Success", successMessage);
     } else {
       // Determine the action that failed for a clearer error message
       final action = widget.initialData == null ? 'create' : 'update';
-      Get.snackbar('Error', 'Failed to $action user', snackPosition: SnackPosition.BOTTOM);
+      UIHelper.showSnackbar("Error", 'Failed to $action user',type: SnackbarType.error);
     }
   }
   String? _validateName(String? v) {
@@ -216,7 +220,7 @@ class _UserFormState extends State<UserForm> {
   String? _validatePhone(String? v) {
     if (v == null || v.trim().isEmpty) return 'Enter phone';
     final digits = v.replaceAll(RegExp(r'\D'), '');
-    if (digits.length < 7) return 'Invalid phone';
+    if (digits.length == 10) return 'Invalid phone';
     return null;
   }
 

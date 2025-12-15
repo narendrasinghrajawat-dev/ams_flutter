@@ -1,5 +1,7 @@
+import 'package:attedance_management_system/core/constants/app_theme_colors.dart';
 import 'package:attedance_management_system/data/utils/app_helper.dart';
 import 'package:attedance_management_system/modules/models/leave_balance.dart';
+import 'package:flutter/painting.dart';
 import 'package:get/get.dart';
 
 import '../../common/controller/loading_controller.dart';
@@ -102,6 +104,8 @@ class UserLeavesController extends GetxController {
   Future<void> onCancelLeave(ApplyLeaveRequest leave) async {
 
     final confirm = await Get.defaultDialog<bool>(
+      contentPadding: EdgeInsets.all(10),
+      backgroundColor: AppThemeColors.whiteColor,
       title: 'Cancel Leave',
       middleText: 'Do you really want to cancel this leave request?',
       textConfirm: 'Yes',

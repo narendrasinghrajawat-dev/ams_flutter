@@ -236,7 +236,7 @@ class AppThemeColors {
 
 
 //   other common widgets
-  static Color get popupBackgroundColor => isDark ? primaryDarkColor : primaryLightColor.withOpacity(.7);
+  static Color get popupBackgroundColor => isDark ? primaryDarkColor : Colors.white;
 
   static Color get editIconColors => isDark ? primaryDarkColor : primaryLightColor;
 
@@ -246,11 +246,23 @@ class AppThemeColors {
 
   // SnackBar Color
   static Color get snackBarSuccessColor => isDark ? Colors.green : Colors.green;
-  static Color get snackBarErrorColor => isDark ? Colors.red : Colors.green;
-  static Color get snackBarWarningColor => isDark ? Colors.yellow : Colors.green;
+  static Color get snackBarErrorColor => isDark ? Colors.red : Colors.red;
+  static Color get snackBarWarningColor => isDark ? Colors.yellow : Colors.orange;
   static Color get snackBarInfoColor => isDark ? Colors.green : Colors.green;
 
   static Color get collapsedBackgroundColor => isDark ? primaryDarkColor : primaryLightColor.withOpacity(.01);
   static Color get collapsedIconColor => isDark ? primaryLightColor : primaryDarkColor;
+
+
+//   Punch Type Colors
+
+  static Color get checkInColor => isDark ? primaryDarkColor : Colors.green;
+  static Color get checkOutColor => isDark ? primaryDarkColor : Colors.red;
+
+
+
+  static const Color totalColor = Color(0xFF6366F1);
+  static const Color availableColor = Color(0xFF10B981);
+  static const Color usedColor = Color(0xFFEF4444);
 
 }

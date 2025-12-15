@@ -50,7 +50,7 @@ class AuthController extends GetxController {
         }
       } else {
         // If server returned error structure or empty map
-        Get.snackbar('Error', res['message'] ?? 'Login failed');
+        // Get.snackbar('Error', res['message'] ?? 'Login failed');
       }
 
     } catch (e) {

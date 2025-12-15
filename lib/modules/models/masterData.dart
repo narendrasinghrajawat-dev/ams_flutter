@@ -14,6 +14,7 @@ class MasterData {
   final List<MasterDataItem> leaveStatus;
   final List<MasterDataItem> leaveDurationsType;
   final List<MasterDataItem> leaveType;
+  final List<MasterDataItem> halfDayShiftType;
   final List<MasterDataItem> role;
   final List<MasterDataItem> gender;
 
@@ -27,6 +28,7 @@ class MasterData {
     this.rev,
     required this.leaveStatus,
     required this.leaveDurationsType,
+    required this.halfDayShiftType,
     required this.leaveType,
     required this.role,
     required this.gender,
@@ -63,6 +65,8 @@ class MasterData {
       // Parsing the nested lists
       leaveStatus: _parseList(json['leaveStatus']),
       leaveDurationsType: _parseList(json['leaveDurationsType']),
+      halfDayShiftType: _parseList(json['halfDayShiftType']),
+
       leaveType: _parseList(json['leaveType']),
       role: _parseList(json['role']),
       gender: _parseList(json['gender']),
@@ -80,6 +84,7 @@ class MasterData {
       // Configuration lists (converting item models back to JSON maps)
       'leaveStatus': leaveStatus.map((item) => item.toJson()).toList(),
       'leaveDurationsType': leaveDurationsType.map((item) => item.toJson()).toList(),
+      'halfDayShiftType': halfDayShiftType.map((item) => item.toJson()).toList(),
       'leaveType': leaveType.map((item) => item.toJson()).toList(),
       'role': role.map((item) => item.toJson()).toList(),
       'gender': gender.map((item) => item.toJson()).toList(),

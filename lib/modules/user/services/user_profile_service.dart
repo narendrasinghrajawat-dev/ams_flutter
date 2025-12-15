@@ -14,7 +14,7 @@ class UserProfileService {
     };
 
     // adapt path if your backend path is different
-    final resp = await _api.post(ApiEndpoints.changePassword, body);
+    final resp = await _api.post(ApiEndpoints.changePasswordByUser, body);
 
     print('res p is teh $resp');
 

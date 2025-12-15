@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 
 import '../../../../../../widgets/card/common_card.dart';
 import '../../../../../../widgets/text_and_icon_widgets/app_text_type.dart';
+import '../../../../../models/apply_leave_request.dart';
+import '../../../../../models/attendance_activity.dart';
 import '../../../../controller/admin_home_controller.dart';
 import '../../../../../../core/constants/app_theme_colors.dart';
 
@@ -62,43 +64,91 @@ class _ActivityItem extends StatelessWidget {
     IconData icon = Icons.info_outline;
     String title = '';
     String subtitle = '';
+    String time = '--';
+    String date = '--';
+    Color color = AppThemeColors.primaryColor;
 
-    /// ATTENDANCE ACTIVITY
-    if (item.runtimeType.toString() == 'AttendanceActivity') {
-      icon = Icons.login_rounded;
+    /// ---------------- ATTENDANCE ACTIVITY ----------------
+    if (item is AttendanceActivity) {
+      final bool isCheckIn = item.punchType == "1";
+
+      icon = isCheckIn ? Icons.login_rounded : Icons.logout_rounded;
+      color = AppHelper.getPunchTypeColor(item.punchType);
+
       title = item.userName ?? 'Employee';
-      subtitle = 'Checked ${item.punchType == "1" ? "in" : "out"} at ${AppHelper.formatTimeString(item.punchTime) ?? '--'}';
+
+      time = AppHelper.formatTimeString(item.punchTime) ?? '--';
+      date = AppHelper.formatDateString(item.punchDate) ?? '--';
+
+      subtitle = 'Checked ${isCheckIn ? "in" : "out"}';
     }
 
-    /// LEAVE ACTIVITY
-    else if (item.runtimeType.toString() == 'ApplyLeaveRequest') {
+    /// ---------------- LEAVE ACTIVITY ----------------
+    else if (item is ApplyLeaveRequest) {
       icon = Icons.beach_access_rounded;
+      color = AppThemeColors.warningColor;
+
       title = item.userName ?? 'Employee';
       subtitle = 'Leave request (${item.leaveStatus})';
+
+      time = AppHelper.formatTimeString(item.createdDate) ?? '--';
+      date = AppHelper.formatDateString(item.createdDate) ?? '--';
     }
 
     return CommonCardWidget(
+      color: color.withOpacity(0.06),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CircleAvatar(
-            radius: 18,
-            backgroundColor: AppThemeColors.primaryColor.withOpacity(0.1),
-            child: Icon(icon, color: AppThemeColors.primaryColor, size: 18),
+          /// 🔹 ICON
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.15),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: color, size: 18),
           ),
+
           const SizedBox(width: 12),
+
+          /// 🔹 CONTENT
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                AppTextWidget.small(title),
+                AppTextWidget.small(
+                  title,
+                  color: AppThemeColors.textPrimaryColor,
+                ),
                 const SizedBox(height: 2),
                 AppTextWidget.verySmall(
                   subtitle,
                   color: AppThemeColors.textSecondaryColor,
                 ),
+                const SizedBox(height: 6),
+
+                /// 📅 DATE CHIP
+
               ],
             ),
           ),
+
+          /// ⏰ TIME
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              AppTextWidget.verySmall(
+                time,
+                color: AppThemeColors.textPrimaryColor,
+              ),
+              AppTextWidget.small(
+                date,
+              ),
+            ],
+          )
+
         ],
       ),
     );

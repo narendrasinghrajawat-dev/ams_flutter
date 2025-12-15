@@ -62,7 +62,47 @@ class UIHelper {
     );
   }
 
-  // --- Convenience Functions (Optional but Recommended) ---
+
+
+  static  Future<bool?> showConfirmationDialog({required String title, required String message, String confirmText = 'Confirm', String cancelText = 'Cancel', Color? confirmColor,}) {
+    return Get.dialog<bool>(
+      AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+        ),
+        title: AppTextWidget.medium(title),
+        content: AppTextWidget.small(
+          message,
+          color: AppThemeColors.textSecondaryColor,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(result: false),
+            child: AppTextWidget.small(
+              cancelText,
+              color: AppThemeColors.muted,
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () => Get.back(result: true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor:
+              confirmColor ?? AppThemeColors.primaryColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              elevation: 0,
+            ),
+            child: AppTextWidget.small(
+              confirmText,
+              color: Colors.white,
+            ),
+          ),
+        ],
+      ),
+      barrierDismissible: false,
+    );
+  }
 
   static void showSuccess(String message, {String title = 'Success'}) {
     showSnackbar(title, message, type: SnackbarType.success);

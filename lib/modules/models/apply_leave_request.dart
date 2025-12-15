@@ -18,6 +18,7 @@ class ApplyLeaveRequest {
   String leaveType;     // e.g. "Sick", "Casual"
   double numberOfLeaves;
   String leaveDurationsType; // e.g., "Full Day", "Half Day"
+  String? halfDayShiftType; // e.g., "Full Day", "Half Day"
 
   bool isActive;
   String? modifiedDate;
@@ -50,6 +51,7 @@ class ApplyLeaveRequest {
     this.actionDate,
     this.approverByName,
     this.approverByKey,
+    this.halfDayShiftType
   });
 
   // --- Factory Constructor for fromJson ---
@@ -81,6 +83,9 @@ class ApplyLeaveRequest {
       leaveDurationsType: AppJsonHelper.safeString(
           json['leaveDurationsType'] ?? json['durationType'],
           defaultValue: 'Full Day'),
+
+      // Duration Type
+      halfDayShiftType: AppJsonHelper.safeString(json['halfDayShiftType'] ?? json['halfDayShiftType']),
 
       // System/Metadata fields
       isActive: AppJsonHelper.safeBool(json['isActive']),
@@ -114,6 +119,7 @@ class ApplyLeaveRequest {
       'leaveType': leaveType,
       'numberOfLeaves': numberOfLeaves,
       'leaveDurationsType': leaveDurationsType,
+      'halfDayShiftType': halfDayShiftType,
       "leaveStatus" : leaveStatus,
       // System/Metadata fields
       'isActive': isActive,
@@ -122,6 +128,7 @@ class ApplyLeaveRequest {
       'actionDate': actionDate,
       'approverByName': approverByName,
       'approverByKey': approverByKey,
+
     };
   }
 }

@@ -26,14 +26,16 @@ class _UserActivityScreenState extends State<UserActivityScreen> {
           // Card Wrapper
           Expanded(
             child: Obx(
-                  () => ListView.separated(
+                  () =>  _userActivityController.filteredAttendanceActivitiesList.isEmpty ? Center(child: AppTextWidget.small("Activity Not Found"),): ListView.separated(
                     padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 12),
                 itemCount: _userActivityController.filteredAttendanceActivitiesList.length,
+                
                 separatorBuilder: (_, __) => const SizedBox(height: 10),
                 itemBuilder: (_, idx) {
+                      
                   // Cast the item to the correct model type: AttendanceActivity
                   final activity = _userActivityController.filteredAttendanceActivitiesList[idx];
-
+  
                   // Use null-aware operators as fields are optional
                   final bool isCheckIn = activity.punchType == "1";
 
@@ -46,6 +48,7 @@ class _UserActivityScreenState extends State<UserActivityScreen> {
                       ? AppHelper.formatDateString(activity.punchDate!)
                       : 'N/A';
 
+                  
                   return _buildActivityTile(
                     time: formattedTime,
                     date: formattedDate,

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:attedance_management_system/data/utils/app_helper.dart';
 
+import '../../../widgets/common/ui_helper_widgets.dart';
 import '../../common/controller/loading_controller.dart';
 import '../../models/user.dart';
 import '../services/admin_employees_service.dart';
@@ -109,4 +110,45 @@ class AdminEmployeesController extends GetxController {
 
     }
   }
+
+
+  Future<bool?> changeUserPasswordByAdmin(String userKey, String newPassword) async {
+
+    print('change pass called');
+
+    if (userKey.isEmpty) {
+      Get.snackbar('Error', 'Unable to identify current user. Please login again.');
+      return false;
+    }
+
+    if (newPassword.trim().length < 6) {
+      Get.snackbar('Validation', 'Password must be at least 6 characters long.');
+      return false;
+    }
+
+    _loadingController.start();
+
+    try {
+      final resp = await _service.changeUserPasswordByAdmin(userKey, newPassword.trim());
+
+      if(resp != null && resp.isNotEmpty){
+
+        UIHelper.showSnackbar(
+          'Success',
+          'Password Updated Successfully"',
+          duration: const Duration(seconds: 7),
+        );
+
+        return true;
+      }
+      return false;
+    } catch (err) {
+      Get.snackbar('Error', err.toString());
+    } finally {
+      _loadingController.hide();
+    }
+    return null;
+  }
+
+
 }

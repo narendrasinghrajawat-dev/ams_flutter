@@ -13,6 +13,7 @@ class AppConstIcons{
 
   static const addIcon = Icons.add;
   static const editIcon = Icons.edit;
+  static const forgotPassword = Icons.password;
   static const deleteIcon = Icons.delete;
 
   static const dateIcon = Icons.date_range;

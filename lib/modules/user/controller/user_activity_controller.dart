@@ -57,7 +57,6 @@ class UserActivityController extends GetxController {
     try {
       final List<Map<String, dynamic>> res =
       await _service.fetchAllAttendanceActivity(userKey);
-      print('res is the $res');
       attendanceActivities
         ..clear()
         ..addAll(res.map((e) => AttendanceActivity.fromJson(e)));
