@@ -1,3 +1,4 @@
+import 'package:attedance_management_system/modules/models/attendance_activity.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_rx/src/rx_types/rx_types.dart';
@@ -11,7 +12,7 @@ class AdminActivityController extends GetxController {
   final AdminActivityService _service = AdminActivityService();
   final LoadingController _loadingController = Get.find<LoadingController>();
 
-  final RxList<dynamic> activities = <dynamic>[].obs;
+  final RxList<AttendanceActivity> activities = <AttendanceActivity>[].obs;
   final Rx<DateTime> selectedDate = DateTime.now().obs;
 
   @override
@@ -40,14 +41,13 @@ class AdminActivityController extends GetxController {
     try {
       _loadingController.start();
 
-      final dateStr =
-      DateFormat('yyyy-MM-dd').format(selectedDate.value);
+      final dateStr = DateFormat('yyyy-MM-dd').format(selectedDate.value);
 
       final data = await _service.fetchActivitiesByDate(dateStr);
 
       activities
         ..clear()
-        ..addAll(data);
+        ..addAll(data.map((e) => AttendanceActivity.fromJson(e)).toList());
     } catch (e) {
       activities.clear();
     } finally {

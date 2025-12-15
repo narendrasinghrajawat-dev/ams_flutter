@@ -4,10 +4,8 @@ import 'package:attedance_management_system/modules/user/views/user_screens/widg
 import 'package:attedance_management_system/modules/user/views/user_screens/widgets/leaves/leave_balance_card.dart';
 import 'package:attedance_management_system/modules/user/views/user_screens/widgets/leaves/leave_card.dart';
 import 'package:attedance_management_system/modules/user/views/user_screens/widgets/leaves/segmented_tabs.dart';
-import 'package:attedance_management_system/modules/user/views/user_screens/widgets/leaves/summary_card.dart';
 import 'package:attedance_management_system/widgets/card/common_card.dart';
 import 'package:attedance_management_system/widgets/common/common_dialong_box.dart';
-import 'package:attedance_management_system/widgets/text_and_icon_widgets/app_icon_button.dart';
 import 'package:attedance_management_system/widgets/text_and_icon_widgets/app_icons_type.dart';
 import 'package:attedance_management_system/widgets/text_and_icon_widgets/app_text_type.dart';
 import 'package:flutter/material.dart';
@@ -42,7 +40,7 @@ class _UserLeavesScreenState extends State<UserLeavesScreen> {
                 _buildBalancesList(),
                 const SizedBox(height: 5),
                 Expanded(
-                  child: Obx(() => _buildSummaryAndList()),
+                  child:  _buildSummaryAndList(),
                 ),
               ],
             ),
@@ -90,7 +88,7 @@ class _UserLeavesScreenState extends State<UserLeavesScreen> {
           crossAxisCount: 2,
           crossAxisSpacing: 10,
           mainAxisSpacing: 10,
-          childAspectRatio: 1.2,
+          childAspectRatio: 1.7,
         ),
         itemBuilder: (ctx, idx) {
           final balance = list[idx];
@@ -101,93 +99,129 @@ class _UserLeavesScreenState extends State<UserLeavesScreen> {
   }
 
   Widget _buildSummaryAndList() {
-    final List<ApplyLeaveRequest> all = _controller.filteredAppliedLeavesList;
-
-    final approved = all.where((e) => (e.leaveStatus ?? '').toLowerCase() == AppStrings.approvedLeavesStatusKey).toList();
-    final pending = all.where((e) => (e.leaveStatus ?? '').toLowerCase() == AppStrings.pendingLeavesStatusKey).toList();
-    final rejected = all.where((e) => (e.leaveStatus ?? '').toLowerCase() ==AppStrings.rejectedLeavesStatusKey).toList();
-    final cancelled = all.where((e) => (e.leaveStatus ?? '').toLowerCase() == AppStrings.cancelledLeavesStatusKey).toList();
-
-    final activeList = _getActiveList(approved, pending, rejected, cancelled);
-
     return Expanded(
-      child: Column(
-        children: [
-          CommonCardWidget(
+      child: Obx(() {
+        final List<ApplyLeaveRequest> all =
+            _controller.filteredAppliedLeavesList;
+
+        final approved = all
+            .where((e) =>
+        (e.leaveStatus ?? '').toLowerCase() ==
+            AppStrings.approvedLeavesStatusKey)
+            .toList();
+
+        final pending = all
+            .where((e) =>
+        (e.leaveStatus ?? '').toLowerCase() ==
+            AppStrings.pendingLeavesStatusKey)
+            .toList();
+
+        final rejected = all
+            .where((e) =>
+        (e.leaveStatus ?? '').toLowerCase() ==
+            AppStrings.rejectedLeavesStatusKey)
+            .toList();
+
+        final cancelled = all
+            .where((e) =>
+        (e.leaveStatus ?? '').toLowerCase() ==
+            AppStrings.cancelledLeavesStatusKey)
+            .toList();
+
+        final activeList =
+        _getActiveList(approved, pending, rejected, cancelled);
+
+        return Column(
+          children: [
+            /// 🔹 SUMMARY CARD
+            CommonCardWidget(
               child: Column(
                 children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(child: AppTextWidget.small("Total Applied"),),
-                AppTextWidget.medium(all.length.toString(), color: AppHelper.getLeavesStatusColor(""),),
-              ],
+                  _summaryRow(
+                    title: 'Total Applied',
+                    value: all.length,
+                    color: AppHelper.getLeavesStatusColor(''),
+                  ),
+                  _summaryRow(
+                    title: 'Approved',
+                    value: approved.length,
+                    color: AppHelper.getLeavesStatusColor(
+                        AppStrings.approvedLeavesStatusKey),
+                  ),
+                  _summaryRow(
+                    title: 'Pending',
+                    value: pending.length,
+                    color: AppHelper.getLeavesStatusColor(
+                        AppStrings.pendingLeavesStatusKey),
+                  ),
+                  _summaryRow(
+                    title: 'Rejected',
+                    value: rejected.length,
+                    color: AppHelper.getLeavesStatusColor(
+                        AppStrings.rejectedLeavesStatusKey),
+                  ),
+                  _summaryRow(
+                    title: 'Cancelled',
+                    value: cancelled.length,
+                    color: AppHelper.getLeavesStatusColor(
+                        AppStrings.cancelledLeavesStatusKey),
+                  ),
+                ],
+              ),
             ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(child: AppTextWidget.small("Approved"),),
-                      AppTextWidget.medium(approved.length.toString(), color: AppHelper.getLeavesStatusColor(AppStrings.approvedLeavesStatusKey),),
-                    ],
-                  ),
 
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(child: AppTextWidget.small("Pending"),),
-                      AppTextWidget.medium(pending.length.toString(), color: AppHelper.getLeavesStatusColor(AppStrings.pendingLeavesStatusKey),),
-                    ],
-                  ),
+            const SizedBox(height: 10),
 
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(child: AppTextWidget.small("Rejected"),),
-                       AppTextWidget.medium(rejected.length.toString(), color: AppHelper.getLeavesStatusColor(AppStrings.rejectedLeavesStatusKey),),
-                    ],
-                  ),
+            /// 🔹 TABS (local state is fine)
+            SegmentedTabs(
+              labels: const ['Approved', 'Pending', 'Rejected', 'Cancelled'],
+              selectedIndex: _activeTab,
+              onTap: (i) => setState(() => _activeTab = i),
+            ),
 
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(child: AppTextWidget.small("Cancelled"),),
-                      AppTextWidget.medium(cancelled.length.toString(), color: AppHelper.getLeavesStatusColor(AppStrings.cancelledLeavesStatusKey),),
-                    ],
-                  ),
+            const SizedBox(height: 12),
 
-
+            /// 🔹 LIST
+            Expanded(
+              child: activeList.isEmpty
+                  ? const EmptyStateWidget(message: 'No leaves found')
+                  : ListView.separated(
+                physics: const BouncingScrollPhysics(),
+                itemCount: activeList.length,
+                separatorBuilder: (_, __) =>
+                const SizedBox(height: 10),
+                itemBuilder: (ctx, idx) {
+                  return LeaveCard(leave: activeList[idx]);
+                },
+              ),
+            ),
           ],
-              )
-          ),
+        );
+      }),
+    );
+  }
 
-          const SizedBox(height: 10),
 
-          SegmentedTabs(
-            labels: const ['Approved', 'Pending', 'Rejected', 'Cancelled'],
-            selectedIndex: _activeTab,
-            onTap: (i) => setState(() => _activeTab = i),
-          ),
-
-          const SizedBox(height: 12),
-
-          // List of leaves
-          Expanded(
-            child: activeList.isEmpty
-                ? const EmptyStateWidget(message: 'No leaves found')
-                : ListView.separated(
-              physics: const BouncingScrollPhysics(),
-              itemCount: activeList.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 10),
-              itemBuilder: (ctx, idx) {
-                final leave = activeList[idx];
-                return LeaveCard(leave: leave);
-              },
-            ),
+  Widget _summaryRow({
+    required String title,
+    required int value,
+    required Color color,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(child: AppTextWidget.small(title)),
+          AppTextWidget.medium(
+            value.toString(),
+            color: color,
           ),
         ],
       ),
     );
   }
+
 
   List<ApplyLeaveRequest> _getActiveList(
       List<ApplyLeaveRequest> approved,

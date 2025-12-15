@@ -3,12 +3,14 @@ import 'dart:convert';
 import 'dart:async';
 
 import 'package:attedance_management_system/modules/common/services/storage_service.dart';
+import 'package:attedance_management_system/widgets/common/ui_helper_widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../core/constants/const_strings.dart';
 import '../controller/loading_controller.dart';
+import '../helper/api_response_helper.dart';
 
 class ApiService {
   final StorageService _storage = StorageService();
@@ -166,16 +168,39 @@ class ApiService {
     final body =
     response.body.isNotEmpty ? jsonDecode(response.body) : null;
 
+    // ✅ SUCCESS
     if (status == 200 || status == 201) {
       return body?['data'] ?? body;
     }
 
-    if (status == 400) throw Exception(body?['message'] ?? "Bad Request");
-    if (status == 401) throw Exception("Unauthorized");
-    if (status == 403) throw Exception("Forbidden");
-    if (status == 404) throw Exception("Not Found");
-    if (status == 500) throw Exception("Server Error");
+    // ❌ ERROR HANDLING
+    ApiResponseHelper.showSnackbarByStatus(
+      status: status,
+      message: body?['message'],
 
-    throw Exception("Error ${response.statusCode}: ${response.body}");
+    );
+
+    switch (status) {
+      case 400:
+        throw Exception(body?['message'] ?? 'Bad Request');
+
+      case 401:
+        throw Exception('Unauthorized');
+
+      case 403:
+        throw Exception('Forbidden');
+
+      case 404:
+        throw Exception('Not Found');
+
+      case 500:
+        throw Exception('Server Error');
+
+      default:
+        throw Exception(
+          'Error $status: ${response.body}',
+        );
+    }
   }
+
 }

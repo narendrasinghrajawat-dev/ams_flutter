@@ -69,4 +69,21 @@ class AdminEmployeesService {
       return false;
     }
   }
+
+
+
+  Future<Map<String, dynamic>?> changeUserPasswordByAdmin(String userKey, String newPassword) async {
+    final body = {
+      'userKey': userKey,
+      'newPassword': newPassword,
+    };
+
+    // adapt path if your backend path is different
+    final resp = await apiService.post(ApiEndpoints.changeUserPasswordByAdmin, body);
+
+    print('res p is teh $resp');
+
+    // If ApiService already decodes JSON, return it; else decode as needed
+    return resp;
+  }
 }

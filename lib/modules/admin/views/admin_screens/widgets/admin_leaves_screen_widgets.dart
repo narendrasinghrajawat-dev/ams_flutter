@@ -36,9 +36,6 @@ class LeaveRequestListItem extends StatelessWidget {
     final statusColor = _getStatusColor(leaveRequest.leaveStatus);
     final isPending = leaveRequest.leaveStatus == AppStrings.pendingLeavesStatusKey;
 
-    print(leaveRequest.startDate);
-    
-
     return CommonCardWidget(
      child:  Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,16 +74,28 @@ class LeaveRequestListItem extends StatelessWidget {
                   Icon(Icons.calendar_today, size: 14, color: AppThemeColors.muted),
                   const SizedBox(width: 4),
                   AppTextWidget.small(
-                    '${AppHelper.formatDateString(leaveRequest.startDate)} → ${AppHelper.formatDateString(leaveRequest.endDate)}',
+                    '${AppHelper.formatDateString(leaveRequest.startDate)}  ${AppHelper.formatDateString(leaveRequest.endDate)}',
                     color: AppThemeColors.textSecondaryColor,
                   ),
                 ],
               ),
               // Number of Days
-              AppTextWidget.small(
-                '${leaveRequest.numberOfLeaves} Days',
-                color: AppThemeColors.textSecondaryColor,
-              ),
+              Row(
+                children: [
+
+                  AppTextWidget.small(
+                    '${leaveRequest.numberOfLeaves} Days',
+                    color: AppThemeColors.textSecondaryColor,
+                  ),
+                  SizedBox(width: 5,),
+
+                  if(leaveRequest.halfDayShiftType != null)
+                    AppTextWidget.small(
+                      AppHelper.getHalfDayLeaveName(leaveRequest.halfDayShiftType),
+                      color: AppThemeColors.textSecondaryColor,
+                    ),
+                ],
+              )
             ],
           ),
 
@@ -99,8 +108,6 @@ class LeaveRequestListItem extends StatelessWidget {
             maxLines: 2,
           ),
 
-
-          UIHelper.showDivider().marginSymmetric(vertical: 10),
 
           isPending
               ? _buildPendingActions()

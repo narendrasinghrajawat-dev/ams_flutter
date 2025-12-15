@@ -1,183 +1,60 @@
 // lib/modules/user/views/user_screens/user_home_screen.dart
 import 'dart:async';
-
-import 'package:attedance_management_system/data/utils/app_helper.dart';
-import 'package:attedance_management_system/modules/common/controller/loading_controller.dart';
-import 'package:attedance_management_system/modules/user/controller/user_activity_controller.dart';
-import 'package:attedance_management_system/modules/user/views/user_screens/widgets/home/activity_tile.dart';
-import 'package:attedance_management_system/modules/user/views/user_screens/widgets/home/attendance_card.dart';
-import 'package:attedance_management_system/modules/user/views/user_screens/widgets/home/attendance_status_badge.dart';
-import 'package:attedance_management_system/modules/user/views/user_screens/widgets/home/empty_activity_state.dart';
-import 'package:attedance_management_system/modules/user/views/user_screens/widgets/home/stats_card.dart';
+import 'package:attedance_management_system/widgets/text_and_icon_widgets/app_icons_type.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
-import 'package:attedance_management_system/core/constants/app_theme_colors.dart';
-import 'package:attedance_management_system/widgets/card/common_card.dart';
-import 'package:attedance_management_system/widgets/text_and_icon_widgets/app_text_type.dart';
-
-import 'package:attedance_management_system/core/constants/const_strings.dart';
-import 'package:attedance_management_system/modules/common/controller/common_controller.dart';
-
+import '../../../../core/constants/app_theme_colors.dart';
+import '../../../../core/constants/const_strings.dart';
+import '../../../../data/utils/app_helper.dart';
+import '../../../../widgets/card/common_card.dart';
+import '../../../../widgets/text_and_icon_widgets/app_text_type.dart';
+import '../../../common/controller/common_controller.dart';
+import '../../../common/controller/loading_controller.dart';
 import '../../../common/services/device_information_service.dart';
 import '../../../common/services/location_service.dart';
 import '../../../common/services/storage_service.dart';
-import '../../../models/attendance_activity.dart';
 import '../../../models/masterData.dart';
+import '../../helper/user_home_helper.dart';
+import '../../controller/user_activity_controller.dart';
+import '../../views/user_screens/widgets/home/activity_tile.dart';
+import '../../views/user_screens/widgets/home/attendance_status_badge.dart';
+import '../../views/user_screens/widgets/home/empty_activity_state.dart';
+import '../../views/user_screens/widgets/home/stats_card.dart';
+import '../../../models/attendance_activity.dart';
 
 class UserHomeScreen extends StatefulWidget {
-  const UserHomeScreen({Key? key}) : super(key: key);
+  const UserHomeScreen({super.key});
 
   @override
   State<UserHomeScreen> createState() => _UserHomeScreenState();
 }
 
 class _UserHomeScreenState extends State<UserHomeScreen> {
-  final UserActivityController _userActivityController =
-  Get.find<UserActivityController>();
+
 
   final CommonController _commonController = Get.find<CommonController>();
+  final UserActivityController _activityCtrl = Get.find<UserActivityController>();
   final StorageService _storageService = StorageService();
 
-  Timer? _tick;
+  Timer? _timer;
   Duration _elapsed = Duration.zero;
   bool _busy = false;
 
-  // 🔹 Worker to react when attendanceActivities list changes (API success, punch, refresh)
-  Worker? _activityWorker;
+  Worker? _worker;
 
   @override
   void initState() {
     super.initState();
 
-    // 1️⃣ Initially try (in case activities already loaded)
-    _initializeTimer();
+    _recalculateTimer();
 
-    // 2️⃣ Whenever attendanceActivities changes, re-evaluate timer
-    _activityWorker = ever<List<AttendanceActivity>>(
-      _userActivityController.attendanceActivities,
-          (_) {
-        _initializeTimer();
-      },
+    _worker = ever<List<AttendanceActivity>>(
+      _activityCtrl.attendanceActivities,
+          (_) => _recalculateTimer(),
     );
   }
 
-  @override
-  void dispose() {
-    _tick?.cancel();
-    _activityWorker?.dispose();
-    super.dispose();
-  }
 
-  void _initializeTimer() {
-    // Always reset previous timer & elapsed when recalculating
-    _stopTimer();
-
-    final todayCheckIn = _getTodayCheckIn();
-    final todayCheckOut = _getTodayCheckOut();
-
-    if (todayCheckIn != null && todayCheckOut == null) {
-      // ✅ Checked in, not checked out → start running timer
-      final checkInTime = AppHelper.parseDateTime(todayCheckIn.punchDate);
-      if (checkInTime != null) {
-        _startTimer(checkInTime);
-      } else {
-        // parsing failed; reset
-        setState(() {
-          _elapsed = Duration.zero;
-        });
-      }
-    } else if (todayCheckIn != null && todayCheckOut != null) {
-      // ✅ Both exist → show final worked duration
-      final duration = AppHelper.calculateDuration(
-        todayCheckIn.punchDate,
-        todayCheckOut.punchDate,
-      );
-      setState(() {
-        _elapsed = duration ?? Duration.zero;
-      });
-    } else {
-      // ❌ No check-in today → reset
-      setState(() {
-        _elapsed = Duration.zero;
-      });
-    }
-  }
-
-
-  void _startTimer(DateTime checkInTime) {
-    _tick?.cancel();
-    _tick = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (mounted) {
-        setState(() {
-          _elapsed = DateTime.now().difference(checkInTime);
-        });
-      }
-    });
-  }
-
-  void _stopTimer() {
-    _tick?.cancel();
-    _tick = null;
-  }
-
-  // Get today's check-in record
-  AttendanceActivity? _getTodayCheckIn() {
-    return _userActivityController.filteredAttendanceActivitiesList
-        .firstWhereOrNull(
-          (activity) =>
-      AppHelper.isCheckIn(activity.punchType) &&
-          AppHelper.isToday(activity.punchDate),
-    );
-  }
-
-  // Get today's check-out record
-  AttendanceActivity? _getTodayCheckOut() {
-    return _userActivityController.filteredAttendanceActivitiesList
-        .firstWhereOrNull(
-          (activity) =>
-      AppHelper.isCheckOut(activity.punchType) &&
-          AppHelper.isToday(activity.punchDate),
-    );
-  }
-
-  // Get today's activities filtered by date
-  List<AttendanceActivity> _getTodayActivities() {
-    return _userActivityController.filteredAttendanceActivitiesList
-        .where((activity) => AppHelper.isToday(activity.punchDate))
-        .toList();
-  }
-
-  // ------------ HELPERS FOR DEVICE & LOCATION VALIDATION ------------
-
-  bool _isSameDevice(
-      Map<String, dynamic> current,
-      Map<String, dynamic> stored,
-      ) {
-    const keys = [
-      'os',
-      'version',
-      'sdkInt',
-      'model',
-      'brand',
-      'androidId',
-      'fingerprint',
-      'uniqueId',
-    ];
-    for (final key in keys) {
-      final currentVal = current[key]?.toString();
-      final storedVal = stored[key]?.toString();
-      if (currentVal != storedVal) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  /// Builds an AttendanceActivity for punch with:
-  /// - Current location
-  /// - Office radius validation
-  /// - Same-device validation
   Future<AttendanceActivity?> _buildPunchActivity(String punchType) async {
     try {
       // 1️⃣ Get current location
@@ -195,7 +72,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
       final double userLat = locRes.position!.latitude;
       final double userLng = locRes.position!.longitude;
-
 
       // 2️⃣ Master data & office radius
       final MasterData? masterData = _commonController.masterData.value;
@@ -276,7 +152,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       final punchJson = {
         "userKey": AppHelper.getProfileUser().key,
         "punchType": punchType, // "1" = check-in, "2" = check-out
-        "punchTime": nowLocal.toUtc().toIso8601String(), // UTC with Z
+        "punchTime": nowLocal.toIso8601String(), // UTC with Z
         "punchDate": nowLocal.toIso8601String(), // local
         "lat": userLat.toString(),
         "long": userLng.toString(),
@@ -295,17 +171,44 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     }
   }
 
-  // ---------------------- CHECK-IN / CHECK-OUT ----------------------
+
+  bool _isSameDevice(
+      Map<String, dynamic> current,
+      Map<String, dynamic> stored,
+      ) {
+    const keys = [
+      'os',
+      'version',
+      'sdkInt',
+      'model',
+      'brand',
+      'androidId',
+      'fingerprint',
+      'uniqueId',
+    ];
+    for (final key in keys) {
+      final currentVal = current[key]?.toString();
+      final storedVal = stored[key]?.toString();
+      if (currentVal != storedVal) {
+        return false;
+      }
+    }
+    return true;
+  }
+
 
   void _onCheckIn() async {
     if (_busy) return;
 
-    final todayCheckIn = _getTodayCheckIn();
+    final activities = _activityCtrl.filteredAttendanceActivitiesList;
+    final todayCheckIn = UserHomeHelper.todayCheckIn(activities);
+
     if (todayCheckIn != null) {
-      final checkInTime = AppHelper.parseDateTime(todayCheckIn.punchDate);
+      final time =
+      AppHelper.formatTime(AppHelper.parseDateTime(todayCheckIn.punchTime));
       Get.snackbar(
         'Already Checked In',
-        'You have already checked in today at ${AppHelper.formatTime(checkInTime)}',
+        'You checked in at $time',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: AppThemeColors.warningColor.withOpacity(0.2),
       );
@@ -314,18 +217,20 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
     setState(() => _busy = true);
 
-    // Build punch with location + office radius + device validation
     LoadingController().start();
-    final activity = await _buildPunchActivity("1");
+
+    final AttendanceActivity? activity =
+    await _buildPunchActivity("1"); // 1 = check-in
+
     LoadingController().hide();
 
     if (activity != null) {
-      final success = await _userActivityController.punch(activity);
+      final success = await _activityCtrl.punch(activity);
 
       if (success) {
-        final checkInTime = AppHelper.parseDateTime(activity.punchDate);
-        if (checkInTime != null) {
-          _startTimer(checkInTime);
+        final inTime = AppHelper.parseDateTime(activity.punchTime);
+        if (inTime != null) {
+          _startLiveTimer(inTime);
         }
       }
     }
@@ -336,23 +241,26 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   void _onCheckOut() async {
     if (_busy) return;
 
-    final todayCheckIn = _getTodayCheckIn();
+    final activities = _activityCtrl.filteredAttendanceActivitiesList;
+    final todayCheckIn = UserHomeHelper.todayCheckIn(activities);
+    final todayCheckOut = UserHomeHelper.todayCheckOut(activities);
+
     if (todayCheckIn == null) {
       Get.snackbar(
         'Not Checked In',
-        'Please check in first before checking out',
+        'Please check in first',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: AppThemeColors.warningColor.withOpacity(0.2),
       );
       return;
     }
 
-    final todayCheckOut = _getTodayCheckOut();
     if (todayCheckOut != null) {
-      final checkOutTime = AppHelper.parseDateTime(todayCheckOut.punchDate);
+      final time =
+      AppHelper.formatTime(AppHelper.parseDateTime(todayCheckOut.punchTime));
       Get.snackbar(
         'Already Checked Out',
-        'You have already checked out today at ${AppHelper.formatTime(checkOutTime)}',
+        'You checked out at $time',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: AppThemeColors.warningColor.withOpacity(0.2),
       );
@@ -361,336 +269,185 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
     setState(() => _busy = true);
 
-    // Build punch with location + office radius + device validation
     LoadingController().start();
-    final activity = await _buildPunchActivity("2");
+
+    final AttendanceActivity? activity =
+    await _buildPunchActivity("2"); // 2 = check-out
+
     LoadingController().hide();
 
     if (activity != null) {
-      final success = await _userActivityController.punch(activity);
+      final success = await _activityCtrl.punch(activity);
 
       if (success) {
-        _stopTimer();
+        _stopLiveTimer();
 
-        final duration = AppHelper.calculateDuration(
-          todayCheckIn.punchDate,
-          activity.punchDate,
+        final duration = UserHomeHelper.elapsedToday(
+          todayCheckIn,
+          activity,
         );
-        if (duration != null) {
-          setState(() {
-            _elapsed = duration;
-          });
-        }
+
+        setState(() {
+          _elapsed = duration;
+        });
       }
     }
 
     setState(() => _busy = false);
   }
 
-  // ---------------------- STATS / UI HELPERS ----------------------
-
-  Color _getStatusColor() {
-    final todayCheckIn = _getTodayCheckIn();
-    final todayCheckOut = _getTodayCheckOut();
-
-    if (todayCheckIn == null) return AppThemeColors.muted;
-    if (todayCheckOut != null) return AppThemeColors.successColor;
-    return AppThemeColors.warningColor;
-  }
-
-  String _getStatusText() {
-    final todayCheckIn = _getTodayCheckIn();
-    final todayCheckOut = _getTodayCheckOut();
-
-    if (todayCheckIn == null) return 'Not Started';
-    if (todayCheckOut != null) return 'Completed';
-    return 'Working';
-  }
-
-  double _calculateTotalHours() {
-    double total = 0.0;
-    final grouped = <String, List<AttendanceActivity>>{};
-
-    for (var activity
-    in _userActivityController.filteredAttendanceActivitiesList) {
-      if (activity.punchDate != null) {
-        final dateTime = AppHelper.parseDateTime(activity.punchDate);
-        if (dateTime != null) {
-          final dateKey = AppHelper.formatDate(dateTime);
-          grouped.putIfAbsent(dateKey, () => []);
-          grouped[dateKey]!.add(activity);
-        }
-      }
-    }
-
-    grouped.forEach((date, activities) {
-      final checkIn =
-      activities.firstWhereOrNull((a) => AppHelper.isCheckIn(a.punchType));
-      final checkOut =
-      activities.firstWhereOrNull((a) => AppHelper.isCheckOut(a.punchType));
-
-      if (checkIn != null && checkOut != null) {
-        final duration =
-        AppHelper.calculateDuration(checkIn.punchDate, checkOut.punchDate);
-        if (duration != null) {
-          total += duration.inMinutes / 60.0;
-        }
+  void _startLiveTimer(DateTime checkInTime) {
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (mounted) {
+        setState(() {
+          _elapsed = DateTime.now().difference(checkInTime);
+        });
       }
     });
-
-    return total;
   }
 
-  int _getTotalDays() {
-    return _userActivityController.filteredAttendanceActivitiesList
-        .where((a) => AppHelper.isCheckIn(a.punchType))
-        .map((a) {
-      final dateTime = AppHelper.parseDateTime(a.punchDate);
-      return dateTime != null ? AppHelper.formatDate(dateTime) : null;
-    })
-        .where((date) => date != null)
-        .toSet()
-        .length;
+  void _stopLiveTimer() {
+    _timer?.cancel();
+    _timer = null;
   }
 
-  // ---------------------- BUILD UI ----------------------
+
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _worker?.dispose();
+    super.dispose();
+  }
+
+  void _recalculateTimer() {
+    _timer?.cancel();
+
+    final activities = _activityCtrl.filteredAttendanceActivitiesList;
+
+    final checkIn = UserHomeHelper.todayCheckIn(activities);
+    final checkOut = UserHomeHelper.todayCheckOut(activities);
+
+    if (checkIn == null) {
+      setState(() => _elapsed = Duration.zero);
+      return;
+    }
+
+    final inTime = AppHelper.parseDateTime(checkIn.punchTime);
+    if (inTime == null) {
+      setState(() => _elapsed = Duration.zero);
+      return;
+    }
+
+    if (checkOut == null) {
+      _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+        if (mounted) {
+          setState(() {
+            _elapsed = DateTime.now().difference(inTime);
+          });
+        }
+      });
+    } else {
+      setState(() {
+        _elapsed = UserHomeHelper.elapsedToday(checkIn, checkOut);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      final todayCheckIn = _getTodayCheckIn();
-      final todayCheckOut = _getTodayCheckOut();
-      final todayActivities = _getTodayActivities();
+      final activities = _activityCtrl.filteredAttendanceActivitiesList;
 
-      final totalDays = _getTotalDays();
-      final totalHoursWorked = _calculateTotalHours();
-      final averageHours =
-      totalDays > 0 ? totalHoursWorked / totalDays : 0.0;
+      final checkIn = UserHomeHelper.todayCheckIn(activities);
+      final checkOut = UserHomeHelper.todayCheckOut(activities);
 
-      final bool canCheckIn = todayCheckIn == null;
-      final bool canCheckOut = todayCheckIn != null && todayCheckOut == null;
-      final bool isCompleted = todayCheckIn != null && todayCheckOut != null;
+      final totalDays = UserHomeHelper.totalDays(activities);
+      final totalHours = UserHomeHelper.totalHours(activities);
+      final avgHours = totalDays > 0 ? totalHours / totalDays : 0.0;
 
-      final checkInTime = AppHelper.parseDateTime(todayCheckIn?.punchDate);
-      final checkOutTime = AppHelper.parseDateTime(todayCheckOut?.punchDate);
+      final canCheckIn = checkIn == null;
+      final canCheckOut = checkIn != null && checkOut == null;
+      final completed = checkIn != null && checkOut != null;
+      final recentActivities = UserHomeHelper.recentActivities(activities, limit: 8);
 
       return SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 12),
+          padding: const EdgeInsets.all(12),
           child: Column(
             children: [
-              // Header Section
+              /// HEADER
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      AppTextWidget.large(
-                        'Good ${AppHelper.getGreeting()}!',
-                        color: AppThemeColors.textPrimaryColor,
-                      ),
-                      const SizedBox(height: 4),
-                      AppTextWidget.small(
-                        AppHelper.getProfileUser().middleName ?? 'User',
-                        color: AppThemeColors.textSecondaryColor,
-                      ),
-                    ],
+                  AppTextWidget.large(
+                    'Good ${AppHelper.getGreeting()}!',
                   ),
                   AttendanceStatusBadge(
-                    status: _getStatusText(),
-                    color: _getStatusColor(),
+                    status: completed
+                        ? 'Completed'
+                        : canCheckIn
+                        ? 'Not Started'
+                        : 'Working',
+                    color: completed
+                        ? AppThemeColors.successColor
+                        : canCheckIn
+                        ? AppThemeColors.muted
+                        : AppThemeColors.warningColor,
                   ),
                 ],
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 14),
 
-              // Timer & Buttons
+              /// TIMER CARD
               CommonCardWidget(
-                child: Column(
+                child: Row(
                   children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment:
-                            CrossAxisAlignment.start,
-                            children: [
-                              AppTextWidget.small(
-                                'Today\'s Work Time',
-                                color: AppThemeColors.textSecondaryColor,
-                              ),
-                              const SizedBox(height: 8),
-                              if (!canCheckIn && !isCompleted) ...[
-                                AppTextWidget.large(
-                                  AppHelper.formatDuration(_elapsed),
-                                  color: AppThemeColors.primaryColor,
-                                ),
-                                AppTextWidget.verySmall(
-                                  'Running...',
-                                  color: AppThemeColors.successColor,
-                                ),
-                              ] else if (isCompleted) ...[
-                                AppTextWidget.large(
-                                  AppHelper.formatDuration(_elapsed),
-                                  color: AppThemeColors.textPrimaryColor,
-                                ),
-                                AppTextWidget.verySmall(
-                                  'Completed',
-                                  color: AppThemeColors.muted,
-                                ),
-                              ] else ...[
-                                AppTextWidget.large(
-                                  '00:00:00',
-                                  color: AppThemeColors.textPrimaryColor,
-                                ),
-                                AppTextWidget.verySmall(
-                                  'Not started',
-                                  color: AppThemeColors.muted,
-                                ),
-                              ],
-                            ],
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          AppTextWidget.small('Today\'s Work Time'),
+                          const SizedBox(height: 8),
+                          AppTextWidget.large(
+                            AppHelper.formatDuration(_elapsed),
+                            color: completed
+                                ? AppThemeColors.textPrimaryColor
+                                : AppThemeColors.primaryColor,
                           ),
-                        ),
-                        Column(
-                          children: [
-                            if (canCheckIn) ...[
-                              SizedBox(
-                                height: 48,
-                                width: 140,
-                                child: ElevatedButton.icon(
-                                  onPressed: _busy ? null : _onCheckIn,
-                                  icon: const Icon(
-                                    Icons.login_rounded,
-                                    color: Colors.white,
-                                    size: 20,
-                                  ),
-                                  label: AppTextWidget.medium(
-                                    'Check In',
-                                    color: Colors.white,
-                                  ),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor:
-                                    AppThemeColors.successColor,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius:
-                                      BorderRadius.circular(12),
-                                    ),
-                                    elevation: 0,
-                                  ),
-                                ),
-                              ),
-                            ] else if (canCheckOut) ...[
-                              SizedBox(
-                                height: 48,
-                                width: 140,
-                                child: ElevatedButton.icon(
-                                  onPressed: _busy ? null : _onCheckOut,
-                                  icon: const Icon(
-                                    Icons.logout_rounded,
-                                    color: Colors.white,
-                                    size: 20,
-                                  ),
-                                  label: AppTextWidget.medium(
-                                    'Check Out',
-                                    color: Colors.white,
-                                  ),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor:
-                                    AppThemeColors.errorColor,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius:
-                                      BorderRadius.circular(12),
-                                    ),
-                                    elevation: 0,
-                                  ),
-                                ),
-                              ),
-                            ] else ...[
-                              Container(
-                                height: 48,
-                                width: 140,
-                                decoration: BoxDecoration(
-                                  color: AppThemeColors.muted
-                                      .withOpacity(0.1),
-                                  borderRadius:
-                                  BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: AppThemeColors.borderColor,
-                                  ),
-                                ),
-                                child: Center(
-                                  child: Row(
-                                    mainAxisAlignment:
-                                    MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.check_circle,
-                                        color: AppThemeColors.successColor,
-                                        size: 20,
-                                      ),
-                                      const SizedBox(width: 6),
-                                      AppTextWidget.medium(
-                                        'Completed',
-                                        color: AppThemeColors
-                                            .textSecondaryColor,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
+                    if (canCheckIn)
+                      _actionBtn(
+                        'Check In',
+                        Icons.login_rounded,
+                        AppThemeColors.successColor,
+                        _onCheckIn,
+                      )
+                    else if (canCheckOut)
+                      _actionBtn(
+                        'Check Out',
+                        Icons.logout_rounded,
+                        AppThemeColors.errorColor,
+                        _onCheckOut,
+                      )
+
                   ],
                 ),
               ),
 
               const SizedBox(height: 14),
 
-              // Attendance Cards
-              Row(
-                children: [
-                  Expanded(
-                    child: AttendanceCard(
-                      title: 'Check In',
-                      time: AppHelper.formatTime(checkInTime),
-                      subtitle: todayCheckIn != null
-                          ? 'On Time'
-                          : 'Not recorded',
-                      icon: Icons.login_outlined,
-                      color: AppThemeColors.successColor,
-                      isRecorded: todayCheckIn != null,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: AttendanceCard(
-                      title: 'Check Out',
-                      time: AppHelper.formatTime(checkOutTime),
-                      subtitle: todayCheckOut != null
-                          ? 'Completed'
-                          : 'Not recorded',
-                      icon: Icons.logout_outlined,
-                      color: AppThemeColors.errorColor,
-                      isRecorded: todayCheckOut != null,
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 14),
-
-              // Summary statistics row
+              /// STATS
               Row(
                 children: [
                   Expanded(
                     child: StatsCard(
-                      title: 'Total Days',
-                      value: totalDays.toString(),
+                      title: 'Days',
+                      value: '$totalDays',
                       icon: Icons.calendar_today,
                       color: AppThemeColors.primaryColor,
                     ),
@@ -699,7 +456,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                   Expanded(
                     child: StatsCard(
                       title: 'Avg Hours',
-                      value: '${averageHours.toStringAsFixed(1)}h',
+                      value: '${avgHours.toStringAsFixed(1)}h',
                       icon: Icons.access_time,
                       color: AppThemeColors.primaryColor,
                     ),
@@ -709,53 +466,60 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
               const SizedBox(height: 18),
 
-              // Activities list heading
+
+              /// 🔹 RECENT ACTIVITIES
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  AppTextWidget.medium(
-                    'Today\'s Activity',
-                    color: AppThemeColors.textPrimaryColor,
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppThemeColors.primaryColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: AppTextWidget.verySmall(
-                      '${todayActivities.length}',
-                      color: AppThemeColors.primaryColor,
-                    ),
+                  AppTextWidget.medium('Recent Activities'),
+                  AppTextWidget.verySmall(
+                    'Last ${recentActivities.length}',
+                    color: AppThemeColors.muted,
                   ),
                 ],
               ),
+              const SizedBox(height: 10),
 
-              const SizedBox(height: 12),
-
-              // Activity list
               Expanded(
-                child: todayActivities.isEmpty
+                child: recentActivities.isEmpty
                     ? const EmptyActivityState()
                     : ListView.separated(
                   physics: const BouncingScrollPhysics(),
-                  itemCount: todayActivities.length,
-                  separatorBuilder: (_, __) =>
-                  const SizedBox(height: 10),
-                  itemBuilder: (ctx, idx) {
-                    return ActivityTile(
-                      activity: todayActivities[idx],
-                    );
-                  },
+                  itemCount: recentActivities.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 10),
+                  itemBuilder: (_, i) => UserActivityTile(
+                    activity: recentActivities[i],
+                  ),
                 ),
               ),
+
+
             ],
           ),
         ),
       );
     });
+  }
+
+  Widget _actionBtn(
+      String label,
+      IconData icon,
+      Color color,
+      VoidCallback onTap,
+      ) {
+    return SizedBox(
+      height: 44,
+      width: 150,
+      child: ElevatedButton.icon(
+        onPressed: _busy ? null : onTap,
+        icon: AppIconWidget.medium(icon, color: AppThemeColors.whiteColor ),
+        label: AppTextWidget.medium(label,color: AppThemeColors.whiteColor ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color,
+          shape:
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+      ),
+    );
   }
 }

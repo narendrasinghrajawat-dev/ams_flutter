@@ -155,11 +155,11 @@ class _LoginScreenState extends State<LoginScreen> {
     await _auth.login(loginPayload);
 
     if (!_auth.isLoggedIn) {
-      Get.snackbar(
-        'Login failed',
-        'Please check credentials',
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      // Get.snackbar(
+      //   'Login failed',
+      //   'Please check credentials',
+      //   snackPosition: SnackPosition.BOTTOM,
+      // );
     } else {
       storageService.saveMap(AppStrings.deviceInformation, deviceInformation.toJson());
     }

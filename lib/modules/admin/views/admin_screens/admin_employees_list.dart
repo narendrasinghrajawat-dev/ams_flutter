@@ -1,6 +1,9 @@
 import 'package:attedance_management_system/core/constants/app_icons.dart';
 import 'package:attedance_management_system/data/utils/app_helper.dart';
+import 'package:attedance_management_system/modules/admin/views/admin_screens/widgets/employee/employee_tile.dart';
+import 'package:attedance_management_system/widgets/common/common_confirmation_dialog.dart';
 import 'package:attedance_management_system/widgets/common/common_dialong_box.dart';
+import 'package:attedance_management_system/widgets/common/ui_helper_widgets.dart';
 import 'package:attedance_management_system/widgets/text_and_icon_widgets/app_icon_button.dart';
 import 'package:attedance_management_system/widgets/card/common_card.dart';
 import 'package:flutter/material.dart';
@@ -78,87 +81,105 @@ class _UserTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final name = (user.firstName ?? '') +
-        (user.lastName != null ? ' ${user.lastName}' : '');
-    final email = user.email ?? '';
-    final dept = user.departmentId ?? '-';
-    final joined = DateTime.now();
+    return EmployeeTile(
+      user: user,
+      onEdit: () {
+        showCommonDialog(
+          context: context,
+          child: UserForm(initialData: user),
+        );
+      },
+      onChangePassword: () {
+        _showChangePasswordDialog(context, user, _adminController);
+      },
+      onDelete: () async {
+        final confirm = await showCommonConfirmationDialog(
+          context,
+          string: "Are you sure want to delete?",
+        );
+        if (confirm == true && user.key != null) {
+          await _adminController.deleteUser(user.key!);
+        }
+      },
+    );
 
-    return CommonCardWidget(
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 20,
-            backgroundColor:
-            AppThemeColors.primaryLightColor.withOpacity(0.3),
-            child: AppTextWidget.small(
-              name.isNotEmpty ? name[0].toUpperCase() : 'U',
-                color: AppThemeColors.primaryColor
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
+  }
+
+
+
+  Future<void> _showChangePasswordDialog(
+      BuildContext context,
+      User user,
+      AdminEmployeesController ctrl,
+      ) async {
+    final newPassCtrl = TextEditingController();
+    final confirmCtrl = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+
+    if (user.key == null || user.key!.isEmpty) {
+      UIHelper.showSnackbar(
+        "Key Not found",
+        "User Data not found please refresh page",
+      );
+      return;
+    }
+
+    await showDialog(
+      context: context,
+
+      builder: (_) => AlertDialog(
+        backgroundColor: AppThemeColors.popupBackgroundColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(5))
+        ),
+        title: AppTextWidget.medium('Change Password'),
+        content: SingleChildScrollView(
+          child: Form(
+            key: formKey,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                AppTextWidget.medium(
-                  AppHelper.formatUserName(user),
-                  color: AppThemeColors.textPrimaryColor,
+                TextFormField(
+                  controller: newPassCtrl,
+                  obscureText: true,
+                  decoration: const InputDecoration(labelText: 'New Password'),
+                  validator: (v) =>
+                  v == null || v.trim().length < 6
+                      ? 'Minimum 6 characters'
+                      : null,
                 ),
-                const SizedBox(height: 4),
-                Row(
-                    children: [
-                  Icon(Icons.email_outlined,
-                      size: 14, color: AppThemeColors.iconColor),
-                  const SizedBox(width: 6),
-                  AppTextWidget.small(
-                    email,
-                    color: AppThemeColors.muted,
-                  ),
-                ]),
                 const SizedBox(height: 8),
-                Row(children: [
-                  Icon(Icons.business_outlined,
-                      size: 14, color: AppThemeColors.iconColor),
-                  const SizedBox(width: 6),
-                  AppTextWidget.verySmall(
-                    'Dept: $dept',
-                    color: AppThemeColors.textSecondaryColor,
-                  ),
-                  const SizedBox(width: 12),
-                  Icon(Icons.calendar_month_outlined,
-                      size: 14, color: AppThemeColors.iconColor),
-                  const SizedBox(width: 6),
-                  AppTextWidget.verySmall(
-                    'Joined: ${joined.day}/${joined.month}/${joined.year}',
-                    color: AppThemeColors.muted,
-                  ),
-                ]),
+                TextFormField(
+                  controller: confirmCtrl,
+                  obscureText: true,
+                  decoration: const InputDecoration(labelText: 'Confirm Password'),
+                  validator: (v) =>
+                  v != newPassCtrl.text.trim()
+                      ? 'Passwords do not match'
+                      : null,
+                ),
               ],
             ),
           ),
-          Column(
-            children: [
-              AppIconButtonWidget.medium(
-                icon: AppConstIcons.editIcon,
-                color: AppThemeColors.editIconColors,
-                onPressed: () {
-                  showCommonDialog(context: context, child: UserForm(initialData: user));
-                },
-              ).marginOnly(bottom: 5),
-              AppIconButtonWidget.medium(
-                icon: AppConstIcons.deleteIcon,
-                color: AppThemeColors.deleteIconColor,
-                onPressed: () {
-                  if (user.key != null) {
-                    _adminController.deleteUser(user.key!);
-                  }
-                },
-              ),
-            ],
+        ),
+        actions: [
+          TextButton(onPressed: Get.back, child: const Text('Cancel')),
+          ElevatedButton(
+            onPressed: () async {
+              if (formKey.currentState!.validate()) {
+                Get.back();
+                await ctrl.changeUserPasswordByAdmin(
+                  user.key!,
+                  newPassCtrl.text.trim(),
+                );
+              }
+            },
+            child: const Text('Change'),
           ),
         ],
       ),
     );
   }
+
+
 }

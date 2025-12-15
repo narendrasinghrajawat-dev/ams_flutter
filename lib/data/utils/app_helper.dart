@@ -42,6 +42,14 @@ class AppHelper {
   }
 
 
+  static String? getGenderName(String? gender){
+    if(isEmptyOrNull(gender)){
+      return "";
+    }
+
+    return Get.find<CommonController>().masterData.value?.gender.firstWhere((e) => e.id == gender).name;
+  }
+
 
 
   /// Converts a string like "TimeOfDay(18:52)" into a displayable time "06:52 PM".
@@ -188,6 +196,17 @@ class AppHelper {
     return AppThemeColors.muted;
   }
 
+  static String getHalfDayLeaveName(String? halfDayTypeId) {
+
+    final CommonController _commonController = Get.find<CommonController>();
+    MasterData? masterData = _commonController.masterData.value;
+
+    if(halfDayTypeId == null || halfDayTypeId.isEmpty){
+      return '';
+    }
+      return masterData?.halfDayShiftType.firstWhere((e) => e.id == halfDayTypeId).name ?? "";
+  }
+
 
   static String getLeavesStatusValue(String? s) {
 
@@ -296,6 +315,12 @@ class AppHelper {
   static bool isCheckOut(String? punchType) {
     return punchType == '2';
   }
+
+  /// Check if attendance record is check-in
+  static Color getPunchTypeColor(String? punchType) {
+    return punchType == '1' ? AppThemeColors.checkInColor : AppThemeColors.checkOutColor;
+  }
+
 
   /// Get punch type label
   static String getPunchTypeLabel(String? punchType) {

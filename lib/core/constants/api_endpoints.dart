@@ -22,6 +22,7 @@ class ApiEndpoints {
   static const fetchLeavesByDate = 'admin/fetchLeavesByDate/';
   static const fetchAttendanceByDate = 'admin/fetchAttendanceByDate/';
   static const fetchActivitiesByDate = 'admin/fetchActivitiesByDate/';
+  static const changeUserPasswordByAdmin = 'admin/changeUserPasswordByAdmin';
 
 
 
@@ -33,6 +34,6 @@ class ApiEndpoints {
 
   static const applyLeaves = 'user/leaves/applyLeaves/';
   static const cancelLeaves = 'user/leaves/cancel/';
-  static const changePassword = 'user/changePassword';
+  static const changePasswordByUser = 'user/changePasswordByUser';
 
 }

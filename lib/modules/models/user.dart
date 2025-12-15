@@ -20,6 +20,8 @@ class User {
   final String? profileImageS3Key;
   final String? profileImageNetworkKey;
   final Address? address;
+  final String? createdAt;
+  final String? joinedDate;
 
   User({
     this.key,
@@ -40,6 +42,9 @@ class User {
     this.address,
     this.profileImageS3Key,
     this.profileImageNetworkKey,
+    this.createdAt,
+    this.joinedDate,
+
   });
 
   /// Factory method to create a [User] object from a JSON map.
@@ -68,6 +73,9 @@ class User {
 
       // Nested model instantiation
       address: json['address'] != null ? Address.fromJson(json['address']) : null,
+      joinedDate: json['joinedDate'] ?? "",
+      createdAt: json['createdAt'] ?? "",
+
     );
   }
 
@@ -93,6 +101,9 @@ class User {
       "password" : password,
       // Converts the nested Address object to JSON
       'address': address?.toJson(),
+      "createdAt" : createdAt,
+      "joinedDate" : joinedDate,
+
     };
   }
 }
