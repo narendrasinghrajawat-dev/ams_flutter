@@ -7,6 +7,38 @@ import '../../models/attendance_activity.dart';
 class UserHomeHelper {
   /// ---------- TODAY HELPERS (USING punchTime ONLY) ----------
 
+
+  static double totalHoursToday(List<AttendanceActivity> activities) {
+    if (activities.isEmpty) return 0.0;
+
+    final checkIn = todayCheckIn(activities);
+    final checkOut = todayCheckOut(activities);
+
+    if (checkIn == null) return 0.0;
+
+    final DateTime? inTime =
+    AppHelper.parseDateTime(checkIn.punchTime);
+
+    if (inTime == null) return 0.0;
+
+    DateTime endTime;
+
+    if (checkOut != null) {
+      final DateTime? outTime =
+      AppHelper.parseDateTime(checkOut.punchTime);
+      if (outTime == null) return 0.0;
+      endTime = outTime;
+    } else {
+      // ⏳ Still working → calculate till now
+      endTime = DateTime.now();
+    }
+
+    final duration = endTime.difference(inTime);
+
+    // Convert duration to hours (double)
+    return duration.inMinutes / 60.0;
+  }
+
   static AttendanceActivity? todayCheckIn(
       List<AttendanceActivity> activities,
       ) {

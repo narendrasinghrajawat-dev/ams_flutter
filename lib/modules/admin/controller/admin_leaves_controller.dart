@@ -14,8 +14,7 @@ class AdminLeavesController extends GetxController {
   final AdminLeavesService _service = AdminLeavesService();
   final LoadingController _loadingController = Get.find<LoadingController>();
 
-  final RxList<ApplyLeaveRequest> leaveRequestsList =
-      <ApplyLeaveRequest>[].obs;
+  final RxList<ApplyLeaveRequest> leaveRequestsList = <ApplyLeaveRequest>[].obs;
   final RxInt selectedFilter = 0.obs;
 
 
@@ -28,6 +27,8 @@ class AdminLeavesController extends GetxController {
   }
 
   Future<void> refreshLeaves() async {
+    selectedFilter.value = 0;
+
     await loadLeaves();
   }
 

@@ -7,4 +7,13 @@ class UserHomeService {
   final ApiService _api = ApiService();
 
 
+  Future<Map<String, dynamic>> getUserCalendar(String userKey, String year) async {
+    try {
+      final path = '${ApiEndpoints.getUserCalendar}$userKey/$year';
+      final resp = await _api.get(path);
+      return resp;
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

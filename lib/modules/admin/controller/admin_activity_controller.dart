@@ -13,7 +13,7 @@ class AdminActivityController extends GetxController {
   final LoadingController _loadingController = Get.find<LoadingController>();
 
   final RxList<AttendanceActivity> activities = <AttendanceActivity>[].obs;
-  final Rx<DateTime> selectedDate = DateTime.now().obs;
+  final Rx<String> selectedDate = DateTime.now().toIso8601String().obs;
 
   @override
   void onReady() {
@@ -23,13 +23,14 @@ class AdminActivityController extends GetxController {
 
   /// 🔄 Called when Activity tab opens
   void resetToToday() {
-    selectedDate.value = DateTime.now();
+    selectedDate.value = DateTime.now().toIso8601String();
     fetchActivities();
   }
 
-  /// 📅 Change date from picker
-  void changeDate(DateTime date) {
-    selectedDate.value = DateTime(date.year, date.month, date.day);
+
+  /// 📅 Change date from picker (STRING ONLY)
+  void changeDate(String date) {
+    selectedDate.value = date;
     fetchActivities();
   }
 
@@ -38,10 +39,12 @@ class AdminActivityController extends GetxController {
   }
 
   Future<void> fetchActivities() async {
+
+    activities.clear();
     try {
       _loadingController.start();
 
-      final dateStr = DateFormat('yyyy-MM-dd').format(selectedDate.value);
+      final dateStr = selectedDate.value;
 
       final data = await _service.fetchActivitiesByDate(dateStr);
 

@@ -1,4 +1,5 @@
 
+import 'package:attedance_management_system/data/utils/app_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:intl/intl.dart';
@@ -6,15 +7,19 @@ import 'package:intl/intl.dart';
 import '../../../../../../core/constants/app_theme_colors.dart';
 import '../../../../../../widgets/text_and_icon_widgets/app_text_type.dart';
 import '../../../../controller/admin_activity_controller.dart';
+
+
+
 class ActivityHeader extends StatelessWidget {
   final AdminActivityController controller;
 
-  const ActivityHeader({required this.controller});
+  const ActivityHeader({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      final date = controller.selectedDate.value;
+      final String dateString = controller.selectedDate.value;
+      final DateTime date = DateTime.parse(dateString);
 
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -24,7 +29,7 @@ class ActivityHeader extends StatelessWidget {
             children: [
               AppTextWidget.medium("Admin Activity"),
               AppTextWidget.small(
-                DateFormat('dd MMM yyyy').format(date),
+                AppHelper.formatDateString(dateString),
                 color: AppThemeColors.textSecondaryColor,
               ),
             ],
@@ -38,24 +43,23 @@ class ActivityHeader extends StatelessWidget {
     });
   }
 
-
   Future<void> _openCalendar(BuildContext context) async {
-    final selected = controller.selectedDate.value;
+    final String selectedString = controller.selectedDate.value;
+    final DateTime selectedDate = DateTime.parse(selectedString);
 
-    // Pick only DATE
-    final pickedDate = await showDatePicker(
+    final DateTime? pickedDate = await showDatePicker(
       context: context,
-      initialDate: selected,
+      initialDate: selectedDate,
       firstDate: DateTime(2020),
       lastDate: DateTime(2100),
     );
 
     if (pickedDate == null) return;
 
-    final now = DateTime.now();
+    final DateTime now = DateTime.now();
 
     // 🔥 Merge picked DATE + CURRENT TIME
-    final fullDateTime = DateTime(
+    final DateTime fullDateTime = DateTime(
       pickedDate.year,
       pickedDate.month,
       pickedDate.day,
@@ -66,10 +70,7 @@ class ActivityHeader extends StatelessWidget {
       now.microsecond,
     );
 
-    print('picked datetime with current time: $fullDateTime');
-
-    // Update controller
-    controller.changeDate(fullDateTime);
+    // 🔁 Convert back to STRING (ISO)
+    controller.changeDate(fullDateTime.toIso8601String());
   }
-
 }

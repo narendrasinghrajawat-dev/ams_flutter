@@ -56,7 +56,7 @@ class _UserDashboardScreenState
       case 0:
       // Home tab
         await Get.find<UserHomeController>().refreshHome();
-        await Get.find<UserActivityController>().refreshActivity();
+        await Get.find<UserActivityController>().getActivityByDate(DateTime.now().toIso8601String());
 
         break;
       case 1:
@@ -70,8 +70,7 @@ class _UserDashboardScreenState
       case 3:
       // Profile tab (if you want live refresh)
         if (Get.isRegistered<UserProfileController>()) {
-          await Get.find<UserProfileController>()
-              .refreshProfile();
+          await Get.find<UserProfileController>().refreshProfile();
         }
         break;
     }

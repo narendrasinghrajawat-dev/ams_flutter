@@ -128,8 +128,7 @@ class _UserLeavesScreenState extends State<UserLeavesScreen> {
             AppStrings.cancelledLeavesStatusKey)
             .toList();
 
-        final activeList =
-        _getActiveList(approved, pending, rejected, cancelled);
+        final activeList = _getActiveList(approved, pending, rejected, cancelled);
 
         return Column(
           children: [
@@ -223,12 +222,7 @@ class _UserLeavesScreenState extends State<UserLeavesScreen> {
   }
 
 
-  List<ApplyLeaveRequest> _getActiveList(
-      List<ApplyLeaveRequest> approved,
-      List<ApplyLeaveRequest> pending,
-      List<ApplyLeaveRequest> rejected,
-      List<ApplyLeaveRequest> cancelled,
-      ) {
+  List<ApplyLeaveRequest> _getActiveList(List<ApplyLeaveRequest> approved, List<ApplyLeaveRequest> pending, List<ApplyLeaveRequest> rejected, List<ApplyLeaveRequest> cancelled,) {
     switch (_activeTab) {
       case 0:
         return approved;

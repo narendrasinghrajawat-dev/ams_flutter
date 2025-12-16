@@ -14,15 +14,18 @@ class UserActivityController extends GetxController {
   final LoadingController _loadingController = Get.find<LoadingController>();
 
   final RxList<AttendanceActivity> attendanceActivities = <AttendanceActivity>[].obs;
+  final RxList<AttendanceActivity> activitiesByDate = <AttendanceActivity>[].obs;
 
   List<AttendanceActivity> get filteredAttendanceActivitiesList => attendanceActivities;
+  List<AttendanceActivity> get filteredAttendanceActivitiesListByDate => activitiesByDate;
 
   @override
   void onReady() {
     super.onReady();
     final user = AppHelper.getProfileUser();
     if (user.key != null) {
-      loadAttendanceActivities(user.key!);
+      // loadAttendanceActivities(user.key!);
+      getActivityByDate(DateTime.now().toIso8601String());
     }
   }
 
@@ -30,6 +33,26 @@ class UserActivityController extends GetxController {
     final userKey = AppHelper.getProfileUser().key!;
     await loadAttendanceActivities(userKey);
   }
+
+  Future<void> getActivityByDate(String date) async {
+    final userKey = AppHelper.getProfileUser().key!;
+    _loadingController.start();
+    // activitiesByDate.clear();
+    try {
+      final list = await _service.fetchPunchesByDate(userKey, date);
+      activitiesByDate..clear()..addAll(list.map((e) => AttendanceActivity.fromJson(e)));
+      activitiesByDate.refresh();
+
+    } catch (e) {
+      // log / snackbar if needed
+      print('UserHomeController.loadRecentPunches error: $e');
+    } finally {
+      _loadingController.hide();
+
+    }
+  }
+
+
 
 
   Future<void> loadRecentPunches({int limit = 10}) async {
@@ -54,12 +77,11 @@ class UserActivityController extends GetxController {
   Future<void> loadAttendanceActivities(String userKey) async {
     print('loadAttendanceActivities called');
     _loadingController.start();
+    attendanceActivities.clear();
     try {
       final List<Map<String, dynamic>> res =
       await _service.fetchAllAttendanceActivity(userKey);
-      attendanceActivities
-        ..clear()
-        ..addAll(res.map((e) => AttendanceActivity.fromJson(e)));
+      attendanceActivities.addAll(res.map((e) => AttendanceActivity.fromJson(e)));
       attendanceActivities.refresh();
     } catch (e) {
       print('UserActivityController.loadAttendanceActivities error: $e');

@@ -40,6 +40,7 @@ dependencies:
   intl: ^0.20.2
   custom_refresh_indicator: ^4.0.1
   location: ^6.0.0
+  table_calendar: ^3.2.0
 
 
 

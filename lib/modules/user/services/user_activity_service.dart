@@ -42,4 +42,19 @@ class UserActivityService {
   }
 
 
+  Future<List<Map<String, dynamic>>> fetchPunchesByDate(String userKey, String date) async {
+    try {
+      final path = '${ApiEndpoints.getActivitiesByDate}$userKey/$date';
+      final resp = await _api.get(path);
+      if (resp is List) {
+        return List<Map<String, dynamic>>.from(resp);
+      }
+      return [];
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+
+
 }
