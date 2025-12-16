@@ -29,8 +29,8 @@ class UserLeavesController extends GetxController {
     super.onReady();
     final user = AppHelper.getProfileUser();
     if (user.key != null) {
-      loadLeavesStatus(user.key!);
-      loadLeavesBalance(user.key!);
+      // loadLeavesStatus(user.key!);
+      // loadLeavesBalance(user.key!);
     }
   }
 

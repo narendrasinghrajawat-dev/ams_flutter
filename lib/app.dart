@@ -28,7 +28,6 @@ class App extends StatelessWidget {
       theme: _themeService.lightTheme,
       darkTheme: _themeService.darkTheme,
       themeMode: Get.find<SettingsController>().isDark.value ? ThemeMode.dark : ThemeMode.light,
-
       getPages: AppPages.pages,
       initialRoute: AppRoutes.splashScreen,
       debugShowCheckedModeBanner: false,

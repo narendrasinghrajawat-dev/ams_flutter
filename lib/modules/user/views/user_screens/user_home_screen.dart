@@ -48,10 +48,10 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
     _recalculateTimer();
 
-    _worker = ever<List<AttendanceActivity>>(
-      _activityCtrl.attendanceActivities,
-          (_) => _recalculateTimer(),
-    );
+    // _worker = ever<List<AttendanceActivity>>(
+    //   _activityCtrl.attendanceActivities,
+    //       (_) => _recalculateTimer(),
+    // );
   }
 
 
@@ -200,7 +200,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   void _onCheckIn() async {
     if (_busy) return;
 
-    final activities = _activityCtrl.filteredAttendanceActivitiesList;
+    final activities = _activityCtrl.activitiesByDate;
     final todayCheckIn = UserHomeHelper.todayCheckIn(activities);
 
     if (todayCheckIn != null) {
@@ -219,8 +219,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
     LoadingController().start();
 
-    final AttendanceActivity? activity =
-    await _buildPunchActivity("1"); // 1 = check-in
+    final AttendanceActivity? activity = await _buildPunchActivity("1"); // 1 = check-in
 
     LoadingController().hide();
 
@@ -241,7 +240,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   void _onCheckOut() async {
     if (_busy) return;
 
-    final activities = _activityCtrl.filteredAttendanceActivitiesList;
+    final activities = _activityCtrl.activitiesByDate;
     final todayCheckIn = UserHomeHelper.todayCheckIn(activities);
     final todayCheckOut = UserHomeHelper.todayCheckOut(activities);
 
@@ -324,7 +323,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   void _recalculateTimer() {
     _timer?.cancel();
 
-    final activities = _activityCtrl.filteredAttendanceActivitiesList;
+    final activities = _activityCtrl.activitiesByDate;
 
     final checkIn = UserHomeHelper.todayCheckIn(activities);
     final checkOut = UserHomeHelper.todayCheckOut(activities);
@@ -355,17 +354,17 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      final activities = _activityCtrl.filteredAttendanceActivitiesList;
+      final activities = _activityCtrl.activitiesByDate;
 
       final checkIn = UserHomeHelper.todayCheckIn(activities);
       final checkOut = UserHomeHelper.todayCheckOut(activities);
 
-      final totalDays = UserHomeHelper.totalDays(activities);
-      final totalHours = UserHomeHelper.totalHours(activities);
-      final avgHours = totalDays > 0 ? totalHours / totalDays : 0.0;
+      final todayHours = UserHomeHelper.totalHoursToday(activities);
+
 
       final canCheckIn = checkIn == null;
       final canCheckOut = checkIn != null && checkOut == null;
@@ -444,19 +443,19 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               /// STATS
               Row(
                 children: [
+                  // Expanded(
+                  //   child: StatsCard(
+                  //     title: 'Today Hours',
+                  //     value: '${todayHours.toStringAsFixed(1)}h',
+                  //     icon: Icons.access_time,
+                  //     color: AppThemeColors.primaryColor,
+                  //   ),
+                  // ),
+                  // const SizedBox(width: 12),
                   Expanded(
                     child: StatsCard(
-                      title: 'Days',
-                      value: '$totalDays',
-                      icon: Icons.calendar_today,
-                      color: AppThemeColors.primaryColor,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: StatsCard(
-                      title: 'Avg Hours',
-                      value: '${avgHours.toStringAsFixed(1)}h',
+                      title: 'Today Hours',
+                      value: '${todayHours.toStringAsFixed(1)}h',
                       icon: Icons.access_time,
                       color: AppThemeColors.primaryColor,
                     ),

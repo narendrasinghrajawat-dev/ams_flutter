@@ -2,6 +2,11 @@ import 'package:attedance_management_system/modules/admin/views/admin_screens/ad
 import 'package:attedance_management_system/modules/admin/views/admin_screens/admin_home_page.dart';
 import 'package:attedance_management_system/modules/admin/views/admin_screens/admin_leaves_screen.dart';
 import 'package:attedance_management_system/modules/admin/views/admin_screens/admin_profile_screen.dart';
+import 'package:attedance_management_system/modules/user/views/user_screens/user_activity_screen.dart';
+import 'package:attedance_management_system/modules/user/views/user_screens/user_home_screen.dart';
+import 'package:attedance_management_system/modules/user/views/user_screens/user_leaves_screen.dart';
+import 'package:attedance_management_system/modules/user/views/user_screens/user_profile_screen.dart';
+import 'package:attedance_management_system/modules/user/views/user_screens/widgets/calendar/year_calendar_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import '../modules/admin/binding/admin_root_binding.dart';
@@ -27,10 +32,17 @@ class RoleMiddleware extends GetMiddleware {
 
 class AppPages {
   static final pages = [
-    GetPage(name: AppRoutes.login, page: () => LoginScreen()),
+    GetPage(name: AppRoutes.login, page: () => LoginScreen(),),
     GetPage(name: AppRoutes.splashScreen, page: () => SplashScreen()),
     GetPage(name: AppRoutes.settingsScreen, page: () => SettingsScreen(), middlewares: [RoleMiddleware()]),
+
+    // user pages
     GetPage(name: AppRoutes.userDashboard, page: () => const UserDashboardScreen(), binding: UserRootBinding(),),
+    GetPage(name: AppRoutes.userHomeScreen, page: () => const UserHomeScreen(), binding: UserRootBinding(),),
+    GetPage(name: AppRoutes.userLeavesScreen, page: () => const UserLeavesScreen(), binding: UserRootBinding(),),
+    GetPage(name: AppRoutes.userActivityScreen, page: () => const UserActivityScreen(), binding: UserRootBinding(),),
+    GetPage(name: AppRoutes.userProfileScreen, page: () => const UserProfileScreen(), binding: UserRootBinding(),),
+    GetPage(name: AppRoutes.userCalenderScreen, page: () => YearCalendarScreen(), binding: UserRootBinding(),),
 
 
     // admin pages

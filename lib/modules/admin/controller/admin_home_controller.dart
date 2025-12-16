@@ -12,9 +12,6 @@ import '../services/admin_home_service.dart';
 
 
 
-bool _isDateInRange(DateTime target, DateTime start, DateTime end) {
-  return !target.isBefore(start) && !target.isAfter(end);
-}
 
 class AdminHomeController extends GetxController {
   final AdminHomeService _service = AdminHomeService();
@@ -24,15 +21,11 @@ class AdminHomeController extends GetxController {
   final RxList<User> users = <User>[].obs;
   List<User> get filteredUsers => users;
 
-  final RxList<ApplyLeaveRequest> leaveRequestsList =
-      <ApplyLeaveRequest>[].obs;
-  List<ApplyLeaveRequest> get filteredLeaveRequestsList =>
-      leaveRequestsList;
+  final RxList<ApplyLeaveRequest> leaveRequestsList = <ApplyLeaveRequest>[].obs;
+  List<ApplyLeaveRequest> get filteredLeaveRequestsList => leaveRequestsList;
 
-  final RxList<AttendanceActivity> attendanceList =
-      <AttendanceActivity>[].obs;
-  List<AttendanceActivity> get filteredAttendanceList =>
-      attendanceList;
+  final RxList<AttendanceActivity> attendanceList = <AttendanceActivity>[].obs;
+  List<AttendanceActivity> get filteredAttendanceList => attendanceList;
 
   final Rx<DateTime> selectedDate = DateTime.now().obs;
 
@@ -50,7 +43,7 @@ class AdminHomeController extends GetxController {
 
     final presentUsers = attendanceList.where((a) {
       if (a.punchTime == null) return false;
-      if (a.punchType != '1') return false;
+      if (a.punchType != AppStrings.approvedLeavesStatusKey) return false;
 
       final punchDate = DateTime.tryParse(a.punchTime!);
       if (punchDate == null) return false;

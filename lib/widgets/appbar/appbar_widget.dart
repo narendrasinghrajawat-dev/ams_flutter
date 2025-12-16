@@ -1,4 +1,6 @@
 
+import 'package:attedance_management_system/modules/user/views/user_screens/widgets/calendar/year_calendar_screen.dart';
+import 'package:attedance_management_system/widgets/common/common_dialong_box.dart';
 import 'package:attedance_management_system/widgets/text_and_icon_widgets/app_icons_type.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -78,6 +80,12 @@ class UserAppBar extends StatelessWidget implements PreferredSizeWidget {
                   ],
                 ),
               ),
+
+              AppIconButtonWidget.large(icon: AppConstIcons.dateIcon, color: Colors.white, onPressed: (){
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  Get.toNamed(AppRoutes.userCalenderScreen);
+                });
+              }).marginOnly(right: 10),
 
               AppIconButtonWidget.large(icon: AppConstIcons.settingsIcon, color: Colors.white, onPressed: (){
                   WidgetsBinding.instance.addPostFrameCallback((_) {
