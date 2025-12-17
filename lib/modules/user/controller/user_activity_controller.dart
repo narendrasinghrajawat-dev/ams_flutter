@@ -37,7 +37,6 @@ class UserActivityController extends GetxController {
   Future<void> getActivityByDate(String date) async {
     final userKey = AppHelper.getProfileUser().key!;
     _loadingController.start();
-    // activitiesByDate.clear();
     try {
       final list = await _service.fetchPunchesByDate(userKey, date);
       activitiesByDate..clear()..addAll(list.map((e) => AttendanceActivity.fromJson(e)));
@@ -97,15 +96,14 @@ class UserActivityController extends GetxController {
   Future<bool> punch(AttendanceActivity punchData) async {
 
     _loadingController.start();
-
     try {
       final res = await _service.punch(punchData);
       if (res != null) {
         final punch = AttendanceActivity.fromJson(res);
 
         // Insert at top so today's list & _getTodayCheckIn/_getTodayCheckOut see it
-        attendanceActivities.insert(0, punch);
-        attendanceActivities.refresh();
+        activitiesByDate.insert(0, punch);
+        activitiesByDate.refresh();
 
         final isCheckIn = AppHelper.isCheckIn(punch.punchType);
         final actionText = isCheckIn ? 'Checked in' : 'Checked out';
