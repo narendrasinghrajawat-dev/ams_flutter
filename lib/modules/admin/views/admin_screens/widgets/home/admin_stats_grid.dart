@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -16,8 +17,8 @@ class AdminStatsGrid extends StatelessWidget {
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: 2.6,
+          crossAxisCount: kIsWeb ? 4 : 2,
+          childAspectRatio:  kIsWeb ? 5 : 2.6,
           crossAxisSpacing: 12,
           mainAxisSpacing: 12,
         ),

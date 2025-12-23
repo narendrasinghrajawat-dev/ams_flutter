@@ -40,39 +40,52 @@ class AdminLeavesScreen extends StatelessWidget {
                 );
               }
 
-              return ListView.builder(
-                physics: const BouncingScrollPhysics(),
-                itemCount: list.length,
-                itemBuilder: (_, idx) {
-                  final leaveRequest = list[idx];
+              return LayoutBuilder(
+                builder: (context, constraints) {
+                  /// 🧠 Responsive logic
+                  final bool isWebTwoColumn = constraints.maxWidth >= 800;
 
-                  return LeaveRequestListItem(
-                    leaveRequest: leaveRequest,
+                  return GridView.builder(
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: list.length,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: isWebTwoColumn ? 2 : 1,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
+                      childAspectRatio: isWebTwoColumn ? 5.5 : 3.8,
+                    ),
+                    itemBuilder: (_, idx) {
+                      final leaveRequest = list[idx];
 
-                    /// APPROVE
-                    onApprove: () {
-                      final payload = AdminAction(
-                        leavesId: leaveRequest.key!,
-                        leavesStatus:
-                        AppStrings.approvedLeavesStatusKey,
-                        approveByKey:
-                        AppHelper.getProfileUser().key!,
+                      return LeaveRequestListItem(
+                        leaveRequest: leaveRequest,
+
+                        /// APPROVE
+                        onApprove: () {
+                          final payload = AdminAction(
+                            leavesId: leaveRequest.key!,
+                            leavesStatus:
+                            AppStrings.approvedLeavesStatusKey,
+                            approveByKey:
+                            AppHelper.getProfileUser().key!,
+                          );
+                          _admin.approveLeave(payload);
+                        },
+
+                        /// REJECT
+                        onReject: () {
+                          final payload = AdminAction(
+                            leavesId: leaveRequest.key!,
+                            leavesStatus:
+                            AppStrings.rejectedLeavesStatusKey,
+                            approveByKey:
+                            AppHelper.getProfileUser().key!,
+                          );
+                          _admin.rejectLeave(payload);
+                        },
                       );
-                      _admin.approveLeave(payload);
                     },
-
-                    /// REJECT
-                    onReject: () {
-                      final payload = AdminAction(
-                        leavesId: leaveRequest.key!,
-                        leavesStatus:
-                        AppStrings.rejectedLeavesStatusKey,
-                        approveByKey:
-                        AppHelper.getProfileUser().key!,
-                      );
-                      _admin.rejectLeave(payload);
-                    },
-                  ).marginOnly(bottom: 10);
+                  );
                 },
               );
             }),

@@ -12,8 +12,7 @@ class AdminLeavesService {
 
   Future<List<Map<String, dynamic>>> fetchLeavesList() async {
     try {
-      final apiResponse = await apiService
-          .get(ApiEndpoints.getAllLeavesRequests);
+      final apiResponse = await apiService.get(ApiEndpoints.getAllLeavesRequests);
       if (apiResponse is List) {
         final List<Map<String, dynamic>> validatedList = [];
         for (final item in apiResponse) {
@@ -38,10 +37,8 @@ class AdminLeavesService {
 
   Future<ApplyLeaveRequest?> adminActionOnLeave(AdminAction payload) async {
     try {
-      final endpoint =
-          ApiEndpoints.adminActionOnLeaveRequest;
-      final apiResponse =
-      await apiService.post(endpoint, payload.toJson());
+      final endpoint = ApiEndpoints.adminActionOnLeaveRequest;
+      final apiResponse = await apiService.post(endpoint, payload.toJson());
       final applyLeaveRequest =
       ApplyLeaveRequest.fromJson(apiResponse);
       return applyLeaveRequest;

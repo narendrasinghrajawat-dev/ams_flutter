@@ -146,7 +146,6 @@ class _UserFormState extends State<UserForm> {
 
   Future<void> _save() async {
 
-    print('save called');
     if (_formKey.currentState?.validate() != true) return;
 
     // Build Address (use your actual Address model fields)
@@ -173,13 +172,12 @@ class _UserFormState extends State<UserForm> {
       countryCode: '+91',
       phoneNo: phoneC.text.trim(),
       username: usernameC.text.trim(),
-      password: passwordC.text, // keep secure handling in real app
+      password: widget.initialData?.password ?? passwordC.text, // keep secure handling in real app
       genderId: genderId,
       departmentId: null,
       dob: dateOfBirth ?? "", // DateTime or null
       address: address,
       roleId: roleId,
-
     );
 
     // FIX 1: Declare a single nullable variable outside the blocks to hold the result
@@ -343,18 +341,23 @@ class _UserFormState extends State<UserForm> {
                 const SizedBox(height: 5),
 
                 // Address (multiline)
-                TextFieldWidget(
-                  controller: passwordC,
-                  labelText: 'Password',
-                  keyboardInputType: TextInputType.multiline,
-                  onChanged: (_) {},
-                  validator: (v) {
-                    if (v == null || v.trim().isEmpty) return 'Enter address';
-                    return null;
-                  },
-                ),
+                if(widget.initialData?.key == null)
+               Column(
+                 children: [
+                   TextFieldWidget(
+                     controller: passwordC,
+                     labelText: 'Password',
+                     keyboardInputType: TextInputType.multiline,
+                     onChanged: (_) {},
+                     validator: (v) {
+                       if (v == null || v.trim().isEmpty) return 'Enter address';
+                       return null;
+                     },
+                   ),
 
-                const SizedBox(height: 5),
+                   const SizedBox(height: 5),
+                 ],
+               ),
 
                 // Address (multiline)
                 TextFieldWidget(

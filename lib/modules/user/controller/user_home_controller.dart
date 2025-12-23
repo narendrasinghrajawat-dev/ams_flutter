@@ -28,7 +28,7 @@ class UserHomeController extends GetxController {
 
   Future<void> refreshHome() async {
     // await loadRecentPunches();
-    await getUserCalendar("2025");
+    // await getUserCalendar("2025");
   }
 
 

@@ -18,7 +18,7 @@ class AdminActivityController extends GetxController {
   @override
   void onReady() {
     // super.onReady();
-    fetchActivities();
+    // fetchActivities();
   }
 
   /// 🔄 Called when Activity tab opens

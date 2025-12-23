@@ -1,11 +1,14 @@
 import 'package:attedance_management_system/core/constants/app_icons.dart';
 import 'package:attedance_management_system/data/utils/app_helper.dart';
+import 'package:attedance_management_system/modules/admin/helper/admin_employee_helper.dart';
+import 'package:attedance_management_system/modules/admin/views/admin_screens/widgets/employee/add_leaves_by_admin_sheet.dart';
 import 'package:attedance_management_system/modules/admin/views/admin_screens/widgets/employee/employee_tile.dart';
 import 'package:attedance_management_system/widgets/common/common_confirmation_dialog.dart';
 import 'package:attedance_management_system/widgets/common/common_dialong_box.dart';
 import 'package:attedance_management_system/widgets/common/ui_helper_widgets.dart';
 import 'package:attedance_management_system/widgets/text_and_icon_widgets/app_icon_button.dart';
 import 'package:attedance_management_system/widgets/card/common_card.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -18,7 +21,7 @@ import '../user_form_screen.dart';
 class AdminEmployeesList extends StatelessWidget {
   const AdminEmployeesList({Key? key}) : super(key: key);
 
-  AdminEmployeesController get _admin =>
+  AdminEmployeesController get _adminEmployeesController =>
       Get.find<AdminEmployeesController>();
 
   @override
@@ -26,58 +29,103 @@ class AdminEmployeesList extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       child: Obx(() {
+        final users = _adminEmployeesController.filteredUsers;
+        final isLoaded =
+            _adminEmployeesController.isLeavesHistoryLoaded.value;
 
-        final list = _admin.filteredUsers;
+        /// 🚫 Default: DO NOT SHOW button
+        bool isShowButton = false;
 
-        return SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(children: [
+        /// ✅ Only evaluate AFTER data is loaded
+        if (isLoaded) {
+          isShowButton =
+              AdminEmployeeHelper.isActiveAddLeavesButtonForThisMonth(
+                _adminEmployeesController.filteredAddedLeavesByAdmin,
+              );
+        }
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            /// 🔹 Header
+            Row(
+              children: [
                 AppTextWidget.medium(
                   'Employees'.tr,
                   color: AppThemeColors.textPrimaryColor,
                 ),
                 const Spacer(),
                 AppTextWidget.small(
-                  'Showing ${list.length}',
+                  'Showing ${users.length}',
                   color: AppThemeColors.muted,
                 ),
-              ]),
-              const SizedBox(height: 10),
-              if (list.isEmpty)
-                Center(
-                  child: AppTextWidget.small(
-                    'No users found'.tr,
-                    color: AppThemeColors.muted,
+
+                /// ➕ Add Leaves Button
+                if (isShowButton)
+                  AppIconButtonWidget.large(
+                    icon: AppConstIcons.addIcon,
+                    onPressed: () {
+                      Get.bottomSheet(
+                        const AddLeavesByAdminSheet(),
+                        isScrollControlled: true,
+                        backgroundColor: Colors.white,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(16),
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                )
-              else
-                ListView.separated(
-                  physics: const NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  itemCount: list.length,
-                  separatorBuilder: (_, __) =>
-                  const SizedBox(height: 10),
-                  itemBuilder: (_, idx) {
-                    final u = list[idx];
-                    return _UserTile(user: u);
-                  },
+              ],
+            ),
+
+            const SizedBox(height: 10),
+
+            /// 🔹 USERS LIST (Responsive)
+            Expanded(
+              child: users.isEmpty
+                  ? Center(
+                child: AppTextWidget.small(
+                  'No users found'.tr,
+                  color: AppThemeColors.muted,
                 ),
-            ],
-          ),
+              )
+                  : LayoutBuilder(
+                builder: (context, constraints) {
+                  /// 🧠 Responsive columns
+                  return GridView.builder(
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: users.length,
+                    gridDelegate:
+                    SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: kIsWeb ? 2 : 1,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
+                      childAspectRatio: kIsWeb ? 5.2 : 4.2,
+                    ),
+                    itemBuilder: (_, idx) {
+                      final u = users[idx];
+                      return _UserTile(user: u);
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
         );
       }),
     );
   }
 }
 
+
+
 class _UserTile extends StatelessWidget {
   final User user;
   _UserTile({required this.user, Key? key}) : super(key: key);
 
-  final AdminEmployeesController _adminController =
-  Get.find<AdminEmployeesController>();
+  final AdminEmployeesController _adminEmployeesControllerController = Get.find<AdminEmployeesController>();
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +138,7 @@ class _UserTile extends StatelessWidget {
         );
       },
       onChangePassword: () {
-        _showChangePasswordDialog(context, user, _adminController);
+        _showChangePasswordDialog(context, user, _adminEmployeesControllerController);
       },
       onDelete: () async {
         final confirm = await showCommonConfirmationDialog(
@@ -98,7 +146,7 @@ class _UserTile extends StatelessWidget {
           string: "Are you sure want to delete?",
         );
         if (confirm == true && user.key != null) {
-          await _adminController.deleteUser(user.key!);
+          await _adminEmployeesControllerController.deleteUser(user.key!);
         }
       },
     );

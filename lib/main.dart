@@ -13,19 +13,27 @@ import 'modules/common/services/storage_service.dart';
 
 
 
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // ✅ Set environment manually
   EnvConfig.setEnvironment(AppEnvironment.development);
-  String environmentName = EnvConfig.getEnvironment().name;
-  var environment = String.fromEnvironment('ENVIRONMENT', defaultValue: environmentName);
+
+  final environment = EnvConfig.getEnvironment();
+
   await dotenv.load(
-    fileName: environment == AppEnvironment.development.name ? 'env/.env.dev' : environment == AppEnvironment.test.name ? 'env/.env.test' : 'env/.env.prod',
+    fileName: environment == AppEnvironment.development
+        ? 'env/.env.dev'
+        : environment == AppEnvironment.test
+        ? 'env/.env.test'
+        : 'env/.env.prod',
   );
 
   await GetStorage.init();
+
   Get.put<LoadingController>(LoadingController(), permanent: true);
   Get.put<SettingsController>(SettingsController(), permanent: true);
 
   runApp(App());
 }
+
