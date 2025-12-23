@@ -80,12 +80,12 @@ class UserAppBar extends StatelessWidget implements PreferredSizeWidget {
                   ],
                 ),
               ),
-
-              AppIconButtonWidget.large(icon: AppConstIcons.dateIcon, color: Colors.white, onPressed: (){
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  Get.toNamed(AppRoutes.userCalenderScreen);
-                });
-              }).marginOnly(right: 10),
+              //
+              // AppIconButtonWidget.large(icon: AppConstIcons.dateIcon, color: Colors.white, onPressed: (){
+              //   WidgetsBinding.instance.addPostFrameCallback((_) {
+              //     Get.toNamed(AppRoutes.userCalenderScreen);
+              //   });
+              // }).marginOnly(right: 10),
 
               AppIconButtonWidget.large(icon: AppConstIcons.settingsIcon, color: Colors.white, onPressed: (){
                   WidgetsBinding.instance.addPostFrameCallback((_) {

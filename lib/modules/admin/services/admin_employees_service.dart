@@ -34,8 +34,7 @@ class AdminEmployeesService {
     }
   }
 
-  Future<Map<String, dynamic>?> createUser(
-      Map<String, dynamic> payload) async {
+  Future<Map<String, dynamic>?> createUser(Map<String, dynamic> payload) async {
     try {
       final apiResponse =
       await apiService.post(ApiEndpoints.createUser, payload);
@@ -86,4 +85,46 @@ class AdminEmployeesService {
     // If ApiService already decodes JSON, return it; else decode as needed
     return resp;
   }
+
+
+  Future<Map<String, dynamic>?> addLeavesByAdmin(Map<String, dynamic> payload) async {
+    try {
+      final apiResponse = await apiService.post(ApiEndpoints.addLeavesByAdmin, payload);
+      return apiResponse;
+    } catch (e) {
+      print('Create user failed: $e');
+      return null;
+    }
+  }
+
+
+  Future<List<Map<String, dynamic>>> getAllAddedLeavesByAdmin() async {
+    try {
+      final apiResponse = await apiService.get(ApiEndpoints.getAllAddedLeavesByAdmin);
+
+      if (apiResponse is List) {
+        final List<Map<String, dynamic>> validatedList = [];
+        for (final item in apiResponse) {
+          if (item is Map<String, dynamic>) {
+            validatedList.add(item);
+          } else {
+            print(
+                'Warning: Skipping item with unexpected type: ${item.runtimeType}');
+          }
+        }
+        return validatedList;
+      }
+
+      print(
+          'Error: API response was not a list, but was: ${apiResponse.runtimeType}');
+      return [];
+    } catch (e) {
+      print('Failed to fetch user list: $e');
+      return [];
+    }
+  }
+
+
+
+
 }

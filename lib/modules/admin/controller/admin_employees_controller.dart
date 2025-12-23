@@ -5,26 +5,32 @@ import 'package:attedance_management_system/data/utils/app_helper.dart';
 import '../../../widgets/common/ui_helper_widgets.dart';
 import '../../common/controller/loading_controller.dart';
 import '../../models/user.dart';
+import '../model/add_leaves_by_admin.dart';
 import '../services/admin_employees_service.dart';
 
 class AdminEmployeesController extends GetxController {
   final AdminEmployeesService _service = AdminEmployeesService();
   final LoadingController _loadingController = Get.find<LoadingController>();
 
+  final RxBool isLeavesHistoryLoaded = false.obs;
 
   final RxList<User> users = <User>[].obs;
   List<User> get filteredUsers => users;
+
+  final RxList<AddLeavesByAdmin> addedLeavesByAdmin = <AddLeavesByAdmin>[].obs;
+  List<AddLeavesByAdmin> get filteredAddedLeavesByAdmin => addedLeavesByAdmin;
 
   @override
   void onInit() {
     super.onInit();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      loadUsers();
+      // loadUsers();
     });
   }
 
   Future<void> refreshEmployees() async {
     await loadUsers();
+    await getAllAddedLeavesByAdmin();
   }
 
   Future<void> loadUsers() async {
@@ -151,4 +157,46 @@ class AdminEmployeesController extends GetxController {
   }
 
 
+
+  Future<AddLeavesByAdmin?> addLeavesByAdmin(AddLeavesByAdmin addLeavesByAdmin) async {
+    _loadingController.start();
+
+    try {
+      final res = await _service.addLeavesByAdmin(addLeavesByAdmin.toJson());
+      if (res != null) {
+        final newUser = AddLeavesByAdmin.fromJson(res);
+        addedLeavesByAdmin.insert(0, newUser);
+        addedLeavesByAdmin.refresh();
+        return newUser;
+      }
+      return null;
+    } catch (e) {
+      print('AdminEmployeesController.addUser error: $e');
+      return null;
+    } finally {
+      _loadingController.hide();
+    }
+  }
+
+  Future<void> getAllAddedLeavesByAdmin() async {
+    isLeavesHistoryLoaded.value = false;
+    addedLeavesByAdmin.clear();
+    _loadingController.show();
+
+    try {
+      final res = await _service.getAllAddedLeavesByAdmin();
+      if (!AppHelper.isEmptyOrNull(res)) {
+        addedLeavesByAdmin.addAll(res.map((e) => AddLeavesByAdmin.fromJson(e)));
+        addedLeavesByAdmin.refresh();
+      }
+    } catch (e) {
+      print('AdminEmployeesController.loadUsers error: $e');
+    } finally {
+      isLeavesHistoryLoaded.value = true; // ✅ IMPORTANT
+      _loadingController.hide();
+    }
+  }
+
+
 }
+

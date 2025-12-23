@@ -181,18 +181,12 @@ class AdminHomeController extends GetxController {
   /// 🔄 Called when Activity tab opens
   void resetToToday() {
     selectedDate.value = DateTime.now();
-    print('reset to today');
-    print(selectedDate.value);
-
     refreshHomeByDate();
   }
 
 
   void changeDate(DateTime date) {
     selectedDate.value = date;
-    print('changeDate to today');
-    print(selectedDate.value);
-
     refreshHomeByDate();
   }
 

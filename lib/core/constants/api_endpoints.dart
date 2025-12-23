@@ -23,6 +23,8 @@ class ApiEndpoints {
   static const fetchAttendanceByDate = 'admin/fetchAttendanceByDate/';
   static const fetchActivitiesByDate = 'admin/fetchActivitiesByDate/';
   static const changeUserPasswordByAdmin = 'admin/changeUserPasswordByAdmin';
+  static const addLeavesByAdmin = 'admin/addLeavesByAdmin';
+  static const getAllAddedLeavesByAdmin = 'admin/getAllLeavesByAdmin';
 
 
 

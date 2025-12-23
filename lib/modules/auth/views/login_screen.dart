@@ -139,9 +139,22 @@ class _LoginScreenState extends State<LoginScreen> {
       radiusInMeters: officeRadius?.toDouble() ?? 100, // 100 meters
     );
     // --- Device Information Retrieval ---
-    final Map<String, dynamic> deviceDataMap = await DeviceService.getDeviceInformation();
+    // final Map<String, dynamic> deviceDataMap = await DeviceService.getDeviceInformation();
 
-    final DeviceInfo deviceInformation = DeviceInfo.fromJson(deviceDataMap);
+    final DeviceInfo deviceInformation = DeviceInfo.fromJson({
+    "os": "Android",
+    "version": "15",
+    "sdkInt": 35,
+    "model": "sdk_gphone64_x86_64",
+    "brand": "google",
+    "manufacturer": "Google",
+    "device": "",
+    "uniqueId": "AE3A.240806.036",
+    "isPhysicalDevice": false,
+    "androidId": "AE3A.240806.036",
+    "fingerprint": "google/sdk_gphone64_x86_64/emu64xa:15/AE3A.240806.036/12592187:user/release-keys",
+    "identifierForVendor": ""
+    },);
 
     // --- Create Login Model and Call Auth Service ---
     final loginPayload = Login(

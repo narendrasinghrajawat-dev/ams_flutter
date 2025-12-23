@@ -1,6 +1,7 @@
 import 'package:attedance_management_system/data/utils/app_helper.dart';
 import 'package:attedance_management_system/modules/admin/views/admin_screens/widgets/activity/activity_header.dart';
 import 'package:attedance_management_system/modules/admin/views/admin_screens/widgets/activity/activity_tile.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -24,16 +25,17 @@ class AdminActivityScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-
           /// 🔹 HEADER + DATE PICKER
           ActivityHeader(controller: c),
 
           const SizedBox(height: 12),
 
-          /// 🔹 ACTIVITY LIST
+          /// 🔹 ACTIVITY LIST (Responsive)
           Expanded(
             child: Obx(() {
-              if (c.activities.isEmpty) {
+              final list = c.activities;
+
+              if (list.isEmpty) {
                 return Center(
                   child: AppTextWidget.small(
                     "No Activity found for selected date",
@@ -42,12 +44,25 @@ class AdminActivityScreen extends StatelessWidget {
                 );
               }
 
-              return  ListView.separated(
-                itemCount: c.activities.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 8),
-                itemBuilder: (_, index) {
-                  return AdminActivityTile(
-                    activity: c.activities[index],
+              return LayoutBuilder(
+                builder: (context, constraints) {
+                  /// 🧠 Responsive columns
+
+                  return GridView.builder(
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: list.length,
+                    gridDelegate:
+                    SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: kIsWeb ? 2 : 1,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
+                      childAspectRatio: kIsWeb ? 9.7 : 4.0,
+                    ),
+                    itemBuilder: (_, index) {
+                      return AdminActivityTile(
+                        activity: list[index],
+                      );
+                    },
                   );
                 },
               );

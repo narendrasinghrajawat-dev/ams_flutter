@@ -67,6 +67,7 @@ class UIHelper {
   static  Future<bool?> showConfirmationDialog({required String title, required String message, String confirmText = 'Confirm', String cancelText = 'Cancel', Color? confirmColor,}) {
     return Get.dialog<bool>(
       AlertDialog(
+        backgroundColor: AppThemeColors.whiteColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14),
         ),

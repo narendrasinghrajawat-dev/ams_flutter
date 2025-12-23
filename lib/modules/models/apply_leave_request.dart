@@ -57,7 +57,6 @@ class ApplyLeaveRequest {
   // --- Factory Constructor for fromJson ---
 
   factory ApplyLeaveRequest.fromJson(Map<String, dynamic> json) {
-    print('ApplyLeaveRequest json is the $json');
 
     // Use AppJsonHelper methods for safe and consistent type conversion
 

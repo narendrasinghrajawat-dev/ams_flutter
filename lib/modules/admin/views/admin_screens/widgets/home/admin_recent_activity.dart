@@ -1,4 +1,5 @@
 import 'package:attedance_management_system/data/utils/app_helper.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -38,14 +39,25 @@ class AdminRecentActivity extends StatelessWidget {
             );
           }
 
-          return ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: activities.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 6),
-            itemBuilder: (_, index) {
-              final item = activities[index];
-              return _ActivityItem(item: item);
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              /// 🧠 Responsive columns
+              return GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: activities.length,
+                gridDelegate:
+                SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: kIsWeb ? 2: 1,
+                  crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
+                  childAspectRatio:kIsWeb ? 11 : 4.4,
+                ),
+                itemBuilder: (_, index) {
+                  final item = activities[index];
+                  return _ActivityItem(item: item);
+                },
+              );
             },
           );
         }),

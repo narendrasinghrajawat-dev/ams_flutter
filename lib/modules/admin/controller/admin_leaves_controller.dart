@@ -22,7 +22,7 @@ class AdminLeavesController extends GetxController {
   void onInit() {
     super.onInit();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      loadLeaves();
+      // loadLeaves();
     });
   }
 
