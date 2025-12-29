@@ -1,77 +1,116 @@
 class DeviceInfo {
+  // ---- Common ----
   final String? os;
+  final String? uniqueId;
+  final bool? isPhysicalDevice;
+
+  // ---- Android ----
   final String? version;
-  final int? sdkInt; // Android Only
+  final int? sdkInt;
   final String? model;
   final String? brand;
-  final String? manufacturer; // New: Manufacturer name
+  final String? manufacturer;
   final String? device;
+  final String? androidId;
+  final String? fingerprint;
 
-  // --- New Core Fields for Identification & Security ---
-  final String? uniqueId; // The best persistent ID available (Android ID or Vendor ID)
-  final bool? isPhysicalDevice; // True if it's a real device, not an emulator/simulator
+  // ---- iOS ----
+  final String? identifierForVendor;
 
-  // --- Platform-Specific IDs (Optional but informative) ---
-  final String? androidId; // Android only ID
-  final String? fingerprint; // Android only unique build ID
-  final String? identifierForVendor; // iOS only unique ID
+  // ---- Web ----
+  final String? browserName;
+  final String? appVersion;
+  final String? userAgent;
+  final String? platform;
+  final String? vendor;
+  final String? language;
 
   DeviceInfo({
     this.os,
+    this.uniqueId,
+    this.isPhysicalDevice,
+
+    // Android
     this.version,
     this.sdkInt,
     this.model,
     this.brand,
-    this.manufacturer, // Added
+    this.manufacturer,
     this.device,
-    this.uniqueId, // Added
-    this.isPhysicalDevice, // Added
-    this.androidId, // Added
-    this.fingerprint, // Added
-    this.identifierForVendor, // Added
+    this.androidId,
+    this.fingerprint,
+
+    // iOS
+    this.identifierForVendor,
+
+    // Web
+    this.browserName,
+    this.appVersion,
+    this.userAgent,
+    this.platform,
+    this.vendor,
+    this.language,
   });
 
   factory DeviceInfo.fromJson(Map<String, dynamic> json) {
-    // Helper to safely cast SDK Int
-    final sdkIntValue = json["sdkInt"] is int ? json["sdkInt"] : (json["sdkInt"] ?? 0);
-
-    // Helper to safely cast boolean
-    final isPhysicalDeviceValue = json["isPhysicalDevice"] is bool ? json["isPhysicalDevice"] : false;
-
     return DeviceInfo(
-      os: json["os"] ?? "",
-      version: json["version"] ?? "",
-      sdkInt: sdkIntValue,
-      model: json["model"] ?? "",
-      brand: json["brand"] ?? "",
-      manufacturer: json["manufacturer"] ?? "", // Mapped
-      device: json["device"] ?? "",
+      // Common
+      os: json["os"],
+      uniqueId: json["uniqueId"],
+      isPhysicalDevice: json["isPhysicalDevice"] is bool
+          ? json["isPhysicalDevice"]
+          : false,
 
-      uniqueId: json["uniqueId"] ?? "", // Mapped
-      isPhysicalDevice: isPhysicalDeviceValue, // Mapped
+      // Android
+      version: json["version"],
+      sdkInt: json["sdkInt"] is int ? json["sdkInt"] : null,
+      model: json["model"],
+      brand: json["brand"],
+      manufacturer: json["manufacturer"],
+      device: json["device"],
+      androidId: json["androidId"],
+      fingerprint: json["fingerprint"],
 
-      androidId: json["androidId"] ?? "", // Mapped
-      fingerprint: json["fingerprint"] ?? "", // Mapped
-      identifierForVendor: json["identifierForVendor"] ?? "", // Mapped
+      // iOS
+      identifierForVendor: json["identifierForVendor"],
+
+      // Web
+      browserName: json["browserName"],
+      appVersion: json["appVersion"],
+      userAgent: json["userAgent"],
+      platform: json["platform"],
+      vendor: json["vendor"],
+      language: json["language"],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
+      // Common
       "os": os,
+      "uniqueId": uniqueId,
+      "isPhysicalDevice": isPhysicalDevice,
+
+      // Android
       "version": version,
       "sdkInt": sdkInt,
       "model": model,
       "brand": brand,
       "manufacturer": manufacturer,
       "device": device,
-
-      "uniqueId": uniqueId,
-      "isPhysicalDevice": isPhysicalDevice,
-
       "androidId": androidId,
       "fingerprint": fingerprint,
+
+      // iOS
       "identifierForVendor": identifierForVendor,
+
+      // Web
+      "browserName": browserName,
+      "appVersion": appVersion,
+      "userAgent": userAgent,
+      "platform": platform,
+      "vendor": vendor,
+      "language": language,
     };
   }
 }

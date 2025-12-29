@@ -29,11 +29,11 @@ class _UserLeavesScreenState extends State<UserLeavesScreen> {
   /// 0 = Approved, 1 = Pending, 2 = Rejected, 3 = Cancelled
   int _activeTab = 0;
 
-  final UserLeavesController _controller =
-  Get.find<UserLeavesController>();
+  final UserLeavesController _controller = Get.find<UserLeavesController>();
 
   @override
   Widget build(BuildContext context) {
+
     return Stack(
       children: [
         SafeArea(
@@ -42,7 +42,57 @@ class _UserLeavesScreenState extends State<UserLeavesScreen> {
             const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
             child: Column(
               children: [
-                _buildBalancesList(),
+               Row(
+                  children: [
+                    Expanded(child: _buildBalancesList(),),
+                    SizedBox(width: 10,),
+                    Expanded(
+                      child: Obx(() {
+                        final all = _controller.filteredAppliedLeavesList;
+
+                        // 🔹 Status-wise count map
+                        final Map<String, int> statusCount = {
+                          AppStrings.approvedLeavesStatusKey: 0,
+                          AppStrings.pendingLeavesStatusKey: 0,
+                          AppStrings.rejectedLeavesStatusKey: 0,
+                          AppStrings.cancelledLeavesStatusKey: 0,
+                        };
+
+                        for (final e in all) {
+                          final status = (e.leaveStatus ?? '').toLowerCase();
+                          if (statusCount.containsKey(status)) {
+                            statusCount[status] = statusCount[status]! + 1;
+                          }
+                        }
+
+                        // 🔹 UI config list
+                        final items = [
+                          ('Total Applied', all.length, ''),
+                          ('Approved', statusCount[AppStrings.approvedLeavesStatusKey]!, AppStrings.approvedLeavesStatusKey),
+                          ('Pending', statusCount[AppStrings.pendingLeavesStatusKey]!, AppStrings.pendingLeavesStatusKey),
+                          ('Rejected', statusCount[AppStrings.rejectedLeavesStatusKey]!, AppStrings.rejectedLeavesStatusKey),
+                          ('Cancelled', statusCount[AppStrings.cancelledLeavesStatusKey]!, AppStrings.cancelledLeavesStatusKey),
+                        ];
+
+                        return CommonCardWidget(
+                          padding: 5,
+                          child: Column(
+                            children: items
+                                .map(
+                                  (e) => _SummaryItem(
+                                title: e.$1,
+                                value: e.$2,
+                                color: AppHelper.getLeavesStatusColor(e.$3),
+                                vertical: false,
+                              ),
+                            )
+                                .toList(),
+                          ),
+                        );
+                      }),
+                    )
+                  ],
+                ),
                 const SizedBox(height: 10),
                 _buildSummaryAndList(),
               ],
@@ -51,7 +101,6 @@ class _UserLeavesScreenState extends State<UserLeavesScreen> {
         ),
 
         /// ➕ FAB (APP ONLY)
-        if (!kIsWeb)
           Positioned(
             bottom: 20,
             right: 20,
@@ -85,11 +134,6 @@ class _UserLeavesScreenState extends State<UserLeavesScreen> {
     return Obx(() {
       final list = _controller.filteredLeaveBalanceList;
 
-      if (list.isEmpty) {
-        return const EmptyStateWidget(
-            message: 'No leave balances available');
-      }
-
       return GridView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
@@ -98,7 +142,7 @@ class _UserLeavesScreenState extends State<UserLeavesScreen> {
           crossAxisCount: kIsWeb ? 2 : 2,
           crossAxisSpacing: 10,
           mainAxisSpacing: 10,
-          childAspectRatio: kIsWeb ? 5.5 : 1.7,
+          childAspectRatio: kIsWeb ? 2.9 : 1.7,
         ),
         itemBuilder: (_, idx) {
           return LeaveBalanceCard(balance: list[idx]);
@@ -146,105 +190,105 @@ class _UserLeavesScreenState extends State<UserLeavesScreen> {
         return Column(
           children: [
             /// 🔹 SUMMARY CARD (Responsive)
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final bool isWeb = constraints.maxWidth >= 800;
+            // LayoutBuilder(
+            //   builder: (context, constraints) {
+            //     final bool isWeb = constraints.maxWidth >= 800;
+            //
+            //     return CommonCardWidget(
+            //       child: isWeb
+            //           ? Row(
+            //         mainAxisAlignment:
+            //         MainAxisAlignment.spaceBetween,
+            //         children: [
+            //           _SummaryItem(
+            //             title: 'Total Applied',
+            //             value: all.length,
+            //             color:
+            //             AppHelper.getLeavesStatusColor(''),
+            //             vertical: true,
+            //           ),
+            //           _SummaryItem(
+            //             title: 'Approved',
+            //             value: approved.length,
+            //             color: AppHelper.getLeavesStatusColor(
+            //                 AppStrings
+            //                     .approvedLeavesStatusKey),
+            //             vertical: true,
+            //           ),
+            //           _SummaryItem(
+            //             title: 'Pending',
+            //             value: pending.length,
+            //             color: AppHelper.getLeavesStatusColor(
+            //                 AppStrings
+            //                     .pendingLeavesStatusKey),
+            //             vertical: true,
+            //           ),
+            //           _SummaryItem(
+            //             title: 'Rejected',
+            //             value: rejected.length,
+            //             color: AppHelper.getLeavesStatusColor(
+            //                 AppStrings
+            //                     .rejectedLeavesStatusKey),
+            //             vertical: true,
+            //           ),
+            //           _SummaryItem(
+            //             title: 'Cancelled',
+            //             value: cancelled.length,
+            //             color: AppHelper.getLeavesStatusColor(
+            //                 AppStrings
+            //                     .cancelledLeavesStatusKey),
+            //             vertical: true,
+            //           ),
+            //         ],
+            //       )
+            //           : Column(
+            //         children: [
+            //           _SummaryItem(
+            //             title: 'Total Applied',
+            //             value: all.length,
+            //             color:
+            //             AppHelper.getLeavesStatusColor(''),
+            //             vertical: false,
+            //           ),
+            //           _SummaryItem(
+            //             title: 'Approved',
+            //             value: approved.length,
+            //             color: AppHelper.getLeavesStatusColor(
+            //                 AppStrings
+            //                     .approvedLeavesStatusKey),
+            //             vertical: false,
+            //           ),
+            //           _SummaryItem(
+            //             title: 'Pending',
+            //             value: pending.length,
+            //             color: AppHelper.getLeavesStatusColor(
+            //                 AppStrings
+            //                     .pendingLeavesStatusKey),
+            //             vertical: false,
+            //           ),
+            //           _SummaryItem(
+            //             title: 'Rejected',
+            //             value: rejected.length,
+            //             color: AppHelper.getLeavesStatusColor(
+            //                 AppStrings
+            //                     .rejectedLeavesStatusKey),
+            //             vertical: false,
+            //           ),
+            //           _SummaryItem(
+            //             title: 'Cancelled',
+            //             value: cancelled.length,
+            //             color: AppHelper.getLeavesStatusColor(
+            //                 AppStrings
+            //                     .cancelledLeavesStatusKey),
+            //             vertical: false,
+            //           ),
+            //         ],
+            //       ),
+            //     );
+            //   },
+            // ),
 
-                return CommonCardWidget(
-                  child: isWeb
-                      ? Row(
-                    mainAxisAlignment:
-                    MainAxisAlignment.spaceBetween,
-                    children: [
-                      _SummaryItem(
-                        title: 'Total Applied',
-                        value: all.length,
-                        color:
-                        AppHelper.getLeavesStatusColor(''),
-                        vertical: true,
-                      ),
-                      _SummaryItem(
-                        title: 'Approved',
-                        value: approved.length,
-                        color: AppHelper.getLeavesStatusColor(
-                            AppStrings
-                                .approvedLeavesStatusKey),
-                        vertical: true,
-                      ),
-                      _SummaryItem(
-                        title: 'Pending',
-                        value: pending.length,
-                        color: AppHelper.getLeavesStatusColor(
-                            AppStrings
-                                .pendingLeavesStatusKey),
-                        vertical: true,
-                      ),
-                      _SummaryItem(
-                        title: 'Rejected',
-                        value: rejected.length,
-                        color: AppHelper.getLeavesStatusColor(
-                            AppStrings
-                                .rejectedLeavesStatusKey),
-                        vertical: true,
-                      ),
-                      _SummaryItem(
-                        title: 'Cancelled',
-                        value: cancelled.length,
-                        color: AppHelper.getLeavesStatusColor(
-                            AppStrings
-                                .cancelledLeavesStatusKey),
-                        vertical: true,
-                      ),
-                    ],
-                  )
-                      : Column(
-                    children: [
-                      _SummaryItem(
-                        title: 'Total Applied',
-                        value: all.length,
-                        color:
-                        AppHelper.getLeavesStatusColor(''),
-                        vertical: false,
-                      ),
-                      _SummaryItem(
-                        title: 'Approved',
-                        value: approved.length,
-                        color: AppHelper.getLeavesStatusColor(
-                            AppStrings
-                                .approvedLeavesStatusKey),
-                        vertical: false,
-                      ),
-                      _SummaryItem(
-                        title: 'Pending',
-                        value: pending.length,
-                        color: AppHelper.getLeavesStatusColor(
-                            AppStrings
-                                .pendingLeavesStatusKey),
-                        vertical: false,
-                      ),
-                      _SummaryItem(
-                        title: 'Rejected',
-                        value: rejected.length,
-                        color: AppHelper.getLeavesStatusColor(
-                            AppStrings
-                                .rejectedLeavesStatusKey),
-                        vertical: false,
-                      ),
-                      _SummaryItem(
-                        title: 'Cancelled',
-                        value: cancelled.length,
-                        color: AppHelper.getLeavesStatusColor(
-                            AppStrings
-                                .cancelledLeavesStatusKey),
-                        vertical: false,
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-
-            const SizedBox(height: 12),
+            // const SizedBox(height: 12),
 
             /// 🔹 TABS
             SegmentedTabs(
@@ -263,21 +307,36 @@ class _UserLeavesScreenState extends State<UserLeavesScreen> {
             /// 🔹 LIST
             Expanded(
               child: activeList.isEmpty
-                  ? const EmptyStateWidget(
-                message: 'No leaves found',
-              )
-                  : ListView.separated(
-                physics: const BouncingScrollPhysics(),
-                itemCount: activeList.length,
-                separatorBuilder: (_, __) =>
-                const SizedBox(height: 10),
-                itemBuilder: (_, idx) {
-                  return LeaveCard(
-                    leave: activeList[idx],
+                  ? const EmptyStateWidget(message: 'No leaves found')
+                  : LayoutBuilder(
+                builder: (context, constraints) {
+                  final isWide = constraints.maxWidth >= 700;
+
+                  if (!isWide) {
+                    return ListView.separated(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                      itemCount: activeList.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 10),
+                      itemBuilder: (_, idx) => LeaveCard(leave: activeList[idx]),
+                    );
+                  }
+
+                  return GridView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                    itemCount: activeList.length,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
+                      childAspectRatio: isWide ? 3.5 : 1.8, // IMPORTANT: vertical cards
+                    ),
+                    itemBuilder: (_, idx) => LeaveCard(leave: activeList[idx]),
                   );
                 },
               ),
             ),
+
+
           ],
         );
       }),

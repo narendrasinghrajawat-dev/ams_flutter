@@ -1,6 +1,8 @@
 import 'package:attedance_management_system/core/constants/app_icons.dart';
 import 'package:attedance_management_system/core/constants/const_strings.dart';
+import 'package:attedance_management_system/data/utils/app_helper.dart';
 import 'package:attedance_management_system/modules/user/controller/user_leaves_controller.dart';
+import 'package:attedance_management_system/widgets/common/ui_helper_widgets.dart';
 import 'package:attedance_management_system/widgets/form_widgets/radio_button_widget.dart';
 import 'package:attedance_management_system/widgets/text_and_icon_widgets/app_icon_button.dart';
 import 'package:flutter/material.dart';
@@ -214,15 +216,6 @@ class _UserApplyLeavesFormState extends State<UserApplyLeavesForm> {
   }
 
 
-
-
-  /// Helper: inclusive days between two dates (start..end)
-  int _calculateInclusiveDays(DateTime start, DateTime end) {
-    final startOnly = DateTime(start.year, start.month, start.day);
-    final endOnly = DateTime(end.year, end.month, end.day);
-    return endOnly.difference(startOnly).inDays + 1;
-  }
-
   /// VALIDATE LEAVE BALANCE BASED ON SELECTED TYPE ID
   /// Returns null when valid, otherwise returns error string.
   String? _validateLeaveBalanceById() {
@@ -281,38 +274,9 @@ class _UserApplyLeavesFormState extends State<UserApplyLeavesForm> {
     }
   }
 
+
   /// VALIDATE DATE RANGE VS NUMBER OF LEAVES
   /// Returns null when valid, otherwise error string.
-  String? _validateDateRangeMatchesDays() {
-    if (_startDateTime == null || _endDateTime == null) {
-      return "Please select both start and end dates.";
-    }
-
-    final daysBetween = _calculateInclusiveDays(_startDateTime!, _endDateTime!);
-
-    final requested = int.tryParse(_daysController.text.trim()) ?? 0;
-    if (requested <= 0) return "Enter valid number of leaves.";
-
-    // If half-day selected, enforce that start==end and requested == 1 (we treat 1 as one half-day unit)
-    final isHalfDay = leaveDurationsId == '2';
-    if (isHalfDay) {
-      if (daysBetween != 1) {
-        return "For half day leave, start and end date must be the same day.";
-      }
-      // requested should be 1 (representing the half-day unit in your UI)
-      if (requested != 1) {
-        return "For half day leave, number of leaves must be 1 (half-day).";
-      }
-      return null;
-    }
-
-    // Full day: requested must match daysBetween
-    if (requested != daysBetween) {
-      return "Number of days ($requested) does not match date range ($daysBetween).";
-    }
-
-    return null;
-  }
 
   Future<void> _submit() async {
     FocusScope.of(context).unfocus();
@@ -321,6 +285,8 @@ class _UserApplyLeavesFormState extends State<UserApplyLeavesForm> {
     });
 
     if (_formKey.currentState?.validate() != true) return;
+    final currentUser = AppHelper.getProfileUser();
+    final double numberOfLeaves = double.parse(_daysController.text.toString());
 
     // Balance validation (ID based)
     final balanceError = _validateLeaveBalanceById();
@@ -333,6 +299,10 @@ class _UserApplyLeavesFormState extends State<UserApplyLeavesForm> {
         backgroundColor: Colors.red.withOpacity(0.08),
         colorText: Colors.red,
       );
+      return;
+    }
+    if (leaveTypeId == "2" && numberOfLeaves > 1) {
+      UIHelper.showSnackbar("Warning", "Leave Limit Reached", type: SnackbarType.warning);
       return;
     }
 
@@ -358,8 +328,7 @@ class _UserApplyLeavesFormState extends State<UserApplyLeavesForm> {
     }
 
 
-    final currentUser = _auth.currentUser.value;
-    final userKey = currentUser?.key ?? currentUser?.id ?? '';
+    final userKey = currentUser.key ?? currentUser.id ?? '';
 
     if (userKey.isEmpty) {
       Get.snackbar(
@@ -370,7 +339,6 @@ class _UserApplyLeavesFormState extends State<UserApplyLeavesForm> {
       return;
     }
 
-    final double numberOfLeaves = double.parse(_daysController.text.toString());
 
     final req = ApplyLeaveRequest(
       key: widget.editForm?.key,
@@ -401,17 +369,9 @@ class _UserApplyLeavesFormState extends State<UserApplyLeavesForm> {
 
     if (ok) {
       Get.back();
-      Get.snackbar(
-        'Success',
-        widget.editForm == null ? 'Leave applied successfully' : 'Leave updated successfully',
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      UIHelper.showSnackbar("Success", widget.editForm == null ? 'Leave applied successfully' : 'Leave updated successfully',);
     } else {
-      Get.snackbar(
-        'Error',
-        'Failed to submit leave. Try again.',
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      UIHelper.showSnackbar("Error", "Failed to submit leave. Try again.",type: SnackbarType.error);
     }
   }
 
@@ -539,25 +499,6 @@ class _UserApplyLeavesFormState extends State<UserApplyLeavesForm> {
                     }
                     return null;
                   },
-
-
-                  // validator: (_) {
-                  //   final entered = double.tryParse(_daysController.text.trim());
-                  //
-                  //   print('entered is teh $entered');
-                  //
-                  //   if(entered != null){
-                  //     final err = UserApplyLeaveHelper.validateDateAndDays(
-                  //       start: _startDateTime,
-                  //       end: _endDateTime,
-                  //       enteredDays: entered,
-                  //       isHalfDay: leaveDurationsId == '2',
-                  //     );
-                  //
-                  //     return err;
-                  //   }
-                  // },
-
                 ),
 
 

@@ -55,8 +55,6 @@ class LocationService {
         desiredAccuracy: LocationAccuracy.best,
       ).timeout(effective);
 
-      print('post iset eh$pos');
-
       return LocationResult(ok: true, position: pos);
     } on TimeoutException {
       // fallback to last known if available
@@ -103,8 +101,6 @@ class LocationService {
   /// ✅ Common function: is user within given radius of target (e.g. office)?
   bool isWithinRadius({required double userLat, required double userLng, required double targetLat, required double targetLng, double radiusInMeters = 100.0,}) {
     final distance = calculateDistanceInMeters(userLat, userLng, targetLat, targetLng);
-
-    print('Distance user–office: $distance meters');
 
     return distance <= radiusInMeters;
   }

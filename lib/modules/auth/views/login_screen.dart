@@ -6,6 +6,7 @@ import 'package:attedance_management_system/modules/models/masterData.dart';
 import 'package:attedance_management_system/widgets/card/common_card.dart';
 import 'package:attedance_management_system/widgets/container/common_container.dart';
 import 'package:attedance_management_system/widgets/form_widgets/text_field_widget.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -107,7 +108,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
     // --- Master Data & Office Radius Validation ---
     MasterData? masterData = _commonController.masterData.value;
-    print('master data is the ${jsonEncode(masterData?.toJson())}');
 
     if (lat == null || lng == null) {
       Get.snackbar(
@@ -139,23 +139,9 @@ class _LoginScreenState extends State<LoginScreen> {
       radiusInMeters: officeRadius?.toDouble() ?? 100, // 100 meters
     );
     // --- Device Information Retrieval ---
-    // final Map<String, dynamic> deviceDataMap = await DeviceService.getDeviceInformation();
+    final Map<String, dynamic> deviceDataMap = await DeviceService.getDeviceInformation();
 
-    final DeviceInfo deviceInformation = DeviceInfo.fromJson({
-    "os": "Android",
-    "version": "15",
-    "sdkInt": 35,
-    "model": "sdk_gphone64_x86_64",
-    "brand": "google",
-    "manufacturer": "Google",
-    "device": "",
-    "uniqueId": "AE3A.240806.036",
-    "isPhysicalDevice": false,
-    "androidId": "AE3A.240806.036",
-    "fingerprint": "google/sdk_gphone64_x86_64/emu64xa:15/AE3A.240806.036/12592187:user/release-keys",
-    "identifierForVendor": ""
-    },);
-
+    final DeviceInfo deviceInformation = DeviceInfo.fromJson(deviceDataMap);
     // --- Create Login Model and Call Auth Service ---
     final loginPayload = Login(
       email: emailC.text.trim(),
@@ -168,11 +154,6 @@ class _LoginScreenState extends State<LoginScreen> {
     await _auth.login(loginPayload);
 
     if (!_auth.isLoggedIn) {
-      // Get.snackbar(
-      //   'Login failed',
-      //   'Please check credentials',
-      //   snackPosition: SnackPosition.BOTTOM,
-      // );
     } else {
       storageService.saveMap(AppStrings.deviceInformation, deviceInformation.toJson());
     }
@@ -220,46 +201,48 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 22),
 
                 // Card with form
-                CommonCardWidget(
-                  color: AppThemeColors.whiteColor,
-                  child: Form(
+                SizedBox(
+                  width: kIsWeb ? MediaQuery.of(context).size.width * .3 : MediaQuery.of(context).size.width,
+                  child: CommonCardWidget(
+                    color: AppThemeColors.whiteColor,
+                    child: Form(
                       key: _formKey,
                       child: Column(
                         children: [
                           // Email
-                          SizedBox(height: 20,),
-                           TextFieldWidget(
-                              controller: emailC,
-                              keyboardInputType: TextInputType.emailAddress,
-                              labelText: 'Email',
-                              hintText: "abc@gmail.com",
-                              validator: (v) {
-                                if (v == null || v.trim().isEmpty) return 'Please enter email';
-                                if (!GetUtils.isEmail(v.trim())) return 'Enter a valid email';
-                                return null;
-                              },
-                            ),
 
-                          const SizedBox(height: 5),
-                          TextFieldWidget(
-                              controller: passC,
-                              keyboardInputType: TextInputType.emailAddress,
-                              labelText: 'Password',
-                              validator: (v) {
-                                if (v == null || v
-                                    .trim()
-                                    .isEmpty) {
-                                  return 'Please enter password';
-                                }
-                                if (v
-                                    .trim()
-                                    .length < 4) {
-                                  return 'Password too short';
-                                }
-                                return null;
-                              },
-                            ),
+                              SizedBox(height: 20,),
+                              TextFieldWidget(
+                                controller: emailC,
+                                keyboardInputType: TextInputType.emailAddress,
+                                labelText: 'Email',
+                                hintText: "abc@gmail.com",
+                                validator: (v) {
+                                  if (v == null || v.trim().isEmpty) return 'Please enter email';
+                                  if (!GetUtils.isEmail(v.trim())) return 'Enter a valid email';
+                                  return null;
+                                },
+                              ),
 
+                              const SizedBox(height: 5),
+                              TextFieldWidget(
+                                controller: passC,
+                                keyboardInputType: TextInputType.emailAddress,
+                                labelText: 'Password',
+                                validator: (v) {
+                                  if (v == null || v
+                                      .trim()
+                                      .isEmpty) {
+                                    return 'Please enter password';
+                                  }
+                                  if (v
+                                      .trim()
+                                      .length < 4) {
+                                    return 'Password too short';
+                                  }
+                                  return null;
+                                },
+                              ),
 
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -290,44 +273,45 @@ class _LoginScreenState extends State<LoginScreen> {
                           const SizedBox(height: 18),
 
                           // Login button / loader
-                           SizedBox(
-                              width: double.infinity,
-                              height: 48,
-                              child: ElevatedButton(
-                                onPressed: _submit,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppThemeColors.buttonBgColor,
-                                  foregroundColor: AppThemeColors.buttonTextColor,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), side: BorderSide(color: AppThemeColors.enableBorderColor)),
-                                  elevation: 1.5,
+                          SizedBox(
+                            width: double.infinity,
+                            height: 48,
+                            child: ElevatedButton(
+                              onPressed: _submit,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppThemeColors.buttonBgColor,
+                                foregroundColor: AppThemeColors.buttonTextColor,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), side: BorderSide(color: AppThemeColors.enableBorderColor)),
+                                elevation: 1.5,
 
-                                ),
-                                child: AppTextWidget.medium('login'.tr, color: Colors.white),
                               ),
+                              child: AppTextWidget.medium('login'.tr, color: Colors.white),
                             ),
+                          ),
 
                           const SizedBox(height: 12),
 
                           // OR separator
-                          Row(
-                            children: [
-                              Expanded(child: Divider(color: AppThemeColors.dividerColor)),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                child: AppTextWidget.small('OR', color: AppThemeColors.textSecondaryColor),
-                              ),
-                              Expanded(child: Divider(color: AppThemeColors.dividerColor)),
-                            ],
-                          ),
-
-                          const SizedBox(height: 10),
-                          TextButton(
-                            onPressed: () => Get.toNamed('/register'),
-                            child: AppTextWidget.small('Create an account', color: AppThemeColors.primaryColor),
-                          ),
+                          // Row(
+                          //   children: [
+                          //     Expanded(child: Divider(color: AppThemeColors.dividerColor)),
+                          //     Padding(
+                          //       padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          //       child: AppTextWidget.small('OR', color: AppThemeColors.textSecondaryColor),
+                          //     ),
+                          //     Expanded(child: Divider(color: AppThemeColors.dividerColor)),
+                          //   ],
+                          // ),
+                          //
+                          // const SizedBox(height: 10),
+                          // TextButton(
+                          //   onPressed: () => Get.toNamed('/register'),
+                          //   child: AppTextWidget.small('Create an account', color: AppThemeColors.primaryColor),
+                          // ),
                         ],
                       ),
                     ),
+                  ),
                 ),
 
                 const SizedBox(height: 20),
