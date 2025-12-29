@@ -1,4 +1,5 @@
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 
@@ -26,7 +27,8 @@ void showCommonDialog({required BuildContext context, required Widget child, isO
               child: child,
             )
         ),
-      ) : DraggableDialog(child: child);
+      ) : DraggableDialog(
+          child: child);
     },
   );
 }
@@ -47,7 +49,7 @@ class _DraggableDialogState extends State<DraggableDialog> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
-    final dialogWidth = screenSize.width * 0.88;
+    final dialogWidth =  kIsWeb ? screenSize.width * 0.3 : screenSize.width * 0.88;
     final maxDialogHeight = screenSize.height * 0.9;
 
     return Stack(

@@ -1,6 +1,7 @@
 import 'package:attedance_management_system/core/constants/app_theme_colors.dart';
 import 'package:attedance_management_system/data/utils/app_helper.dart';
 import 'package:attedance_management_system/modules/models/leave_balance.dart';
+import 'package:attedance_management_system/widgets/common/ui_helper_widgets.dart';
 import 'package:flutter/painting.dart';
 import 'package:get/get.dart';
 
@@ -129,18 +130,9 @@ class UserLeavesController extends GetxController {
 
       appliedLeaves.removeWhere((l) => l.key == leave.key);
       appliedLeaves.refresh();
-
-      Get.snackbar(
-        'Success',
-        'Leave request cancelled',
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      UIHelper.showSnackbar("Success", 'Leave request cancelled');
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Failed to cancel leave request',
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      UIHelper.showSnackbar("Error", 'Failed to cancel leave request', type: SnackbarType.error);
     } finally {
       isCancelling.value = false;
       _loadingController.hide();

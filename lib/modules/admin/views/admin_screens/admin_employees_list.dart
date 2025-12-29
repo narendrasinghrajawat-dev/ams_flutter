@@ -143,7 +143,7 @@ class _UserTile extends StatelessWidget {
       onDelete: () async {
         final confirm = await showCommonConfirmationDialog(
           context,
-          string: "Are you sure want to delete?",
+          string: "Are you sure want to delete",
         );
         if (confirm == true && user.key != null) {
           await _adminEmployeesControllerController.deleteUser(user.key!);

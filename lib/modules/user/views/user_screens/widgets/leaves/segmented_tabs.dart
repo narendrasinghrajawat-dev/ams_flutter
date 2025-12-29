@@ -12,9 +12,8 @@ class SegmentedTabs extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-
       decoration: BoxDecoration(color: AppThemeColors.containerBackgroundColor, borderRadius: BorderRadius.circular(10)),
-      padding: const EdgeInsets.all(6),
+      padding: const EdgeInsets.all(0),
       child: Row(
         children: List.generate(labels.length, (i) {
           final selected = i == selectedIndex;
@@ -22,7 +21,7 @@ class SegmentedTabs extends StatelessWidget {
             child: GestureDetector(
               onTap: () => onTap(i),
               child: Container(
-                height: 42,
+                height: 35,
                 margin: const EdgeInsets.symmetric(horizontal: 4),
                 decoration: BoxDecoration(
                   color: selected ? AppThemeColors.primaryColor : Colors.transparent,

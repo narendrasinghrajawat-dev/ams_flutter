@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:attedance_management_system/widgets/common/ui_helper_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -150,6 +151,11 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
       if (officeLat == null || officeLng == null) return null;
 
+      print('is inside is the');
+      print(officeLat);
+      print(officeLng);
+      print(officeRadius);
+
       final isInside = LocationService.instance.isWithinRadius(
         userLat: locRes.position!.latitude,
         userLng: locRes.position!.longitude,
@@ -159,26 +165,15 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       );
 
       if (!isInside) {
-        Get.snackbar(
-          'Outside Office',
-          'You must be inside office radius',
-          backgroundColor: AppThemeColors.warningColor.withOpacity(0.2),
-        );
+        UIHelper.showSnackbar("Outside Office", 'You must be inside office radius',type: SnackbarType.error);
         return null;
       }
 
-      final currentDevice =
-      await DeviceService.getDeviceInformation();
-      final storedDevice =
-      _storageService.readMap(AppStrings.deviceInformation);
+      final currentDevice = await DeviceService.getDeviceInformation();
+      final storedDevice = _storageService.readMap(AppStrings.deviceInformation);
 
-      if (storedDevice == null ||
-          !_isSameDevice(currentDevice, storedDevice)) {
-        Get.snackbar(
-          'Device Mismatch',
-          'Attendance allowed only from login device',
-          backgroundColor: AppThemeColors.errorColor.withOpacity(0.1),
-        );
+      if (storedDevice == null || !_isSameDevice(currentDevice, storedDevice)) {
+        UIHelper.showSnackbar("Device Mismatch", 'Attendance allowed only from login device',type: SnackbarType.error);
         return null;
       }
 
@@ -366,14 +361,37 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               Expanded(
                 child: recent.isEmpty
                     ? const EmptyActivityState()
-                    : ListView.separated(
-                  itemCount: recent.length,
-                  separatorBuilder: (_, __) =>
-                  const SizedBox(height: 10),
-                  itemBuilder: (_, i) =>
-                      UserActivityTile(activity: recent[i]),
+                    : LayoutBuilder(
+                  builder: (context, constraints) {
+                    final bool isWideScreen = constraints.maxWidth >= 700;
+
+                    // 📱 Mobile → Single column list
+                    if (!isWideScreen) {
+                      return ListView.separated(
+                        itemCount: recent.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 10),
+                        itemBuilder: (_, i) =>
+                            UserActivityTile(activity: recent[i]),
+                      );
+                    }
+
+                    // 🌐 Web / Desktop → 2 items per row
+                    return GridView.builder(
+                      itemCount: recent.length,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,          // 👈 2 tiles per row
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
+                        childAspectRatio: isWideScreen ? 9 : 3.5,      // 👈 adjust for tile height
+                      ),
+                      itemBuilder: (_, i) =>
+                          UserActivityTile(activity: recent[i]),
+                    );
+                  },
                 ),
               ),
+
+
             ],
           ),
         ),

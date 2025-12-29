@@ -3,6 +3,7 @@ import 'package:attedance_management_system/data/utils/app_helper.dart';
 import 'package:attedance_management_system/modules/admin/controller/admin_employees_controller.dart';
 import 'package:attedance_management_system/modules/common/controller/common_controller.dart';
 import 'package:attedance_management_system/modules/models/masterData.dart';
+import 'package:attedance_management_system/widgets/card/common_card.dart';
 import 'package:attedance_management_system/widgets/common/ui_helper_widgets.dart';
 import 'package:attedance_management_system/widgets/text_and_icon_widgets/app_icon_button.dart';
 import 'package:flutter/material.dart';
@@ -231,165 +232,165 @@ class _UserFormState extends State<UserForm> {
   @override
   Widget build(BuildContext context) {
 
-    return  SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+    return   SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
 
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              AppIconButtonWidget.large(icon: AppConstIcons.backIcon, onPressed:  () => Get.back()),
-              AppTextWidget.large(widget.initialData == null ? 'Add' : 'Edit', color: AppThemeColors.textPrimaryColor),
-              AppIconButtonWidget.large(icon: AppConstIcons.saveIcon, onPressed:  () => _save()),
-            ],
-          ),
-
-
-          Form(
-            key: _formKey,
-            child: Column(
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Name row: First | Middle | Last
-                TextFieldWidget(
-                  controller: firstNameC,
-                  labelText: 'First Name',
-                  hintText: 'Enter first name',
-                  validator: _validateName,
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextFieldWidget(
-                        controller: middleNameC,
-                        labelText: 'Middle Name',
-                        validator: (v) {
-                          if (v != null && v.trim().isNotEmpty && v.trim().length < 2) return 'Too short';
-                          return null;
-                        },
+                AppIconButtonWidget.large(icon: AppConstIcons.backIcon, onPressed:  () => Get.back()),
+                AppTextWidget.large(widget.initialData == null ? 'Add' : 'Edit', color: AppThemeColors.textPrimaryColor),
+                AppIconButtonWidget.large(icon: AppConstIcons.saveIcon, onPressed:  () => _save()),
+              ],
+            ),
+
+
+            Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  // Name row: First | Middle | Last
+                  TextFieldWidget(
+                    controller: firstNameC,
+                    labelText: 'First Name',
+                    hintText: 'Enter first name',
+                    validator: _validateName,
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFieldWidget(
+                          controller: middleNameC,
+                          labelText: 'Middle Name',
+                          validator: (v) {
+                            if (v != null && v.trim().isNotEmpty && v.trim().length < 2) return 'Too short';
+                            return null;
+                          },
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: TextFieldWidget(
-                        controller: lastNameC,
-                        labelText: 'Last Name',
-                        validator: _validateName,
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: TextFieldWidget(
+                          controller: lastNameC,
+                          labelText: 'Last Name',
+                          validator: _validateName,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
 
-                const SizedBox(height: 5),
+                  const SizedBox(height: 5),
 
-                // Email & Phone
+                  // Email & Phone
 
-                TextFieldWidget(
-                  controller: emailC,
-                  labelText: 'Email',
-                  keyboardInputType: TextInputType.emailAddress,
-                  validator: _validateEmail,
-                ),
-                const SizedBox(height: 5),
-
-
-                TextFieldWidget(
-                  controller: phoneC,
-                  labelText: 'Phone No',
-                  keyboardInputType: TextInputType.phone,
-                  validator: _validatePhone,
-                ),
-
-                const SizedBox(height: 5),
-
-                DropdownFieldWidget(
-                  labelText: 'Gender',
-                  value: genderId,
-                  items: genderList,
-                  onChanged: (v) => setState(() => genderId = v),
-                ),
-                const SizedBox(height: 5),
+                  TextFieldWidget(
+                    controller: emailC,
+                    labelText: 'Email',
+                    keyboardInputType: TextInputType.emailAddress,
+                    validator: _validateEmail,
+                  ),
+                  const SizedBox(height: 5),
 
 
-                // Username & DOB
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextFieldWidget(
-                        controller: usernameC,
-                        labelText: 'Username',
-                        validator: _validateUsername,
+                  TextFieldWidget(
+                    controller: phoneC,
+                    labelText: 'Phone No',
+                    keyboardInputType: TextInputType.phone,
+                    validator: _validatePhone,
+                  ),
+
+                  const SizedBox(height: 5),
+
+                  DropdownFieldWidget(
+                    labelText: 'Gender',
+                    value: genderId,
+                    items: genderList,
+                    onChanged: (v) => setState(() => genderId = v),
+                  ),
+                  const SizedBox(height: 5),
+
+
+                  // Username & DOB
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFieldWidget(
+                          controller: usernameC,
+                          labelText: 'Username',
+                          validator: _validateUsername,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: _pickDob,
-                        child: AbsorbPointer(
-                          child: TextFieldWidget(
-                            controller: dobC,
-                            labelText: 'Date of Birth',
-                            readOnly: true,
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: _pickDob,
+                          child: AbsorbPointer(
+                            child: TextFieldWidget(
+                              controller: dobC,
+                              labelText: 'Date of Birth',
+                              readOnly: true,
 
+                            ),
                           ),
                         ),
                       ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 5),
+
+                  // Address (multiline)
+                  if(widget.initialData?.key == null)
+                    Column(
+                      children: [
+                        TextFieldWidget(
+                          controller: passwordC,
+                          labelText: 'Password',
+                          keyboardInputType: TextInputType.multiline,
+                          onChanged: (_) {},
+                          validator: (v) {
+                            if (v == null || v.trim().isEmpty) return 'Enter address';
+                            return null;
+                          },
+                        ),
+
+                        const SizedBox(height: 5),
+                      ],
                     ),
-                  ],
-                ),
 
-                const SizedBox(height: 5),
+                  // Address (multiline)
+                  TextFieldWidget(
+                    controller: addressC,
+                    labelText: 'Address',
+                    keyboardInputType: TextInputType.multiline,
+                    onChanged: (_) {},
+                    validator: (v) {
+                      if (v == null || v.trim().isEmpty) return 'Enter address';
+                      return null;
+                    },
+                  ),
 
-                // Address (multiline)
-                if(widget.initialData?.key == null)
-               Column(
-                 children: [
-                   TextFieldWidget(
-                     controller: passwordC,
-                     labelText: 'Password',
-                     keyboardInputType: TextInputType.multiline,
-                     onChanged: (_) {},
-                     validator: (v) {
-                       if (v == null || v.trim().isEmpty) return 'Enter address';
-                       return null;
-                     },
-                   ),
-
-                   const SizedBox(height: 5),
-                 ],
-               ),
-
-                // Address (multiline)
-                TextFieldWidget(
-                  controller: addressC,
-                  labelText: 'Address',
-                  keyboardInputType: TextInputType.multiline,
-                  onChanged: (_) {},
-                  validator: (v) {
-                    if (v == null || v.trim().isEmpty) return 'Enter address';
-                    return null;
-                  },
-                ),
-
-                const SizedBox(height: 10),
+                  const SizedBox(height: 10),
 
 
-                // Role dropdown (uses DropdownFieldWidget if you want to reuse it)
-                DropdownFieldWidget(
-                  labelText: 'Role',
-                  value: roleId,
-                  items: roleList,
-                  onChanged: (v) => setState(() => roleId = v),
-                ),
+                  // Role dropdown (uses DropdownFieldWidget if you want to reuse it)
+                  DropdownFieldWidget(
+                    labelText: 'Role',
+                    value: roleId,
+                    items: roleList,
+                    onChanged: (v) => setState(() => roleId = v),
+                  ),
 
 
-              ],
+                ],
+              ),
             ),
-          ),
 
-          SizedBox(height: 10,),
-        ],
-      ),
-    ).paddingSymmetric(horizontal: 10);
+            SizedBox(height: 10,),
+          ],
+        ),
+      ).paddingSymmetric(horizontal: 10);
   }
 }

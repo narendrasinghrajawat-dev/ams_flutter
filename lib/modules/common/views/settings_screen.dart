@@ -24,6 +24,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final String _buildNumber = '100';
 
   // no need to load prefs here - controller already loaded them
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -80,6 +81,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   activeColor: AppThemeColors.primaryColor,
                 ),
               )),
+              Divider(color: AppThemeColors.dividerColor),
 
               // rest of the UI unchanged...
               // App version

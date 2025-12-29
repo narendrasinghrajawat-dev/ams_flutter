@@ -24,40 +24,91 @@ class _UserActivityScreenState extends State<UserActivityScreen> {
       child: Column(
         children: [
           // Card Wrapper
+
           Expanded(
-            child: Obx(
-                  () =>  _userActivityController.filteredAttendanceActivitiesList.isEmpty ? Center(child: AppTextWidget.small("Activity Not Found"),): ListView.separated(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 12),
-                itemCount: _userActivityController.filteredAttendanceActivitiesList.length,
-                
-                separatorBuilder: (_, __) => const SizedBox(height: 10),
-                itemBuilder: (_, idx) {
-                      
-                  // Cast the item to the correct model type: AttendanceActivity
-                  final activity = _userActivityController.filteredAttendanceActivitiesList[idx];
-  
-                  // Use null-aware operators as fields are optional
-                  final bool isCheckIn = activity.punchType == "1";
+            child: Obx(() {
+                final activities = _userActivityController.filteredAttendanceActivitiesList;
 
-                  // --- FIX APPLIED HERE: Use AppHelper for formatting ---
-                  final String formattedTime = activity.punchTime != null
-                      ? AppHelper.formatTimeString(activity.punchTime!)
-                      : 'N/A';
-
-                  final String formattedDate = activity.punchDate != null
-                      ? AppHelper.formatDateString(activity.punchDate!)
-                      : 'N/A';
-
-                  
-                  return _buildActivityTile(
-                    time: formattedTime,
-                    date: formattedDate,
-                    isCheckIn: isCheckIn,
+                if (activities.isEmpty) {
+                  return Center(
+                    child: AppTextWidget.small("Activity Not Found"),
                   );
-                },
-              ),
+                }
+
+                return LayoutBuilder(
+                  builder: (context, constraints) {
+                    final bool isWideScreen = constraints.maxWidth >= 700;
+
+                    // 📱 Mobile → ListView (1 per row)
+                    if (!isWideScreen) {
+                      return ListView.separated(
+                        padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                        itemCount: activities.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 10),
+                        itemBuilder: (_, idx) {
+                          final activity = activities[idx];
+
+                          final bool isCheckIn = activity.punchType == "1";
+
+                          final String formattedTime =
+                          activity.punchTime != null
+                              ? AppHelper.formatTimeString(activity.punchTime!)
+                              : 'N/A';
+
+                          final String formattedDate =
+                          activity.punchDate != null
+                              ? AppHelper.formatDateString(activity.punchDate!)
+                              : 'N/A';
+
+                          return _buildActivityTile(
+                            time: formattedTime,
+                            date: formattedDate,
+                            isCheckIn: isCheckIn,
+                          );
+                        },
+                      );
+                    }
+
+                    // 🌐 Web / Desktop → GridView (2 per row)
+                    return GridView.builder(
+                      padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                      itemCount: activities.length,
+                      gridDelegate:  SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,          // 👈 2 tiles per row
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
+                        childAspectRatio: isWideScreen ? 10 : 3.8,      // 👈 adjust based on tile height
+                      ),
+                      itemBuilder: (_, idx) {
+                        final activity = activities[idx];
+
+                        final bool isCheckIn = activity.punchType == "1";
+
+                        final String formattedTime =
+                        activity.punchTime != null
+                            ? AppHelper.formatTimeString(activity.punchTime!)
+                            : 'N/A';
+
+                        final String formattedDate =
+                        activity.punchDate != null
+                            ? AppHelper.formatDateString(activity.punchDate!)
+                            : 'N/A';
+
+                        return _buildActivityTile(
+                          time: formattedTime,
+                          date: formattedDate,
+                          isCheckIn: isCheckIn,
+                        );
+                      },
+                    );
+                  },
+                );
+              },
             ),
           )
+
         ],
       ),
     );

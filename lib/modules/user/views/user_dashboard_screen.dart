@@ -23,8 +23,7 @@ class UserDashboardScreen extends StatefulWidget {
   const UserDashboardScreen({Key? key}) : super(key: key);
 
   @override
-  State<UserDashboardScreen> createState() =>
-      _UserDashboardScreenState();
+  State<UserDashboardScreen> createState() => _UserDashboardScreenState();
 }
 
 class _UserDashboardScreenState

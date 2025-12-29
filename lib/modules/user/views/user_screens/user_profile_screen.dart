@@ -1,5 +1,6 @@
 // lib/views/user/user_profile_screen.dart
 import 'package:attedance_management_system/core/constants/app_icons.dart';
+import 'package:attedance_management_system/data/utils/app_helper.dart';
 import 'package:attedance_management_system/widgets/common/ui_helper_widgets.dart';
 import 'package:attedance_management_system/widgets/text_and_icon_widgets/app_icons_type.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import 'package:get/get.dart';
 import '../../../../../core/constants/app_theme_colors.dart';
 import '../../../../../widgets/card/common_card.dart';
 import '../../../../../widgets/text_and_icon_widgets/app_text_type.dart';
+import '../../../admin/views/admin_screens/widgets/profile/responsive_info_grid.dart';
 import '../../../auth/controller/auth_controller.dart';
 import '../../controller/user_profile_controller.dart';
 
@@ -26,7 +28,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   Widget build(BuildContext context) {
     final authRegistered = Get.isRegistered<AuthController>();
     final auth = authRegistered ? Get.find<AuthController>() : null;
-    final user = auth?.currentUser.value;
+    final user = AppHelper.getProfileUser();
 
     return  SingleChildScrollView(
       child: Column(
@@ -95,44 +97,37 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 const SizedBox(height: 12),
                 CommonCardWidget(
                   child: Column(
-                    children: [
-                      _InfoRow(
-                        icon: Icons.person,
-                        iconColor: Colors.blue.shade600,
-                        label: 'Name',
-                        value: "${user?.firstName ?? ""} ${user?.middleName ?? ""} ${user?.lastName ?? ""}",
+                    children:  [
+                      ResponsiveInfoGrid(
+                        children: [
+                          _InfoRow(
+                            icon: Icons.person,
+                            iconColor: Colors.blue.shade600,
+                            label: 'Name',
+                            value: "${user?.firstName ?? ""} ${user?.middleName ?? ""} ${user?.lastName ?? ""}",
+                          ),
+                          _InfoRow(
+                            icon: Icons.email_rounded,
+                            iconColor: Colors.orange.shade600,
+                            label: 'Email',
+                            value: user?.email ?? 'michael@example.com',
+                          ),
+                          _InfoRow(
+                            icon: Icons.phone_rounded,
+                            iconColor: Colors.green.shade600,
+                            label: 'Phone',
+                            value: user?.phoneNo ?? '+91 98765 43210',
+                          ),
+                          _InfoRow(
+                            icon: Icons.location_on_rounded,
+                            iconColor: Colors.red.shade600,
+                            label: 'Location',
+                            value: user?.address?.street ?? 'Jaipur, Rajasthan',
+                          ),
+                        ],
                       ),
-                      UIHelper.showDivider(),
-
-                      _InfoRow(
-                        icon: Icons.email_rounded,
-                        iconColor: Colors.orange.shade600,
-                        label: 'Email',
-                        value: user?.email ?? 'michael@example.com',
-                      ),
-                      UIHelper.showDivider(),
-                      _InfoRow(
-                        icon: Icons.phone_rounded,
-                        iconColor: Colors.green.shade600,
-                        label: 'Phone',
-                        value: user?.phoneNo ?? '+91 98765 43210',
-                      ),
-                      UIHelper.showDivider(),
-                      _InfoRow(
-                        icon: Icons.location_on_rounded,
-                        iconColor: Colors.red.shade600,
-                        label: 'Location',
-                        value: user?.address?.street ?? 'Jaipur, Rajasthan',
-                      ),
-                      UIHelper.showDivider(),
-                      _InfoRow(
-                        icon: Icons.badge_rounded,
-                        iconColor: Colors.purple.shade600,
-                        label: 'Employee ID',
-                        value: 'EMP-2024-001',
-                      ),
-                    ],
-                  ),
+                    ]
+                  )
                 ),
               ],
             ),
