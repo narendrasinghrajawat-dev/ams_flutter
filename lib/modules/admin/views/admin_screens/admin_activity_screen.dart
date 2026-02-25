@@ -56,7 +56,7 @@ class AdminActivityScreen extends StatelessWidget {
                       crossAxisCount: kIsWeb ? 2 : 1,
                       crossAxisSpacing: 10,
                       mainAxisSpacing: 10,
-                      childAspectRatio: kIsWeb ? 9.7 : 4.0,
+                      childAspectRatio: kIsWeb ? 9.7 : 4.5,
                     ),
                     itemBuilder: (_, index) {
                       return AdminActivityTile(

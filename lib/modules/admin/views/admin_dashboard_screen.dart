@@ -135,10 +135,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       )
           : null,
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
         backgroundColor: AppThemeColors.whiteColor,
+        currentIndex: _currentIndex,
         selectedItemColor: AppThemeColors.primaryColor,
         unselectedItemColor: AppThemeColors.muted,
+        type: BottomNavigationBarType.fixed,
         onTap: _onTabChanged, // 👈 controller-based handler
         items: [
           BottomNavigationBarItem(icon: const Icon(Icons.home_outlined), label: 'Home'.tr),

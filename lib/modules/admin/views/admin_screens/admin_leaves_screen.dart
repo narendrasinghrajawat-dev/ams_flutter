@@ -52,7 +52,7 @@ class AdminLeavesScreen extends StatelessWidget {
                       crossAxisCount: isWebTwoColumn ? 2 : 1,
                       crossAxisSpacing: 10,
                       mainAxisSpacing: 10,
-                      childAspectRatio: isWebTwoColumn ? 5.5 : 3.8,
+                      childAspectRatio: isWebTwoColumn ? 5.5 : 2.7,
                     ),
                     itemBuilder: (_, idx) {
                       final leaveRequest = list[idx];

@@ -31,6 +31,7 @@ class App extends StatelessWidget {
       getPages: AppPages.pages,
       initialRoute: AppRoutes.splashScreen,
       debugShowCheckedModeBanner: false,
+
       builder: (context, child) {
         return Stack(
           children: [

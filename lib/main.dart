@@ -9,15 +9,13 @@ import 'core/constants/app_theme_colors.dart';
 import 'core/enums/app_environment.dart';
 import 'modules/common/controller/loading_controller.dart';
 import 'modules/common/controller/settings_controller.dart';
-import 'modules/common/services/storage_service.dart';
-
 
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // ✅ Set environment manually
-  EnvConfig.setEnvironment(AppEnvironment.development);
+  EnvConfig.setEnvironment(AppEnvironment.test);
 
   final environment = EnvConfig.getEnvironment();
 

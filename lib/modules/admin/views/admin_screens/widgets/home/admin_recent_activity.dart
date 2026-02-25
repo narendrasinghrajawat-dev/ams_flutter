@@ -51,7 +51,7 @@ class AdminRecentActivity extends StatelessWidget {
                   crossAxisCount: kIsWeb ? 2: 1,
                   crossAxisSpacing: 8,
                   mainAxisSpacing: 8,
-                  childAspectRatio:kIsWeb ? 11 : 4.4,
+                  childAspectRatio:kIsWeb ? 11 : 5.5,
                 ),
                 itemBuilder: (_, index) {
                   final item = activities[index];

@@ -22,6 +22,7 @@ class User {
   final Address? address;
   final String? createdAt;
   final String? joinedDate;
+  final String? employeeId;
 
   User({
     this.key,
@@ -44,7 +45,7 @@ class User {
     this.profileImageNetworkKey,
     this.createdAt,
     this.joinedDate,
-
+    this.employeeId,
   });
 
   /// Factory method to create a [User] object from a JSON map.
@@ -75,6 +76,8 @@ class User {
       address: json['address'] != null ? Address.fromJson(json['address']) : null,
       joinedDate: json['joinedDate'] ?? "",
       createdAt: json['createdAt'] ?? "",
+      employeeId : json['employeeId'],
+
 
     );
   }

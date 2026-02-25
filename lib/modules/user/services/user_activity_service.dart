@@ -56,5 +56,15 @@ class UserActivityService {
   }
 
 
+  Future<int> getAllTakenCurrentMonthWFH(String userKey) async {
+    try {
+      final path = '${ApiEndpoints.getAllTakenCurrentMonthWFH}$userKey/';
+      return await _api.get(path);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+
 
 }

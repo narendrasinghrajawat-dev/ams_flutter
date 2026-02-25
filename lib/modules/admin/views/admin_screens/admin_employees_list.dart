@@ -102,7 +102,7 @@ class AdminEmployeesList extends StatelessWidget {
                       crossAxisCount: kIsWeb ? 2 : 1,
                       crossAxisSpacing: 10,
                       mainAxisSpacing: 10,
-                      childAspectRatio: kIsWeb ? 5.2 : 4.2,
+                      childAspectRatio: kIsWeb ? 5.2 : 2.6,
                     ),
                     itemBuilder: (_, idx) {
                       final u = users[idx];
