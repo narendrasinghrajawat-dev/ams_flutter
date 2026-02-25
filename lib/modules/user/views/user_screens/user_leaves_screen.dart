@@ -14,6 +14,7 @@ import 'package:get/get.dart';
 
 import '../../../../core/constants/const_strings.dart';
 import '../../../../data/utils/app_helper.dart';
+import '../../../common/views/ui_helpers.dart';
 import '../../controller/user_leaves_controller.dart';
 import '../../../models/apply_leave_request.dart';
 import 'forms/user_apply_leaves_form.dart';
@@ -42,57 +43,107 @@ class _UserLeavesScreenState extends State<UserLeavesScreen> {
             const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
             child: Column(
               children: [
-               Row(
+                UIHelpers.responsive(
+                  context: context,
                   children: [
-                    Expanded(child: _buildBalancesList(),),
-                    SizedBox(width: 10,),
-                    Expanded(
-                      child: Obx(() {
-                        final all = _controller.filteredAppliedLeavesList;
+                    _buildBalancesList(),
+                    Obx(() {
+                      final all = _controller.filteredAppliedLeavesList;
 
-                        // 🔹 Status-wise count map
-                        final Map<String, int> statusCount = {
-                          AppStrings.approvedLeavesStatusKey: 0,
-                          AppStrings.pendingLeavesStatusKey: 0,
-                          AppStrings.rejectedLeavesStatusKey: 0,
-                          AppStrings.cancelledLeavesStatusKey: 0,
-                        };
+                      // 🔹 Status-wise count map
+                      final Map<String, int> statusCount = {
+                        AppStrings.approvedLeavesStatusKey: 0,
+                        AppStrings.pendingLeavesStatusKey: 0,
+                        AppStrings.rejectedLeavesStatusKey: 0,
+                        AppStrings.cancelledLeavesStatusKey: 0,
+                      };
 
-                        for (final e in all) {
-                          final status = (e.leaveStatus ?? '').toLowerCase();
-                          if (statusCount.containsKey(status)) {
-                            statusCount[status] = statusCount[status]! + 1;
-                          }
+                      for (final e in all) {
+                        final status = (e.leaveStatus ?? '').toLowerCase();
+                        if (statusCount.containsKey(status)) {
+                          statusCount[status] = statusCount[status]! + 1;
                         }
+                      }
 
-                        // 🔹 UI config list
-                        final items = [
-                          ('Total Applied', all.length, ''),
-                          ('Approved', statusCount[AppStrings.approvedLeavesStatusKey]!, AppStrings.approvedLeavesStatusKey),
-                          ('Pending', statusCount[AppStrings.pendingLeavesStatusKey]!, AppStrings.pendingLeavesStatusKey),
-                          ('Rejected', statusCount[AppStrings.rejectedLeavesStatusKey]!, AppStrings.rejectedLeavesStatusKey),
-                          ('Cancelled', statusCount[AppStrings.cancelledLeavesStatusKey]!, AppStrings.cancelledLeavesStatusKey),
-                        ];
+                      // 🔹 UI config list
+                      final items = [
+                        ('Total Applied', all.length, ''),
+                        ('Approved', statusCount[AppStrings.approvedLeavesStatusKey]!, AppStrings.approvedLeavesStatusKey),
+                        ('Pending', statusCount[AppStrings.pendingLeavesStatusKey]!, AppStrings.pendingLeavesStatusKey),
+                        ('Rejected', statusCount[AppStrings.rejectedLeavesStatusKey]!, AppStrings.rejectedLeavesStatusKey),
+                        ('Cancelled', statusCount[AppStrings.cancelledLeavesStatusKey]!, AppStrings.cancelledLeavesStatusKey),
+                      ];
 
-                        return CommonCardWidget(
-                          padding: 5,
-                          child: Column(
-                            children: items
-                                .map(
-                                  (e) => _SummaryItem(
-                                title: e.$1,
-                                value: e.$2,
-                                color: AppHelper.getLeavesStatusColor(e.$3),
-                                vertical: false,
-                              ),
-                            )
-                                .toList(),
-                          ),
-                        );
-                      }),
-                    )
+                      return CommonCardWidget(
+                        padding: 5,
+                        child: Column(
+                          children: items
+                              .map(
+                                (e) => _SummaryItem(
+                              title: e.$1,
+                              value: e.$2,
+                              color: AppHelper.getLeavesStatusColor(e.$3),
+                              vertical: false,
+                            ),
+                          )
+                              .toList(),
+                        ),
+                      );
+                    }),
                   ],
                 ),
+
+               // Row(
+               //    children: [
+               //      Expanded(child: _buildBalancesList(),),
+               //      SizedBox(width: 10,),
+               //      Expanded(
+               //        child: Obx(() {
+               //          final all = _controller.filteredAppliedLeavesList;
+               //
+               //          // 🔹 Status-wise count map
+               //          final Map<String, int> statusCount = {
+               //            AppStrings.approvedLeavesStatusKey: 0,
+               //            AppStrings.pendingLeavesStatusKey: 0,
+               //            AppStrings.rejectedLeavesStatusKey: 0,
+               //            AppStrings.cancelledLeavesStatusKey: 0,
+               //          };
+               //
+               //          for (final e in all) {
+               //            final status = (e.leaveStatus ?? '').toLowerCase();
+               //            if (statusCount.containsKey(status)) {
+               //              statusCount[status] = statusCount[status]! + 1;
+               //            }
+               //          }
+               //
+               //          // 🔹 UI config list
+               //          final items = [
+               //            ('Total Applied', all.length, ''),
+               //            ('Approved', statusCount[AppStrings.approvedLeavesStatusKey]!, AppStrings.approvedLeavesStatusKey),
+               //            ('Pending', statusCount[AppStrings.pendingLeavesStatusKey]!, AppStrings.pendingLeavesStatusKey),
+               //            ('Rejected', statusCount[AppStrings.rejectedLeavesStatusKey]!, AppStrings.rejectedLeavesStatusKey),
+               //            ('Cancelled', statusCount[AppStrings.cancelledLeavesStatusKey]!, AppStrings.cancelledLeavesStatusKey),
+               //          ];
+               //
+               //          return CommonCardWidget(
+               //            padding: 5,
+               //            child: Column(
+               //              children: items
+               //                  .map(
+               //                    (e) => _SummaryItem(
+               //                  title: e.$1,
+               //                  value: e.$2,
+               //                  color: AppHelper.getLeavesStatusColor(e.$3),
+               //                  vertical: false,
+               //                ),
+               //              )
+               //                  .toList(),
+               //            ),
+               //          );
+               //        }),
+               //      )
+               //    ],
+               //  ),
                 const SizedBox(height: 10),
                 _buildSummaryAndList(),
               ],
@@ -142,7 +193,7 @@ class _UserLeavesScreenState extends State<UserLeavesScreen> {
           crossAxisCount: kIsWeb ? 2 : 2,
           crossAxisSpacing: 10,
           mainAxisSpacing: 10,
-          childAspectRatio: kIsWeb ? 2.9 : 1.7,
+          childAspectRatio: kIsWeb ? 2.9 : 1.5,
         ),
         itemBuilder: (_, idx) {
           return LeaveBalanceCard(balance: list[idx]);

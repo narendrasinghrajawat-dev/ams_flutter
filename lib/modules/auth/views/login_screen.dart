@@ -51,8 +51,12 @@ class _LoginScreenState extends State<LoginScreen> {
       if (savedEmail != null) emailC.text = savedEmail;
     }
 
-    emailC.text = "nsr@gmail.com";
-    passC.text = "123456";
+    // emailC.text = "nsr@gmail.com";
+    // passC.text = "123456";
+
+    emailC.text = "";
+    passC.text = "";
+
   }
 
   @override

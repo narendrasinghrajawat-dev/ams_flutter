@@ -37,8 +37,20 @@ class AppHelper {
     return User.fromJson(storageService.readMap(AppStrings.profileJson)!);
   }
 
-  static String formatUserName(User user){
-    return "${user.firstName} ${user.middleName} ${user.lastName}";
+  static String formatUserName(User user) {
+    String capitalize(String? value) {
+      if (value == null || value.trim().isEmpty) return '';
+      value = value.trim().toLowerCase();
+      return value[0].toUpperCase() + value.substring(1);
+    }
+
+    final first = capitalize(user.firstName);
+    final middle = capitalize(user.middleName);
+    final last = capitalize(user.lastName);
+
+    return [first, middle, last]
+        .where((e) => e.isNotEmpty)
+        .join(' ');
   }
 
 

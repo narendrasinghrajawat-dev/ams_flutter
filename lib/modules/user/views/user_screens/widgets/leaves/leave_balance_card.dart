@@ -21,6 +21,8 @@ class LeaveBalanceCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return CommonCardWidget(
       child: Column(
+        mainAxisSize: MainAxisSize.min,
+
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           /// 🔹 LEAVE NAME

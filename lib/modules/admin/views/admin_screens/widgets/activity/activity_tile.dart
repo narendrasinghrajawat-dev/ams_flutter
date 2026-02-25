@@ -1,5 +1,6 @@
 
 
+import 'package:attedance_management_system/widgets/card/common_card.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../../core/constants/app_icons.dart';
@@ -38,21 +39,7 @@ class AdminActivityTile extends StatelessWidget {
         ? activity.userName!
         : "User";
 
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppThemeColors.cardBackgroundColor,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppThemeColors.borderColor),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
+    return CommonCardWidget(child:  Row(
         children: [
           /// 🔹 STATUS ICON
           Container(

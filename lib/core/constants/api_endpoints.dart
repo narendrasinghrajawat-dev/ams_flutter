@@ -31,6 +31,7 @@ class ApiEndpoints {
   // user apis
   static const punch = 'user/attendance/punch';
   static const getAllAttedanceActivity = 'user/attendance/getAllAttedanceActivity/';
+  static const getAllTakenCurrentMonthWFH = 'user/attendance/getAllTakenCurrentMonthWFH/';
   static const getActivitiesByDate = 'user/attendance/getActivitiesByDate/';
   static const getAllLeavesStatus = 'user/leaves/getLeavesStatus/';
   static const getLeaveBalance = 'user/leaves/getLeavesBalance/';

@@ -81,7 +81,7 @@ class EmployeeTile extends StatelessWidget {
                 value: AppHelper.formatDateString(user.dob),
               ),
               InfoItem(
-                icon: Icons.person_outline,
+                icon: Icons.male,
                 label: 'Gender',
                 value: AppHelper.getGenderName(user.genderId) ?? "",
               ),
@@ -90,6 +90,12 @@ class EmployeeTile extends StatelessWidget {
                 label: 'Joined',
                 value: AppHelper.formatDateString(user.joinedDate),
               ),
+              InfoItem(
+                icon: Icons.perm_identity_outlined,
+                label: 'EMP ID',
+                value: user.employeeId ?? "",
+              ),
+
             ],
           ),
         ],

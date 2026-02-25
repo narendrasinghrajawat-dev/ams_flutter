@@ -516,6 +516,7 @@ class _UserApplyLeavesFormState extends State<UserApplyLeavesForm> {
                             if (value == null) return;
                             setState(() {
                               leaveDurationsId = value;
+                              halfDayShiftTypeId = null;
                               _recalculateDays();
                             });
                           },

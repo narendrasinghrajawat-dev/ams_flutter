@@ -151,22 +151,26 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
       if (officeLat == null || officeLng == null) return null;
 
-      print('is inside is the');
-      print(officeLat);
-      print(officeLng);
-      print(officeRadius);
 
-      final isInside = LocationService.instance.isWithinRadius(
-        userLat: locRes.position!.latitude,
-        userLng: locRes.position!.longitude,
-        targetLat: officeLat,
-        targetLng: officeLng,
-        radiusInMeters: officeRadius,
-      );
+      final isWFH = _activityCtrl.isWorkFromHome.value;
 
-      if (!isInside) {
-        UIHelper.showSnackbar("Outside Office", 'You must be inside office radius',type: SnackbarType.error);
-        return null;
+      if (!isWFH) {
+        final isInside = LocationService.instance.isWithinRadius(
+          userLat: locRes.position!.latitude,
+          userLng: locRes.position!.longitude,
+          targetLat: officeLat,
+          targetLng: officeLng,
+          radiusInMeters: officeRadius,
+        );
+
+        if (!isInside) {
+          UIHelper.showSnackbar(
+            "Outside Office",
+            'You must be inside office radius',
+            type: SnackbarType.error,
+          );
+          return null;
+        }
       }
 
       final currentDevice = await DeviceService.getDeviceInformation();
@@ -187,6 +191,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         "lat": locRes.position!.latitude.toString(),
         "long": locRes.position!.longitude.toString(),
         "deviceInformation": currentDevice,
+        "isWFH" : _activityCtrl.isWorkFromHome.value,
       });
     } catch (_) {
       return null;
@@ -223,6 +228,16 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
     setState(() => _busy = true);
     LoadingController().start();
+
+    print('before click');
+    print(_activityCtrl.totalTakenWFH.value);
+
+    if(_activityCtrl.isWorkFromHome.value == true){
+      _activityCtrl.totalTakenWFH.value++;
+    }
+
+    print('after click');
+    print(_activityCtrl.totalTakenWFH.value);
 
     final activity = await _buildPunchActivity("1");
     LoadingController().hide();
@@ -283,18 +298,54 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                   AppTextWidget.large(
                     'Good ${AppHelper.getGreeting()}!',
                   ),
-                  AttendanceStatusBadge(
-                    status: completed
-                        ? 'Completed'
-                        : canCheckIn
-                        ? 'Not Started'
-                        : 'Working',
-                    color: completed
-                        ? AppThemeColors.successColor
-                        : canCheckIn
-                        ? AppThemeColors.muted
-                        : AppThemeColors.warningColor,
-                  ),
+                  Row(
+                    children: [
+
+                      /// 🔹 WFH Radio
+                      Obx(() {
+                        final master = _commonController.getMasterData.value;
+                        final maxWFH = master?.maxWFHInSingleMonth;
+
+                        if (maxWFH != null && _activityCtrl.totalTakenWFH.value >= maxWFH) {
+                          return const SizedBox();
+                        }
+
+                        return Row(
+                          children: [
+                            AppTextWidget.medium("WFH"),
+                            const SizedBox(width: 8),
+                            Switch(
+                              value: _activityCtrl.isWorkFromHome.value,
+                              activeColor: Colors.white,
+                              activeTrackColor: AppThemeColors.primaryColor,
+                              inactiveTrackColor: AppThemeColors.buttonDisabledColor,
+                              onChanged: canCheckIn == false &&
+                                  _activityCtrl.isWorkFromHome.value == true
+                                  ? null
+                                  : (value) {
+                                _activityCtrl.isWorkFromHome.value = value;
+                              },
+                            ),
+                          ],
+                        );
+                      }),
+
+                      SizedBox(width: 5,),
+
+                      AttendanceStatusBadge(
+                        status: completed
+                            ? 'Completed'
+                            : canCheckIn
+                            ? 'Not Started'
+                            : 'Working',
+                        color: completed
+                            ? AppThemeColors.successColor
+                            : canCheckIn
+                            ? AppThemeColors.muted
+                            : AppThemeColors.warningColor,
+                      ),
+                    ],
+                  )
                 ],
               ),
 

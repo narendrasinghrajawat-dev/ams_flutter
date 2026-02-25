@@ -19,6 +19,11 @@ class UserActivityController extends GetxController {
   List<AttendanceActivity> get filteredAttendanceActivitiesList => attendanceActivities;
   List<AttendanceActivity> get filteredAttendanceActivitiesListByDate => activitiesByDate;
 
+
+  RxBool isWorkFromHome = false.obs;
+  RxInt totalTakenWFH = 0.obs;
+
+
   @override
   void onReady() {
     super.onReady();
@@ -26,6 +31,7 @@ class UserActivityController extends GetxController {
     if (user.key != null) {
       // loadAttendanceActivities(user.key!);
       getActivityByDate(DateTime.now().toIso8601String());
+      getAllTakenCurrentMonthWFH(user.key!);
     }
   }
 
@@ -41,6 +47,16 @@ class UserActivityController extends GetxController {
       final list = await _service.fetchPunchesByDate(userKey, date);
       activitiesByDate..clear()..addAll(list.map((e) => AttendanceActivity.fromJson(e)));
       activitiesByDate.refresh();
+
+      final todayPunch = activitiesByDate.firstWhereOrNull(
+            (e) => e.punchType == '1',
+      );
+
+      if (todayPunch != null && todayPunch.isWFH == true) {
+        isWorkFromHome.value = true;
+      } else {
+         isWorkFromHome.value = false;
+      }
 
     } catch (e) {
       // log / snackbar if needed
@@ -133,4 +149,19 @@ class UserActivityController extends GetxController {
 
     }
   }
+
+
+  Future<void> getAllTakenCurrentMonthWFH(String userKey) async {
+    print('getAllTakenCurrentMonthWFH called');
+    _loadingController.start();
+    try {
+      totalTakenWFH.value = await _service.getAllTakenCurrentMonthWFH(userKey);
+      totalTakenWFH.refresh();
+    } catch (e) {
+      print('getAllTakenCurrentMonthWFH error: $e');
+    } finally {
+      _loadingController.hide();
+    }
+  }
+
 }

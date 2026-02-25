@@ -23,6 +23,8 @@ class AttendanceActivity {
   final String? long;
   final String? createdDate;
 
+  final bool? isWFH;
+
   // Optional Nested Object
   final DeviceInfo? deviceInformation;
 
@@ -41,6 +43,7 @@ class AttendanceActivity {
     this.long,
     this.createdDate,
     this.deviceInformation,
+    this.isWFH
   });
 
   // 2. fromJson() Method (Handles null values and uses safe helper)
@@ -79,6 +82,7 @@ class AttendanceActivity {
       createdDate: AppJsonHelper.safeNullableString(json['createdDate']),
 
       deviceInformation: info,
+      isWFH: AppJsonHelper.safeBool(json['isWFH']) ,
     );
   }
 
@@ -104,6 +108,7 @@ class AttendanceActivity {
       if (id != null) "_id": id,
       if (rev != null) "_rev": rev,
       if (createdDate != null) "createdDate": createdDate,
+      "isWFH" : isWFH,
 
       // We don't typically send computed fields back
     };

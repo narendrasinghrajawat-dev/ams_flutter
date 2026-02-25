@@ -23,8 +23,7 @@ class ApiService {
   int _pendingRequests = 0;
 
   // Safe access to LoadingController
-  LoadingController? get _loaderOrNull =>
-      Get.isRegistered<LoadingController>() ? Get.find<LoadingController>() : null;
+  LoadingController? get _loaderOrNull => Get.isRegistered<LoadingController>() ? Get.find<LoadingController>() : null;
 
   // -----------------------------
   // COMMON HEADERS

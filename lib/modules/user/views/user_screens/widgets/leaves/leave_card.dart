@@ -1,4 +1,5 @@
 // leave_card.dart
+import 'package:attedance_management_system/widgets/text_and_icon_widgets/app_icons_type.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../../../data/utils/app_helper.dart';
@@ -188,14 +189,14 @@ class _DetailRow extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
         children: [
-          Expanded(child: Row(children: [Icon(icon, size: 16, color: Colors.grey.shade600),
-            const SizedBox(width: 6),
-            AppTextWidget.small(label, color: Colors.grey.shade600),],)),
-          const Spacer(),
           Expanded(
-            child: AppTextWidget.small(
-              value,
-            ),
+              child: Row(
+                children: [
+                  AppIconWidget.medium(icon),
+                  const SizedBox(width: 6),
+                  AppTextWidget.small(label, color: Colors.grey.shade600),],)),
+          AppTextWidget.small(
+            value,
           ),
         ],
       ),

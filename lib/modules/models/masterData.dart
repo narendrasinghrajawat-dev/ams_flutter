@@ -22,6 +22,8 @@ class MasterData {
   final String? officeLong;
   final int? officeRadius;
 
+  final int? maxWFHInSingleMonth;
+
   MasterData({
     this.key,
     this.id,
@@ -35,7 +37,8 @@ class MasterData {
 
     this.officeLat,
     this.officeLong,
-    this.officeRadius
+    this.officeRadius,
+    this.maxWFHInSingleMonth,
   });
 
   factory MasterData.fromJson(Map<String, dynamic> json) {
@@ -70,6 +73,7 @@ class MasterData {
       leaveType: _parseList(json['leaveType']),
       role: _parseList(json['role']),
       gender: _parseList(json['gender']),
+      maxWFHInSingleMonth : AppJsonHelper.safeNullableInt(json['maxWFHInSingleMonth']),
 
 
     );

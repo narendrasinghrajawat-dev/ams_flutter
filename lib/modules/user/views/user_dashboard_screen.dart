@@ -91,11 +91,10 @@ class _UserDashboardScreenState
         children: _pages,
       ),
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: AppThemeColors.whiteColor,
         currentIndex: _currentIndex,
-        selectedItemColor:
-        AppThemeColors.primaryColor,
-        unselectedItemColor:
-        AppThemeColors.muted,
+        selectedItemColor: AppThemeColors.primaryColor,
+        unselectedItemColor: AppThemeColors.muted,
         onTap: _onTabChanged,
         items: const [
           BottomNavigationBarItem(
