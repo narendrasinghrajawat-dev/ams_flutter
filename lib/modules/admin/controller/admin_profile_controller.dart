@@ -54,7 +54,7 @@ class AdminProfileController extends GetxController {
 
         UIHelper.showSnackbar(
           'Success',
-          'Password Updated Successfully"',
+          'Password Updated Successfully',
           duration: const Duration(seconds: 7),
         );
 

@@ -122,26 +122,26 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    final officeLat = double.tryParse(masterData?.officeLat ?? '');
-    final officeLng = double.tryParse(masterData?.officeLong ?? '');
-    final officeRadius = masterData?.officeRadius;
-
-    if (officeLat == null || officeLng == null) {
-      Get.snackbar(
-        'Office Location',
-        'Office coordinates are not configured properly.',
-        snackPosition: SnackPosition.BOTTOM,
-      );
-      return;
-    }
-
-    final isInsideOfficeRadius = LocationService.instance.isWithinRadius(
-      userLat: lat,
-      userLng: lng,
-      targetLat: officeLat,
-      targetLng: officeLng,
-      radiusInMeters: officeRadius?.toDouble() ?? 100, // 100 meters
-    );
+    // final officeLat = double.tryParse(masterData?.officeLat ?? '');
+    // final officeLng = double.tryParse(masterData?.officeLong ?? '');
+    // final officeRadius = masterData?.officeRadius;
+    //
+    // if (officeLat == null || officeLng == null) {
+    //   Get.snackbar(
+    //     'Office Location',
+    //     'Office coordinates are not configured properly.',
+    //     snackPosition: SnackPosition.BOTTOM,
+    //   );
+    //   return;
+    // }
+    //
+    // final isInsideOfficeRadius = LocationService.instance.isWithinRadius(
+    //   userLat: lat,
+    //   userLng: lng,
+    //   targetLat: officeLat,
+    //   targetLng: officeLng,
+    //   radiusInMeters: officeRadius?.toDouble() ?? 100, // 100 meters
+    // );
     // --- Device Information Retrieval ---
     final Map<String, dynamic> deviceDataMap = await DeviceService.getDeviceInformation();
 

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:attedance_management_system/widgets/common/ui_helper_widgets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -229,15 +230,10 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     setState(() => _busy = true);
     LoadingController().start();
 
-    print('before click');
-    print(_activityCtrl.totalTakenWFH.value);
-
     if(_activityCtrl.isWorkFromHome.value == true){
       _activityCtrl.totalTakenWFH.value++;
     }
 
-    print('after click');
-    print(_activityCtrl.totalTakenWFH.value);
 
     final activity = await _buildPunchActivity("1");
     LoadingController().hide();
@@ -274,6 +270,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   // ===========================================================
   @override
   Widget build(BuildContext context) {
+    print('_elapsed is the $_elapsed');
+
     return Obx(() {
       final activities = _activityCtrl.activitiesByDate;
 
@@ -289,15 +287,13 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
       return SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
           child: Column(
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  AppTextWidget.large(
-                    'Good ${AppHelper.getGreeting()}!',
-                  ),
+                 kIsWeb ? AppTextWidget.large('Good ${AppHelper.getGreeting()}!',) : AppTextWidget.medium('Good ${AppHelper.getGreeting()}!',),
                   Row(
                     children: [
 
@@ -306,7 +302,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                         final master = _commonController.getMasterData.value;
                         final maxWFH = master?.maxWFHInSingleMonth;
 
-                        if (maxWFH != null && _activityCtrl.totalTakenWFH.value >= maxWFH) {
+                        if (maxWFH != null && _activityCtrl.totalTakenWFH.value >= maxWFH || _elapsed != Duration.zero) {
                           return const SizedBox();
                         }
 
@@ -315,12 +311,13 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                             AppTextWidget.medium("WFH"),
                             const SizedBox(width: 8),
                             Switch(
+                              padding: EdgeInsets.all(0),
+                              splashRadius: 1,
                               value: _activityCtrl.isWorkFromHome.value,
                               activeColor: Colors.white,
                               activeTrackColor: AppThemeColors.primaryColor,
                               inactiveTrackColor: AppThemeColors.buttonDisabledColor,
-                              onChanged: canCheckIn == false &&
-                                  _activityCtrl.isWorkFromHome.value == true
+                              onChanged: canCheckIn == false && _activityCtrl.isWorkFromHome.value == true
                                   ? null
                                   : (value) {
                                 _activityCtrl.isWorkFromHome.value = value;

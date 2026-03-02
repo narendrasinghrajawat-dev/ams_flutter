@@ -33,58 +33,23 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     return  SingleChildScrollView(
       child: Column(
         children: [
-               Column(
-              children: [
 
-                SizedBox(height: 20,),
-                // Avatar with Edit Button
-                Stack(
-                  children: [
-                   Container(
-                        padding: const EdgeInsets.all(3),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: AppThemeColors.whiteColor,
-                        ),
-                        child: CircleAvatar(
-                          radius: 50,
-                          backgroundImage: NetworkImage(networkImage),
-                          backgroundColor: Colors.grey.shade200,
-                        ),
-                      ),
-                    Positioned(
-                      top: 5,
-                      right: 0,
-                      child: GestureDetector(
-                        onTap: () {
-                          Get.snackbar('Info', 'Change avatar tapped');
-                        },
-                        child: Container(
-                            padding: const EdgeInsets.all(5),
-                            decoration: BoxDecoration(
-                              color: AppThemeColors.primaryColor,
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: AppThemeColors.whiteColor,
-                                width: 3,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppThemeColors.primaryColor.withOpacity(0.3),
-                                  blurRadius: 8,
-                                  spreadRadius: 1,
-                                ),
-                              ],
-                            ),
-                            child: AppIconWidget.medium(AppConstIcons.editIcon, color: AppThemeColors.whiteColor,)
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+          SizedBox(height: 20,),
 
-              ],
+          CircleAvatar(
+            radius: 50,
+            backgroundColor: AppThemeColors.primaryColor.withOpacity(0.1),
+            child: Text(
+              (user?.firstName != null && user!.firstName!.isNotEmpty)
+                  ? user.firstName![0].toUpperCase()
+                  : "U",
+              style: TextStyle(
+                fontSize: 40,
+                fontWeight: FontWeight.bold,
+                color: AppThemeColors.primaryColor,
+              ),
             ),
+          ),
 
 
 
@@ -121,8 +86,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           _InfoRow(
                             icon: Icons.location_on_rounded,
                             iconColor: Colors.red.shade600,
-                            label: 'Location',
-                            value: user?.address?.street ?? 'Jaipur, Rajasthan',
+                            label: 'Address',
+                            value: user.address ?? "",
+                          ),
+                          _InfoRow(
+                            icon: Icons.badge_rounded,
+                            iconColor: Colors.purple.shade600,
+                            label: 'Employee ID',
+                            value: user.employeeId ?? "",
                           ),
                         ],
                       ),
@@ -208,13 +179,16 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     await showDialog(
       context: context,
       builder: (_) => AlertDialog(
+        backgroundColor: AppThemeColors.whiteColor,
         title: AppTextWidget.medium('Change Password'),
         content: Form(
+          autovalidateMode: AutovalidateMode.onUserInteraction,
           key: formKey,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextFormField(
+                autovalidateMode: AutovalidateMode.onUserInteraction,
                 controller: newPassCtrl,
                 obscureText: true,
                 decoration: const InputDecoration(labelText: 'New Password'),
@@ -225,11 +199,18 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               ),
               const SizedBox(height: 8),
               TextFormField(
+                autovalidateMode: AutovalidateMode.onUserInteraction,
                 controller: confirmCtrl,
                 obscureText: true,
                 decoration: const InputDecoration(labelText: 'Confirm Password'),
                 validator: (v) {
-                  if (v == null || v.trim() != newPassCtrl.text.trim()) return 'Passwords do not match';
+                  final confirm = v?.trim() ?? '';
+                  final password = newPassCtrl.text.trim();
+
+                  if (confirm != password  && confirm.isNotEmpty && password.isNotEmpty) {
+                    return 'Passwords do not match';
+                  }
+
                   return null;
                 },
               ),
@@ -242,21 +223,20 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               child: AppTextWidget.small('Cancel'),
            ),
            ElevatedButton(
-              onPressed: () async {
-                if (formKey.currentState?.validate() ?? false) {
-                  Get.back();
-                  await ctrl.changePassword(newPassCtrl.text.trim());
-                }
-              },
+             onPressed: () async {
+               if (formKey.currentState?.validate() ?? false) {
+                 final password = newPassCtrl.text.trim();
+                 Navigator.of(context).pop();  // safer than Get.back inside dialog
+                 await ctrl.changePassword(password);
+               }
+             },
               child: AppTextWidget.small('Change'),
           ),
         ],
       ),
     );
 
-    // dispose controllers
-    newPassCtrl.dispose();
-    confirmCtrl.dispose();
+
   }
 
 
