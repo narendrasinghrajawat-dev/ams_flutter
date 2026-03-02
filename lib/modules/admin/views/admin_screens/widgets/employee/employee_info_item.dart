@@ -1,5 +1,6 @@
 
 
+import 'package:attedance_management_system/widgets/text_and_icon_widgets/app_icons_type.dart';
 import 'package:flutter/material.dart';
 import '../../../../../../core/constants/app_theme_colors.dart';
 import '../../../../../../widgets/text_and_icon_widgets/app_text_type.dart';
@@ -18,26 +19,25 @@ class InfoItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: Row(
+      child:  Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            icon,
-            size: 16,
-            color: AppThemeColors.iconColor,
-          ),
-          const SizedBox(width: 6),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Row(
             children: [
+              AppIconWidget.medium(
+                icon, color: AppThemeColors.iconColor,
+              ),
+              SizedBox(width: 5,),
               AppTextWidget.verySmall(
                 label,
                 color: AppThemeColors.muted,
               ),
-              AppTextWidget.small(
-                value,
-                color: AppThemeColors.textPrimaryColor,
-              ),
             ],
+          ),
+
+          AppTextWidget.small(
+            value,
+            color: AppThemeColors.textPrimaryColor,
           ),
         ],
       ),

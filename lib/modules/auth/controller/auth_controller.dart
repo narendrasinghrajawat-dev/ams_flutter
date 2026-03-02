@@ -26,12 +26,17 @@ class AuthController extends GetxController {
       // Call your service
       final res = await _authServices.login(loginPayload);
 
+        print('res is the $res');
+
       if (res != null && res.isNotEmpty) {
         // If your API follows `{ data: {...}, token: ... }` format
         final data = res['data'] ?? res;
 
         // Convert response to User model
         final user = User.fromJson(data);
+
+        print('user is teh ${user.toJson()}');
+
         currentUser.value = user;
 
         // Save profile locally

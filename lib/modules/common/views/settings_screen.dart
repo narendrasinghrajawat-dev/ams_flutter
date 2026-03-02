@@ -88,7 +88,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 title: AppTextWidget.small('App Version', color: AppThemeColors.textPrimaryColor),
-                subtitle: AppTextWidget.verySmall('$_appVersion ($_buildNumber)', color: AppThemeColors.textSecondaryColor),
+                subtitle: AppTextWidget.verySmall(_appVersion, color: AppThemeColors.textSecondaryColor),
               ),
 
               Divider(color: AppThemeColors.dividerColor),

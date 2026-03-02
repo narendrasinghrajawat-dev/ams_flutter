@@ -122,7 +122,7 @@ class AppThemeColors {
   // ============================================================
   static Color get dashboardCardBackgroundColor => isDark ? primaryDarkColor : primaryLightColor.withOpacity(.15);
 
-  static Color get cardBackgroundColor => isDark ? primaryDarkColor : primaryLightColor.withOpacity(.05);
+  static Color get cardBackgroundColor => isDark ? primaryDarkColor : primaryLightColor.withOpacity(.03);
 
   static Color get cardBorderColor => isDark ? primaryDarkColor : primaryLightColor.withOpacity(.2);
 

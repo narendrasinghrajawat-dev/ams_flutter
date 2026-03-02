@@ -19,7 +19,7 @@ class User {
   final String password;
   final String? profileImageS3Key;
   final String? profileImageNetworkKey;
-  final Address? address;
+  final String? address;
   final String? createdAt;
   final String? joinedDate;
   final String? employeeId;
@@ -51,6 +51,8 @@ class User {
   /// Factory method to create a [User] object from a JSON map.
   factory User.fromJson(Map<String, dynamic> json) {
 
+    print('user from json si the $json');
+
     return User(
       // Database fields (using original JSON keys for mapping)
       key: json['_key'] ?? "",
@@ -73,7 +75,7 @@ class User {
       profileImageNetworkKey: json['profileImageNetworkKey'] ?? "",
 
       // Nested model instantiation
-      address: json['address'] != null ? Address.fromJson(json['address']) : null,
+      address: json['address'],
       joinedDate: json['joinedDate'] ?? "",
       createdAt: json['createdAt'] ?? "",
       employeeId : json['employeeId'],
@@ -103,7 +105,7 @@ class User {
       'roleId': roleId,
       "password" : password,
       // Converts the nested Address object to JSON
-      'address': address?.toJson(),
+      'address': address,
       "createdAt" : createdAt,
       "joinedDate" : joinedDate,
 

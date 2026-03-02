@@ -15,6 +15,7 @@ import 'package:get/get.dart';
 import '../../../../core/constants/const_strings.dart';
 import '../../../../data/utils/app_helper.dart';
 import '../../../common/views/ui_helpers.dart';
+import '../../../models/leave_balance.dart';
 import '../../controller/user_leaves_controller.dart';
 import '../../../models/apply_leave_request.dart';
 import 'forms/user_apply_leaves_form.dart';
@@ -93,57 +94,6 @@ class _UserLeavesScreenState extends State<UserLeavesScreen> {
                   ],
                 ),
 
-               // Row(
-               //    children: [
-               //      Expanded(child: _buildBalancesList(),),
-               //      SizedBox(width: 10,),
-               //      Expanded(
-               //        child: Obx(() {
-               //          final all = _controller.filteredAppliedLeavesList;
-               //
-               //          // 🔹 Status-wise count map
-               //          final Map<String, int> statusCount = {
-               //            AppStrings.approvedLeavesStatusKey: 0,
-               //            AppStrings.pendingLeavesStatusKey: 0,
-               //            AppStrings.rejectedLeavesStatusKey: 0,
-               //            AppStrings.cancelledLeavesStatusKey: 0,
-               //          };
-               //
-               //          for (final e in all) {
-               //            final status = (e.leaveStatus ?? '').toLowerCase();
-               //            if (statusCount.containsKey(status)) {
-               //              statusCount[status] = statusCount[status]! + 1;
-               //            }
-               //          }
-               //
-               //          // 🔹 UI config list
-               //          final items = [
-               //            ('Total Applied', all.length, ''),
-               //            ('Approved', statusCount[AppStrings.approvedLeavesStatusKey]!, AppStrings.approvedLeavesStatusKey),
-               //            ('Pending', statusCount[AppStrings.pendingLeavesStatusKey]!, AppStrings.pendingLeavesStatusKey),
-               //            ('Rejected', statusCount[AppStrings.rejectedLeavesStatusKey]!, AppStrings.rejectedLeavesStatusKey),
-               //            ('Cancelled', statusCount[AppStrings.cancelledLeavesStatusKey]!, AppStrings.cancelledLeavesStatusKey),
-               //          ];
-               //
-               //          return CommonCardWidget(
-               //            padding: 5,
-               //            child: Column(
-               //              children: items
-               //                  .map(
-               //                    (e) => _SummaryItem(
-               //                  title: e.$1,
-               //                  value: e.$2,
-               //                  color: AppHelper.getLeavesStatusColor(e.$3),
-               //                  vertical: false,
-               //                ),
-               //              )
-               //                  .toList(),
-               //            ),
-               //          );
-               //        }),
-               //      )
-               //    ],
-               //  ),
                 const SizedBox(height: 10),
                 _buildSummaryAndList(),
               ],
@@ -184,6 +134,43 @@ class _UserLeavesScreenState extends State<UserLeavesScreen> {
   Widget _buildBalancesList() {
     return Obx(() {
       final list = _controller.filteredLeaveBalanceList;
+      print('list is the ');
+      print(list);
+
+      // Check if list is null or empty
+      final bool isEmpty = list == null || list.isEmpty;
+
+      // Default items to show when list is empty
+      final List<Map<String, dynamic>> defaultItems = [
+        {'name': 'Casual/Sick Leave', 'total': 0, 'balance': 0},
+        {'name': 'Annual Leave', 'total': 0, 'balance': 0},
+      ];
+
+      if (isEmpty) {
+        // Show default cards
+        return GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: defaultItems.length,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: kIsWeb ? 2 : 2,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            childAspectRatio: kIsWeb ? 2.9 : 1.5,
+          ),
+          itemBuilder: (_, idx) {
+            return LeaveBalanceCard(
+              balance: LeaveBalance(
+                name: defaultItems[idx]['name'],
+                total: defaultItems[idx]['total'],
+                balance: defaultItems[idx]['balance'],
+                id: '',
+                // Add any other required fields
+              ),
+            );
+          },
+        );
+      }
 
       return GridView.builder(
         shrinkWrap: true,
@@ -200,6 +187,61 @@ class _UserLeavesScreenState extends State<UserLeavesScreen> {
         },
       );
     });
+  }
+
+  Widget _buildEmptyBalanceCard(String labelText) {
+    return CommonCardWidget(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          /// 🔹 LEAVE NAME
+          AppTextWidget.medium(
+            labelText,
+            color: AppThemeColors.textSecondaryColor,
+          ),
+
+          const SizedBox(height: 10),
+
+          /// 🔹 PROGRESS BAR (empty)
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: LinearProgressIndicator(
+              value: 0,
+              minHeight: 8,
+              backgroundColor: AppThemeColors.borderColor,
+              valueColor: AlwaysStoppedAnimation<Color>(
+                AppThemeColors.textSecondaryColor,
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          /// 🔹 STATS ROW (all zeros)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              StatItem(
+                label: 'Total',
+                value: '0',
+                color: AppThemeColors.textSecondaryColor,
+              ),
+              StatItem(
+                label: 'Available',
+                value: '0',
+                color: AppThemeColors.textSecondaryColor,
+              ),
+              StatItem(
+                label: 'Used',
+                value: '0',
+                color: AppThemeColors.textSecondaryColor,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 
   // ---------------------------------------------------------------------------
@@ -415,6 +457,36 @@ class _UserLeavesScreenState extends State<UserLeavesScreen> {
       default:
         return approved;
     }
+  }
+}
+
+class StatItem extends StatelessWidget {
+  final String label;
+  final String value;
+  final Color color;
+
+  const StatItem({
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AppTextWidget.medium(
+          value,
+          color: color,
+        ),
+        const SizedBox(height: 2),
+        AppTextWidget.small(
+          label,
+          color: AppThemeColors.textSecondaryColor,
+        ),
+      ],
+    );
   }
 }
 

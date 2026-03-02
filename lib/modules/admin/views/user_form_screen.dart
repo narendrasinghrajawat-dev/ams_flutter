@@ -103,6 +103,7 @@ class _UserFormState extends State<UserForm> {
 
     passwordC.text = widget.initialData?.password ?? "";
     roleId = widget.initialData?.roleId;
+    addressC.text = widget.initialData?.address ?? "";
 
   }
 
@@ -149,18 +150,6 @@ class _UserFormState extends State<UserForm> {
 
     if (_formKey.currentState?.validate() != true) return;
 
-    // Build Address (use your actual Address model fields)
-    final address = Address(
-      street: addressC.text,
-      cityName: 'Jaipur',
-      cityId: '7',
-      stateName: 'Rajasthan',
-      stateId: '10',
-      zipCode: '302020',
-      countryName: 'India',
-      countryId: '4',
-    );
-
     // Create typed User object instead of raw Map
     final user = User(
       key: widget.initialData?.key,
@@ -177,7 +166,7 @@ class _UserFormState extends State<UserForm> {
       genderId: genderId,
       departmentId: null,
       dob: dateOfBirth ?? "", // DateTime or null
-      address: address,
+      address: addressC.text,
       roleId: roleId,
     );
 
@@ -216,10 +205,13 @@ class _UserFormState extends State<UserForm> {
     return null;
   }
 
+
+
   String? _validatePhone(String? v) {
     if (v == null || v.trim().isEmpty) return 'Enter phone';
     final digits = v.replaceAll(RegExp(r'\D'), '');
-    if (digits.length == 10) return 'Invalid phone';
+    if (digits.length != 10) return 'Invalid phone';
+
     return null;
   }
 
@@ -229,10 +221,22 @@ class _UserFormState extends State<UserForm> {
     return null;
   }
 
+
+  String? _validatePassword(String? v) {
+    if (v == null || v.trim().isEmpty) {
+      return 'Please enter a password';
+    }
+    if (v.length < 6) {
+      return 'Password must be at least 6 characters long';
+    }
+
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
 
-    return   SingleChildScrollView(
+    return SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -248,6 +252,7 @@ class _UserFormState extends State<UserForm> {
 
 
             Form(
+              // autovalidateMode: AutovalidateMode.onUserInteraction,
               key: _formKey,
               child: Column(
                 children: [
@@ -350,10 +355,7 @@ class _UserFormState extends State<UserForm> {
                           labelText: 'Password',
                           keyboardInputType: TextInputType.multiline,
                           onChanged: (_) {},
-                          validator: (v) {
-                            if (v == null || v.trim().isEmpty) return 'Enter address';
-                            return null;
-                          },
+                          validator: _validatePassword
                         ),
 
                         const SizedBox(height: 5),

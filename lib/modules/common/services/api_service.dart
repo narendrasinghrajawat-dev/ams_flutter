@@ -72,6 +72,9 @@ class ApiService {
   Future<dynamic> get(String path, {bool showLoader = true}) async {
     final url = Uri.parse("$baseUrl$path");
     print('GET start: $url');
+    print('get headers ios the ');
+    print(_headers());
+
 
     return _sendRequest(
           () => http.get(url, headers: _headers()),

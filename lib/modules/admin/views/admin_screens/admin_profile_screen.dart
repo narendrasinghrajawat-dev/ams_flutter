@@ -35,59 +35,22 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
     child:  SingleChildScrollView(
       child: Column(
         children: [
-          Column(
-            children: [
+          SizedBox(height: 20,),
 
-              SizedBox(height: 20,),
-              // Avatar with Edit Button
-              Stack(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(3),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: AppThemeColors.whiteColor,
-                    ),
-                    child: CircleAvatar(
-                      radius: 50,
-                      backgroundImage: NetworkImage(networkImage),
-                      backgroundColor: Colors.grey.shade200,
-                    ),
-                  ),
-                  Positioned(
-                    top: 5,
-                    right: 0,
-                    child: GestureDetector(
-                      onTap: () {
-                        Get.snackbar('Info', 'Change avatar tapped');
-                      },
-                      child: Container(
-                          padding: const EdgeInsets.all(5),
-                          decoration: BoxDecoration(
-                            color: AppThemeColors.primaryColor,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: AppThemeColors.whiteColor,
-                              width: 3,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppThemeColors.primaryColor.withOpacity(0.3),
-                                blurRadius: 8,
-                                spreadRadius: 1,
-                              ),
-                            ],
-                          ),
-                          child: AppIconWidget.medium(AppConstIcons.editIcon, color: AppThemeColors.whiteColor,)
-                      ),
-                    ),
-                  ),
-                ],
+          CircleAvatar(
+            radius: 50,
+            backgroundColor: AppThemeColors.primaryColor.withOpacity(0.1),
+            child: Text(
+              (user?.firstName != null && user!.firstName!.isNotEmpty)
+                  ? user.firstName![0].toUpperCase()
+                  : "U",
+              style: TextStyle(
+                fontSize: 40,
+                fontWeight: FontWeight.bold,
+                color: AppThemeColors.primaryColor,
               ),
-
-            ],
+            ),
           ),
-
 
 
           // Basic Information Section
@@ -116,20 +79,15 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
                     icon: Icons.phone_rounded,
                     iconColor: Colors.green.shade600,
                     label: 'Phone',
-                    value: user?.phoneNo ?? '+91 98765 43210',
+                    value: user.phoneNo ?? '+91 98765 43210',
                   ),
                   _InfoRow(
                     icon: Icons.location_on_rounded,
                     iconColor: Colors.red.shade600,
-                    label: 'Location',
-                    value: user?.address?.street ?? 'Jaipur, Rajasthan',
+                    label: 'Address',
+                    value: user.address ?? "",
                   ),
-                  _InfoRow(
-                    icon: Icons.badge_rounded,
-                    iconColor: Colors.purple.shade600,
-                    label: 'Employee ID',
-                    value: 'EMP-2024-001',
-                  ),
+
                 ],
               ),
             ),

@@ -37,6 +37,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
     _ctrl.forward();
 
+    print('splash screeen inti called');
+
     _ctrl.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         Future.delayed(const Duration(milliseconds: 200), () {

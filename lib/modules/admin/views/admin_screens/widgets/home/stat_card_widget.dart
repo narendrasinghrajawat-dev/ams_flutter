@@ -15,15 +15,8 @@ class StatCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [color.withOpacity(0.15), color.withOpacity(0.05)],
-        ),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: CommonCardWidget(
-        color: Colors.transparent,
+    return  CommonCardWidget(
+        color: color.withOpacity(0.05),
         child: Row(
           children: [
             CircleAvatar(
@@ -41,7 +34,6 @@ class StatCardWidget extends StatelessWidget {
             ),
           ],
         ),
-      ),
     );
   }
 }

@@ -152,7 +152,6 @@ class UserActivityController extends GetxController {
 
 
   Future<void> getAllTakenCurrentMonthWFH(String userKey) async {
-    print('getAllTakenCurrentMonthWFH called');
     _loadingController.start();
     try {
       totalTakenWFH.value = await _service.getAllTakenCurrentMonthWFH(userKey);

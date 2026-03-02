@@ -1,4 +1,5 @@
 // leave_card.dart
+import 'package:attedance_management_system/widgets/card/common_card.dart';
 import 'package:attedance_management_system/widgets/text_and_icon_widgets/app_icons_type.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -17,30 +18,14 @@ class LeaveCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('halfDayShiftType');
-    print(leave.halfDayShiftType);
 
     final statusColor = AppHelper.getLeavesStatusColor(leave.leaveStatus);
     final isPending =
         (leave.leaveStatus ?? '').toLowerCase() ==
             AppStrings.pendingLeavesStatusKey;
-    final isWide = _isWide(context);
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
+    return CommonCardWidget(
+      child:  Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // ================= HEADER =================
