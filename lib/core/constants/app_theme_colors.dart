@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../enums/app_environment.dart';
+import '../../modules/common/controller/settings_controller.dart';
 
 
 
@@ -27,7 +28,14 @@ class EnvConfig {
 
 
 class AppThemeColors {
-  static bool get isDark => Get.isDarkMode;
+  static bool get isDark {
+    try {
+      if (Get.isRegistered<SettingsController>()) {
+        return Get.find<SettingsController>().isDark.value;
+      }
+    } catch (_) {}
+    return Get.isDarkMode;
+  }
 
 
   static const Color primaryProdColor = Color(0xFF009688);

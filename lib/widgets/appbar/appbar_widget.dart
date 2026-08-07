@@ -39,6 +39,7 @@ class UserAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       backgroundColor: AppThemeColors.appbarBackgroundColor,
       elevation: 0,
+      automaticallyImplyLeading: false,
       actionsPadding: EdgeInsets.all(0),
       flexibleSpace: SafeArea(
         child: Padding(

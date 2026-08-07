@@ -1,9 +1,10 @@
-name: Deploy Flutter Web to GitHub Pages
+name: Deploy Flutter Web & App to GitHub
 
 on:
   push:
     branches:
       - main
+      - test
 
 permissions:
   contents: write
@@ -32,16 +33,31 @@ jobs:
           echo 'appSetup=Dev' > env/.env.dev
           echo 'baseURL=${{ secrets.BACKEND_URL }}' >> env/.env.dev
           echo 'appSetup=Test' > env/.env.test
-          echo 'baseURL=${{ secrets.BACKEND_URL }}' >> env/.env.test
+          echo 'baseURL=${{ secrets.BACKEND_URL_TEST || secrets.BACKEND_URL }}' >> env/.env.test
           echo 'appSetup=Prod' > env/.env.prod
           echo 'baseURL=${{ secrets.BACKEND_URL }}' >> env/.env.prod
+
+      - name: Determine Environment Settings
+        id: settings
+        run: |
+          if [ "${{ github.ref_name }}" = "main" ]; then
+            echo "app_env=prod" >> $GITHUB_OUTPUT
+            echo "base_href=/ams_flutter/" >> $GITHUB_OUTPUT
+            echo "release_prefix=prod" >> $GITHUB_OUTPUT
+            echo "release_name=Production Release" >> $GITHUB_OUTPUT
+          else
+            echo "app_env=test" >> $GITHUB_OUTPUT
+            echo "base_href=/ams_flutter/test/" >> $GITHUB_OUTPUT
+            echo "release_prefix=test" >> $GITHUB_OUTPUT
+            echo "release_name=Testing Release" >> $GITHUB_OUTPUT
+          fi
 
       - name: Install dependencies
         run: flutter pub get
 
       - name: Build Web
         run: |
-          flutter build web --release --base-href "/ams_flutter/"
+          flutter build web --release --base-href "${{ steps.settings.outputs.base_href }}" --dart-define=APP_ENV=${{ steps.settings.outputs.app_env }}
           touch build/web/.nojekyll
 
       - name: Remove gitignore before deploy
@@ -52,19 +68,21 @@ jobs:
         with:
           folder: build/web
           branch: gh-pages
+          target-folder: ${{ github.ref_name == 'test' && 'test' || '.' }}
+          clean: ${{ github.ref_name == 'main' }}
 
       - name: Build Android APK
         run: |
-          flutter build apk --release --dart-define=APP_ENV=prod
+          flutter build apk --release --dart-define=APP_ENV=${{ steps.settings.outputs.app_env }}
 
       - name: Generate Release Tag
         id: tag
-        run: echo "release_tag=v$(date +'%Y.%m.%d-%H%M')" >> $GITHUB_OUTPUT
+        run: echo "release_tag=${{ steps.settings.outputs.release_prefix }}-v$(date +'%Y.%m.%d-%H%M')" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release & Upload APK
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.tag.outputs.release_tag }}
-          name: Release ${{ steps.tag.outputs.release_tag }}
+          name: ${{ steps.settings.outputs.release_name }} (${{ steps.tag.outputs.release_tag }})
           files: build/app/outputs/flutter-apk/app-release.apk
           token: ${{ secrets.GITHUB_TOKEN }}

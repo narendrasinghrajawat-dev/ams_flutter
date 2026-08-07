@@ -293,7 +293,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                 kIsWeb ? AppTextWidget.large('Good ${AppHelper.getGreeting()}!',) : AppTextWidget.medium('Good ${AppHelper.getGreeting()}!',),
+                 kIsWeb ? AppTextWidget.large('good_${AppHelper.getGreeting().toLowerCase()}') : AppTextWidget.medium('good_${AppHelper.getGreeting().toLowerCase()}'),
                   Row(
                     children: [
 
@@ -355,7 +355,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          AppTextWidget.small("Today's Work Time"),
+                          AppTextWidget.small("today_work_time"),
                           const SizedBox(height: 6),
                           AppTextWidget.large(
                             AppHelper.formatDuration(_elapsed),
@@ -366,14 +366,14 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                     ),
                     if (canCheckIn)
                       _actionBtn(
-                        'Check In',
+                        'check_in',
                         Icons.login_rounded,
                         AppThemeColors.successColor,
                         _onCheckIn,
                       )
                     else if (canCheckOut)
                       _actionBtn(
-                        'Check Out',
+                        'check_out',
                         Icons.logout_rounded,
                         AppThemeColors.errorColor,
                         _onCheckOut,
@@ -385,7 +385,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               const SizedBox(height: 14),
 
               StatsCard(
-                title: 'Today Hours',
+                title: 'today_hours',
                 value: '${todayHours.toStringAsFixed(1)}h',
                 icon: Icons.access_time,
                 color: AppThemeColors.primaryColor,
@@ -396,7 +396,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  AppTextWidget.medium('Recent Activities'),
+                  AppTextWidget.medium('recent_activities'),
                   AppTextWidget.verySmall(
                     'Last ${recent.length}',
                     color: AppThemeColors.muted,
