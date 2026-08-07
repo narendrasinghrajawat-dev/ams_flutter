@@ -52,3 +52,19 @@ jobs:
         with:
           folder: build/web
           branch: gh-pages
+
+      - name: Build Android APK
+        run: |
+          flutter build apk --release
+
+      - name: Generate Release Tag
+        id: tag
+        run: echo "release_tag=v$(date +'%Y.%m.%d-%H%M')" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release & Upload APK
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.tag.outputs.release_tag }}
+          name: Release ${{ steps.tag.outputs.release_tag }}
+          files: build/app/outputs/flutter-apk/app-release.apk
+          token: ${{ secrets.GITHUB_TOKEN }}
