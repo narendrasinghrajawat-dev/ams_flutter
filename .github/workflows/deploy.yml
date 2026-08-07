@@ -69,7 +69,9 @@ jobs:
           folder: build/web
           branch: gh-pages
           target-folder: ${{ github.ref_name == 'test' && 'test' || '.' }}
-          clean: ${{ github.ref_name == 'main' }}
+          clean: true
+          clean-exclude: |
+            test/
 
       - name: Build Android APK
         run: |
