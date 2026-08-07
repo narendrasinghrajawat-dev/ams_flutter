@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../constants/app_theme_colors.dart';
 
 class ThemeService {
   final _box = GetStorage();
@@ -16,15 +17,35 @@ class ThemeService {
   ThemeData get lightTheme => ThemeData(
     brightness: Brightness.light,
     textTheme: GoogleFonts.openSansTextTheme(ThemeData.light().textTheme),
-    primarySwatch: Colors.blue,
+    primaryColor: AppThemeColors.primaryLightProdColor,
     scaffoldBackgroundColor: Colors.white,
+    appBarTheme: AppBarTheme(
+      backgroundColor: AppThemeColors.primaryLightColor,
+      elevation: 0,
+      iconTheme: const IconThemeData(color: Colors.white),
+      titleTextStyle: GoogleFonts.openSans(
+        color: Colors.white,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
   );
 
   ThemeData get darkTheme => ThemeData(
     brightness: Brightness.dark,
     textTheme: GoogleFonts.openSansTextTheme(ThemeData.dark().textTheme),
-    primarySwatch: Colors.blue,
+    primaryColor: AppThemeColors.primaryDarkProdColor,
     scaffoldBackgroundColor: Colors.black,
+    appBarTheme: AppBarTheme(
+      backgroundColor: AppThemeColors.primaryDarkColor,
+      elevation: 0,
+      iconTheme: const IconThemeData(color: Colors.white),
+      titleTextStyle: GoogleFonts.openSans(
+        color: Colors.white,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
   );
 
   void switchTheme() {

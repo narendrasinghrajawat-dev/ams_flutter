@@ -55,7 +55,7 @@ jobs:
 
       - name: Build Android APK
         run: |
-          flutter build apk --release
+          flutter build apk --release --dart-define=APP_ENV=prod
 
       - name: Generate Release Tag
         id: tag

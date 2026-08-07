@@ -16,48 +16,49 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     final loading = Get.find<LoadingController>();
+    final settings = Get.find<SettingsController>();
 
-    return GetMaterialApp(
-      title: 'AMS',
-      initialBinding: AppBinding(),
-      translations: TranslationService(),
-      locale: Locale(Get.find<SettingsController>().language.value),
-      fallbackLocale: TranslationService.fallbackLocale,
-      theme: _themeService.lightTheme,
-      darkTheme: _themeService.darkTheme,
-      themeMode: Get.find<SettingsController>().isDark.value ? ThemeMode.dark : ThemeMode.light,
-      getPages: AppPages.pages,
-      initialRoute: AppRoutes.splashScreen,
-      debugShowCheckedModeBanner: false,
+    return Obx(() {
+      return GetMaterialApp(
+        title: 'AMS',
+        initialBinding: AppBinding(),
+        translations: TranslationService(),
+        locale: Locale(settings.language.value),
+        fallbackLocale: TranslationService.fallbackLocale,
+        theme: _themeService.lightTheme,
+        darkTheme: _themeService.darkTheme,
+        themeMode: settings.isDark.value ? ThemeMode.dark : ThemeMode.light,
+        getPages: AppPages.pages,
+        initialRoute: AppRoutes.splashScreen,
+        debugShowCheckedModeBanner: false,
+        builder: (context, child) {
+          return Stack(
+            children: [
+              child ?? const SizedBox.shrink(),
 
-      builder: (context, child) {
-        return Stack(
-          children: [
-            child ?? const SizedBox.shrink(),
+              // Global loader overlay (hidden on splash screen)
+              Obx(() {
+                // ALWAYS read the Rx value so Obx can track it
+                final bool isLoading = loading.isLoading.value;
+                final String currentRoute = Get.currentRoute;
+                final bool isSplash = currentRoute == AppRoutes.splashScreen;
 
-            // Global loader overlay (hidden on splash screen)
-            Obx(() {
-              // ALWAYS read the Rx value so Obx can track it
-              final bool isLoading = loading.isLoading.value;
-              final String currentRoute = Get.currentRoute;
-              final bool isSplash = currentRoute == AppRoutes.splashScreen;
+                if (isSplash || !isLoading) {
+                  return const SizedBox.shrink();
+                }
 
-              if (isSplash || !isLoading) {
-                return const SizedBox.shrink();
-              }
-
-              return Container(
-                color: Colors.black.withOpacity(0.3),
-                child: Center(
-                  child: CircularProgressIndicator(color:  AppThemeColors.loaderColor,),
-                ),
-              );
-            }),
-          ],
-        );
-      },
-    );
+                return Container(
+                  color: Colors.black.withOpacity(0.3),
+                  child: Center(
+                    child: CircularProgressIndicator(color: AppThemeColors.loaderColor),
+                  ),
+                );
+              }),
+            ],
+          );
+        },
+      );
+    });
   }
 }

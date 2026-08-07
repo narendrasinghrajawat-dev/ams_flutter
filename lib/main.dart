@@ -17,10 +17,17 @@ import 'modules/common/utils/http_override_web.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // ✅ Set environment manually
-  EnvConfig.setEnvironment(AppEnvironment.development);
-
-  final environment = EnvConfig.getEnvironment();
+  // ✅ Set environment dynamically using --dart-define
+  const String appEnv = String.fromEnvironment('APP_ENV', defaultValue: 'dev');
+  AppEnvironment environment;
+  if (appEnv == 'prod') {
+    environment = AppEnvironment.production;
+  } else if (appEnv == 'test') {
+    environment = AppEnvironment.test;
+  } else {
+    environment = AppEnvironment.development;
+  }
+  EnvConfig.setEnvironment(environment);
 
   await dotenv.load(
     fileName: environment == AppEnvironment.development

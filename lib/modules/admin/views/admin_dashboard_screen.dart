@@ -14,6 +14,7 @@ import '../../../../widgets/text_and_icon_widgets/app_text_type.dart';
 // Screens
 import '../../../data/utils/app_helper.dart';
 import '../../../widgets/appbar/appbar_widget.dart';
+import '../../../../widgets/drawer/app_drawer.dart';
 import '../../models/user.dart';
 import '../controller/admin_employees_controller.dart';
 import '../controller/admin_home_controller.dart';
@@ -115,6 +116,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         const Size.fromHeight(80.0),
         child: UserAppBar(user: user),
       ),
+      drawer: AppDrawer(user: user, onTabSelected: _onTabChanged),
 
 
       body: IndexedStack(

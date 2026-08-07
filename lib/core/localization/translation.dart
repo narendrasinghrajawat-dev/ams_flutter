@@ -15,7 +15,6 @@ class TranslationService extends Translations {
       'user_dashboard': 'User Dashboard',
       'mark_attendance': 'Mark Attendance',
 
-
       // 🔹 Admin Home Page
       'total_employees': 'Total Employees',
       'total_registered_staff': 'Total registered staff',
@@ -30,10 +29,16 @@ class TranslationService extends Translations {
       'view_all': 'View All',
       'no_recent_activity': 'No recent activity found.',
 
-
-
-
-
+      // 🔹 Drawer & Navigation
+      'Home': 'Home',
+      'Employees': 'Employees',
+      'Leaves': 'Leaves',
+      'Activity': 'Activity',
+      'Profile': 'Profile',
+      'Settings': 'Settings',
+      'Logout': 'Logout',
+      'Cancel': 'Cancel',
+      'Are you sure you want to logout?': 'Are you sure you want to logout?',
     },
     'hi_IN': {
       'login': 'लॉगिन',
@@ -42,8 +47,6 @@ class TranslationService extends Translations {
       'admin_dashboard': 'अडमिन डैशबोर्ड',
       'user_dashboard': 'उपयोगकर्ता डैशबोर्ड',
       'mark_attendance': 'अटेंडेंस मार्क करें',
-
-
 
       // 🔹 Admin Home Page (Hindi)
       'total_employees': 'कुल कर्मचारी',
@@ -59,7 +62,16 @@ class TranslationService extends Translations {
       'view_all': 'सभी देखें',
       'no_recent_activity': 'कोई हाल की गतिविधि नहीं मिली।',
 
-
+      // 🔹 Drawer & Navigation (Hindi)
+      'Home': 'होम',
+      'Employees': 'कर्मचारी',
+      'Leaves': 'छुट्टियाँ',
+      'Activity': 'गतिविधि',
+      'Profile': 'प्रोफ़ाइल',
+      'Settings': 'सेटिंग्स',
+      'Logout': 'लॉगआउट',
+      'Cancel': 'रद्द करें',
+      'Are you sure you want to logout?': 'क्या आप वाकई लॉगआउट करना चाहते हैं?',
     }
   };
 }

@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:attedance_management_system/data/utils/app_helper.dart';
 import 'package:attedance_management_system/core/constants/app_theme_colors.dart';
 import 'package:attedance_management_system/widgets/appbar/appbar_widget.dart';
+import 'package:attedance_management_system/widgets/drawer/app_drawer.dart';
 
 // User screens
 import 'package:attedance_management_system/modules/user/views/user_screens/user_leaves_screen.dart';
@@ -86,6 +87,7 @@ class _UserDashboardScreenState
         const Size.fromHeight(80.0),
         child: UserAppBar(user: user),
       ),
+      drawer: AppDrawer(user: user, onTabSelected: _onTabChanged),
       body: IndexedStack(
         index: _currentIndex,
         children: _pages,
@@ -96,19 +98,19 @@ class _UserDashboardScreenState
         selectedItemColor: AppThemeColors.primaryColor,
         unselectedItemColor: AppThemeColors.muted,
         onTap: _onTabChanged,
-        items: const [
+        items: [
           BottomNavigationBarItem(
-              icon: Icon(Icons.home_outlined),
-              label: 'Home'),
+              icon: const Icon(Icons.home_outlined),
+              label: 'Home'.tr),
           BottomNavigationBarItem(
-              icon: Icon(Icons.beach_access_outlined),
-              label: 'Leaves'),
+              icon: const Icon(Icons.beach_access_outlined),
+              label: 'Leaves'.tr),
           BottomNavigationBarItem(
-              icon: Icon(Icons.timeline_outlined),
-              label: 'Activity'),
+              icon: const Icon(Icons.timeline_outlined),
+              label: 'Activity'.tr),
           BottomNavigationBarItem(
-              icon: Icon(Icons.person_outline),
-              label: 'Profile'),
+              icon: const Icon(Icons.person_outline),
+              label: 'Profile'.tr),
         ],
         type: BottomNavigationBarType.fixed,
       ),

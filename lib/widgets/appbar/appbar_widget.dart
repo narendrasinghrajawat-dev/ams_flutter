@@ -46,15 +46,20 @@ class UserAppBar extends StatelessWidget implements PreferredSizeWidget {
           child: Row(
             children: [
 
-              Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: AppThemeColors.primaryLightColor, width: 2.5),
-                ),
-                child: CircleAvatar(
-                  backgroundColor: AppThemeColors.circleAvatarBackgroundColor,
-                  radius: 22,
-                  child: AppIconWidget.veryLarge(AppConstIcons.personIcon), // Specify the radius of the avatar, which controls its size
+              GestureDetector(
+                onTap: () {
+                  Scaffold.of(context).openDrawer();
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: AppThemeColors.primaryLightColor, width: 2.5),
+                  ),
+                  child: CircleAvatar(
+                    backgroundColor: AppThemeColors.circleAvatarBackgroundColor,
+                    radius: 22,
+                    child: AppIconWidget.veryLarge(AppConstIcons.personIcon), // Specify the radius of the avatar, which controls its size
+                  ),
                 ),
               ),
 
