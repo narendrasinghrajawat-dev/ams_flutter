@@ -26,6 +26,16 @@ jobs:
         with:
           channel: 'stable'
 
+      - name: Create dummy env files
+        run: |
+          mkdir -p env
+          echo 'appSetup="Dev"' > env/.env.dev
+          echo 'baseURL="https://ams-backend-k4gp.onrender.com/"' >> env/.env.dev
+          echo 'appSetup="Test"' > env/.env.test
+          echo 'baseURL="https://ams-backend-k4gp.onrender.com/"' >> env/.env.test
+          echo 'appSetup="Prod"' > env/.env.prod
+          echo 'baseURL="https://ams-backend-1-hjq6.onrender.com/"' >> env/.env.prod
+
       - name: Install dependencies
         run: flutter pub get
 
