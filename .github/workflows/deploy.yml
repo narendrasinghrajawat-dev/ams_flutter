@@ -29,12 +29,12 @@ jobs:
       - name: Create dummy env files
         run: |
           mkdir -p env
-          echo 'appSetup="Dev"' > env/.env.dev
-          echo 'baseURL="${{ secrets.BACKEND_URL }}"' >> env/.env.dev
-          echo 'appSetup="Test"' > env/.env.test
-          echo 'baseURL="${{ secrets.BACKEND_URL }}"' >> env/.env.test
-          echo 'appSetup="Prod"' > env/.env.prod
-          echo 'baseURL="${{ secrets.BACKEND_URL }}"' >> env/.env.prod
+          echo 'appSetup=Dev' > env/.env.dev
+          echo 'baseURL=${{ secrets.BACKEND_URL }}' >> env/.env.dev
+          echo 'appSetup=Test' > env/.env.test
+          echo 'baseURL=${{ secrets.BACKEND_URL }}' >> env/.env.test
+          echo 'appSetup=Prod' > env/.env.prod
+          echo 'baseURL=${{ secrets.BACKEND_URL }}' >> env/.env.prod
 
       - name: Install dependencies
         run: flutter pub get
