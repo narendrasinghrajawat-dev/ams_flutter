@@ -54,40 +54,50 @@ class AppDrawer extends StatelessWidget {
       backgroundColor: AppThemeColors.popupBackgroundColor,
       child: Column(
         children: [
-          // Drawer Header
-          UserAccountsDrawerHeader(
-            decoration: BoxDecoration(
-              color: AppThemeColors.appbarBackgroundColor,
-            ),
-            currentAccountPicture: Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 2),
-              ),
-              child: const CircleAvatar(
-                backgroundColor: Colors.white,
-                child: Icon(Icons.person, size: 40, color: Colors.grey),
-              ),
-            ),
-            accountName: Text(
-              _fullName,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-            ),
-            accountEmail: Column(
+          // Beautiful Custom Drawer Header
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.only(top: 50, bottom: 20, left: 20, right: 20),
+            color: AppThemeColors.appbarBackgroundColor,
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                AppTextWidget.small(
+                Container(
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 2),
+                  ),
+                  child: const CircleAvatar(
+                    backgroundColor: Colors.white,
+                    child: Icon(Icons.person, size: 36, color: Colors.grey),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  _fullName,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
                   user.email,
-                  color: Colors.white70,
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 13,
+                  ),
                 ),
                 const SizedBox(height: 2),
-                AppTextWidget.small(
+                Text(
                   '${user.countryCode} ${user.phoneNo}',
-                  color: Colors.white70,
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 13,
+                  ),
                 ),
               ],
             ),
@@ -121,7 +131,7 @@ class AppDrawer extends StatelessWidget {
                     Get.back();
                     if (onTabSelected != null) onTabSelected!(isAdmin ? 1 : 2);
                   },
-                                  ),
+                ),
                 ListTile(
                   leading: Icon(Icons.person_outline, color: AppThemeColors.iconColor),
                   title: AppTextWidget.medium('Profile'.tr, color: AppThemeColors.textPrimaryColor),

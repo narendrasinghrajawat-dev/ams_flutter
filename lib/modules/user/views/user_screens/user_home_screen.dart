@@ -144,13 +144,19 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       }
 
       final masterData = _commonController.masterData.value;
-      if (masterData == null) return null;
+      if (masterData == null) {
+        UIHelper.showSnackbar("Master Data Error", 'Master data is not loaded. Try restarting the app.', type: SnackbarType.error);
+        return null;
+      }
 
       final officeLat = double.tryParse(masterData.officeLat ?? '');
       final officeLng = double.tryParse(masterData.officeLong ?? '');
       final officeRadius = masterData.officeRadius?.toDouble() ?? 100;
 
-      if (officeLat == null || officeLng == null) return null;
+      if (officeLat == null || officeLng == null) {
+        UIHelper.showSnackbar("Master Data Error", 'Office location coordinates are invalid or unconfigured.', type: SnackbarType.error);
+        return null;
+      }
 
 
       final isWFH = _activityCtrl.isWorkFromHome.value;
