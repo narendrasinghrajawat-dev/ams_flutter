@@ -42,6 +42,7 @@ jobs:
       - name: Build Web
         run: |
           flutter build web --release --base-href "/ams_flutter/"
+          touch build/web/.nojekyll
 
       - name: Remove gitignore before deploy
         run: rm -f .gitignore
