@@ -80,30 +80,29 @@ class AppThemeColors {
 
   // dependent colors on primary colors list
 
-  static Color get scaffoldBackgroundColor => isDark ? primaryDarkColor : primaryLightColor;
+  static Color get scaffoldBackgroundColor => isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC);
 
-  static Color get appbarBackgroundColor => isDark ? primaryDarkColor : primaryLightColor;
+  static Color get appbarBackgroundColor => isDark ? const Color(0xFF1E293B) : primaryColor;
 
-  static Color get buttonBgColor => isDark ? primaryDarkColor : primaryLightColor;
+  static Color get buttonBgColor => primaryColor;
 
-  static Color get loaderColor => isDark ? Colors.white : primaryLightColor;
+  static Color get loaderColor => isDark ? Colors.white : primaryColor;
 
-  static Color get containerBackgroundColor => isDark ? const Color(0xFF121212) : const Color(0xFFF5F5F5);
+  static Color get containerBackgroundColor => isDark ? const Color(0xFF1E293B) : Colors.white;
 
   // ============================================================
   // APPBAR
   // ============================================================
 
-  static Color get appBarColor => isDark ? const Color(0xFF101010) : const Color(0xFFFFFFFF);
+  static Color get appBarColor => isDark ? const Color(0xFF1E293B) : primaryColor;
 
-  static Color get appBarTextColor => isDark ? Colors.white : Colors.black87;
+  static Color get appBarTextColor => Colors.white;
 
   // ============================================================
   // BUTTON COLORS
   // ============================================================
 
-
-  static Color get buttonTextColor => isDark ? Colors.white : Colors.white;
+  static Color get buttonTextColor => Colors.white;
 
   static Color get buttonDisabledColor => isDark ? Colors.white24 : Colors.black12;
 
@@ -111,42 +110,42 @@ class AppThemeColors {
   // TEXT COLORS
   // ============================================================
 
-  static Color get textPrimaryColor => isDark ? Colors.white : const Color(0xFF263238);
+  static Color get textPrimaryColor => isDark ? const Color(0xFFF8FAFC) : const Color(0xFF0F172A);
 
-  static Color get textSecondaryColor => isDark ? Colors.white70 : const Color(0xFF546E7A);
+  static Color get textSecondaryColor => isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
 
-  static Color get textHintColor => isDark ? Colors.white38 : const Color(0xFF90CAF9);
+  static Color get textHintColor => isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8);
 
-  static Color get textDisabledColor => isDark ? Colors.white24 : const Color(0xFFBDBDBD);
+  static Color get textDisabledColor => isDark ? const Color(0xFF475569) : const Color(0xFFCBD5E1);
 
-  static Color get textLargeColor => isDark ? Colors.white : const Color(0xFF000000);
+  static Color get textLargeColor => isDark ? const Color(0xFFF8FAFC) : const Color(0xFF0F172A);
 
-  static Color get textMediumColor => isDark ? Colors.white70 : const Color(0xDD000000);
+  static Color get textMediumColor => isDark ? const Color(0xFFE2E8F0) : const Color(0xFF1E293B);
 
-  static Color get textSmallColor => isDark ? Colors.white54 : const Color(0x8A000000);
+  static Color get textSmallColor => isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
 
   // ============================================================
   // CARD COLORS
   // ============================================================
-  static Color get dashboardCardBackgroundColor => isDark ? primaryDarkColor : primaryLightColor.withOpacity(.15);
+  static Color get dashboardCardBackgroundColor => isDark ? const Color(0xFF1E293B) : Colors.white;
 
-  static Color get cardBackgroundColor => isDark ? primaryDarkColor : primaryLightColor.withOpacity(.03);
+  static Color get cardBackgroundColor => isDark ? const Color(0xFF1E293B) : Colors.white;
 
-  static Color get cardBorderColor => isDark ? primaryDarkColor : primaryLightColor.withOpacity(.2);
+  static Color get cardBorderColor => isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
 
   // ============================================================
   // Container COLORS
   // ============================================================
-  static Color get containerBgColor => isDark ? Colors.white70 : Colors.white70;
+  static Color get containerBgColor => isDark ? const Color(0xFF1E293B) : Colors.white;
 
   // Circle Avatar Colors
-  static Color get circleAvatarBackgroundColor => isDark ? Colors.white : Colors.white;
+  static Color get circleAvatarBackgroundColor => isDark ? const Color(0xFF1E293B) : Colors.white;
 
   // ============================================================
   // ICON COLORS
   // ============================================================
 
-  static Color get iconColor => isDark ? primaryLightColor : primaryLightColor;
+  static Color get iconColor => isDark ? const Color(0xFF94A3B8) : primaryColor;
 
   static Color get iconActiveColor => primaryColor;
 
@@ -154,17 +153,17 @@ class AppThemeColors {
   // DIVIDER / BORDER COLORS
   // ============================================================
 
-  static Color get dividerColor => isDark ? primaryLightColor.withOpacity(.1) : primaryLightColor;
+  static Color get dividerColor => isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
 
-  static Color get borderColor => isDark ? const Color(0xFF2C2C2C) : const Color(0xFFBDBDBD);
+  static Color get borderColor => isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1);
 
   // ============================================================
   // STATUS COLORS (SUCCESS / ERROR / WARNING)
   // ============================================================
 
-  static const Color successColor = Color(0xFF2E7D32);
-  static const Color errorColor = Color(0xFFD32F2F);
-  static const Color warningColor = Color(0xFFF9A825);
+  static const Color successColor = Color(0xFF10B981);
+  static const Color errorColor = Color(0xFFEF4444);
+  static const Color warningColor = Color(0xFFF59E0B);
 
   // ============================================================
   // WALKTHROUGH / DOTS COLORS
@@ -179,95 +178,47 @@ class AppThemeColors {
 
   static Color get richTextColor => primaryColor;
 
-
-
-  static Color get muted => isDark ? const Color(0xFFB0BEC5) : const Color(0xFF90A4AE);
-
+  static Color get muted => isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
 
   // Form Colors
+  static Color get suffixIconColor => isDark ? const Color(0xFF81D4FA) : const Color(0xFF1565C0);
+  static Color get prefixIconColor => isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+  static Color get focusBorderColor => primaryColor;
+  static Color get errorBorderColor => errorColor;
+  static Color get disableBorderColor => isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1);
+  static Color get disableLabelColor => isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8);
+  static Color get enableBorderColor => isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1);
 
-  /// Color for icons inside the suffix position (often focus color).
-  static Color get suffixIconColor => Get.isDarkMode ? const Color(0xFF81D4FA) : const Color(0xFF1565C0);
-  /// Color for icons inside the prefix position (more subtle).
-  static Color get prefixIconColor => Get.isDarkMode ? const Color(0xFFB0BEC5) : const Color(0xFF90A4AE);
-  /// Color for the border when the field is enabled but not focused.
-  // static Color get enableBorderColor => Get.isDarkMode ? const Color(0xFF455A64) : const Color(0xFFCFD8DC);
-  /// Color for the border when the field is actively focused.
-  static Color get focusBorderColor => Get.isDarkMode ? const Color(0xFF42A5F5) : const Color(0xFF1976D2);
-  /// Color for the border when a validation error occurs.
-  static Color get errorBorderColor => Get.isDarkMode ? const Color(0xFFEF5350) : const Color(0xFFD32F2F);
-  /// Color for the border when the field is explicitly disabled.
-  static Color get disableBorderColor => Get.isDarkMode ? const Color(0xFF616161) : const Color(0xFFBDBDBD);
-  /// Color for the label/hint text when the field is disabled.
-  static Color get disableLabelColor => Get.isDarkMode ? const Color(0xFF757575) : const Color(0xFF9E9E9E);
-  static Color get enableBorderColor => isDark ? primaryLightColor : primaryDarkColor;
+  static Color get datePickerBackgroundColor => isDark ? const Color(0xFF1E293B) : Colors.white;
+  static Color get dropDownBackgroundColor => isDark ? const Color(0xFF1E293B) : Colors.white;
+  static Color get sliderActiveColor => primaryColor;
+  static Color get sliderInActiveColor => isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
+  static Color get inactiveTrackColor => isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
 
+  static List<Color> get splashGradientColors => isDark ? [const Color(0xFF0F172A), const Color(0xFF1E293B)] : [primaryColor, primaryColor];
 
-  static Color get datePickerBackgroundColor => Get.isDarkMode ? const Color(0xFF757575) :  Color(0xFFFFFFFF);
-  static Color get dropDownBackgroundColor => Get.isDarkMode ? const Color(0xFF757575) :  Color(0xFFFFFFFF);
-  static Color get sliderActiveColor => Get.isDarkMode ? const Color(0xFF757575) :  Color(0xFF1E88E5);
-  static Color get sliderInActiveColor => Get.isDarkMode ? const Color(0xFF757575) :  Color(0xFFBBDEFB);
-  static Color get inactiveTrackColor => Get.isDarkMode ? const Color(0xFF757575) :  Color(0xFFFFFFFF);
-
-
-  static List<Color>  get splashGradientColors => Get.isDarkMode ? [primaryDarkColor, primaryDarkColor] : [primaryLightColor, primaryLightColor];
-
-  // static List<Color> get splashGradientColors {
-  //   if (EnvConfig.isDev) {
-  //     return [Color(0xFF5E92F3), Color(0xFF42A5F5)]; // dev blue-ish
-  //   }
-  //   if (EnvConfig.isTest) {
-  //     return [Color(0xFF6A1B9A), Color(0xFF8E24AA)]; // staging purple-ish
-  //   }
-  //
-  //   if (EnvConfig.isProd) {
-  //     return [Color(0xFF00ACC1), Color(0xFF4DD0E1)]; // staging purple-ish
-  //   }
-  //
-  //   // production default (blue -> indigo)
-  //   return isDark
-  //       ? [Color(0xFF1A237E), Color(0xFF283593)]
-  //       : [Color(0xFF1976D2), Color(0xFF42A5F5)];
-  // }
-
-  /// Splash icon background (circle behind icon)
-  static Color get splashIconBg => isDark ? primaryLightColor.withOpacity(0.12) : primaryLightColor.withOpacity(0.25);
-
-  /// Splash text color (usually white on gradient)
+  static Color get splashIconBg => isDark ? Colors.white12 : Colors.black12;
   static Color get splashTextColor => Colors.white;
-
-  /// Progress bar color on splash
   static Color get splashProgressColor => Colors.white;
-
   static Color get whiteColor => Colors.white;
 
-
-
-//   other common widgets
-  static Color get popupBackgroundColor => isDark ? primaryDarkColor : Colors.white;
-
-  static Color get editIconColors => isDark ? primaryDarkColor : primaryLightColor;
-
-  static Color get deleteIconColor => isDark ? primaryDarkColor : Colors.red;
-
-
+  // Other common widgets
+  static Color get popupBackgroundColor => isDark ? const Color(0xFF1E293B) : Colors.white;
+  static Color get editIconColors => primaryColor;
+  static Color get deleteIconColor => errorColor;
 
   // SnackBar Color
-  static Color get snackBarSuccessColor => isDark ? Colors.green : Colors.green;
-  static Color get snackBarErrorColor => isDark ? Colors.red : Colors.red;
-  static Color get snackBarWarningColor => isDark ? Colors.yellow : Colors.orange;
-  static Color get snackBarInfoColor => isDark ? Colors.green : Colors.green;
+  static Color get snackBarSuccessColor => successColor;
+  static Color get snackBarErrorColor => errorColor;
+  static Color get snackBarWarningColor => warningColor;
+  static Color get snackBarInfoColor => primaryColor;
 
-  static Color get collapsedBackgroundColor => isDark ? primaryDarkColor : primaryLightColor.withOpacity(.01);
-  static Color get collapsedIconColor => isDark ? primaryLightColor : primaryDarkColor;
+  static Color get collapsedBackgroundColor => isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC);
+  static Color get collapsedIconColor => isDark ? const Color(0xFF94A3B8) : primaryColor;
 
-
-//   Punch Type Colors
-
-  static Color get checkInColor => isDark ? primaryDarkColor : Colors.green;
-  static Color get checkOutColor => isDark ? primaryDarkColor : Colors.red;
-
-
+  // Punch Type Colors
+  static Color get checkInColor => successColor;
+  static Color get checkOutColor => errorColor;
 
   static const Color totalColor = Color(0xFF6366F1);
   static const Color availableColor = Color(0xFF10B981);

@@ -109,49 +109,48 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   Widget build(BuildContext context) {
     final showFab = _currentIndex == 2; // show FAB only on Employees tab
 
-    return Scaffold(
-
-      appBar: PreferredSize(
-        preferredSize:
-        const Size.fromHeight(80.0),
-        child: UserAppBar(user: user),
-      ),
-      drawer: AppDrawer(user: user, onTabSelected: _onTabChanged),
-
-
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _pages,
-      ),
-      floatingActionButton: showFab
-          ? FloatingActionButton(
-        shape: CircleBorder(
-          side: BorderSide(color: AppThemeColors.primaryColor),
+    return Obx(() {
+      return Scaffold(
+        backgroundColor: AppThemeColors.scaffoldBackgroundColor,
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(80.0),
+          child: UserAppBar(user: user),
         ),
-        backgroundColor: AppThemeColors.primaryColor,
-        onPressed: _openAddUser,
-        child: AppIconWidget.large(
-          AppConstIcons.addIcon,
-          color: AppThemeColors.whiteColor,
+        drawer: AppDrawer(user: user, onTabSelected: _onTabChanged),
+        body: IndexedStack(
+          index: _currentIndex,
+          children: _pages,
         ),
-      )
-          : null,
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: AppThemeColors.whiteColor,
-        currentIndex: _currentIndex,
-        selectedItemColor: AppThemeColors.primaryColor,
-        unselectedItemColor: AppThemeColors.muted,
-        type: BottomNavigationBarType.fixed,
-        onTap: _onTabChanged, // 👈 controller-based handler
-        items: [
-          BottomNavigationBarItem(icon: const Icon(Icons.home_outlined), label: 'Home'.tr),
-          BottomNavigationBarItem(icon: const Icon(Icons.timeline_outlined), label: 'Activity'.tr),
-          BottomNavigationBarItem(icon: const Icon(Icons.group_outlined), label: 'Employees'.tr),
-          BottomNavigationBarItem(icon: const Icon(Icons.beach_access_outlined), label: 'Leaves'.tr),
-          BottomNavigationBarItem(icon: const Icon(Icons.person), label: 'Profile'.tr),
-        ],
-      ),
-    );
+        floatingActionButton: showFab
+            ? FloatingActionButton(
+          shape: CircleBorder(
+            side: BorderSide(color: AppThemeColors.primaryColor),
+          ),
+          backgroundColor: AppThemeColors.primaryColor,
+          onPressed: _openAddUser,
+          child: AppIconWidget.large(
+            AppConstIcons.addIcon,
+            color: AppThemeColors.whiteColor,
+          ),
+        )
+            : null,
+        bottomNavigationBar: BottomNavigationBar(
+          backgroundColor: AppThemeColors.popupBackgroundColor,
+          currentIndex: _currentIndex,
+          selectedItemColor: AppThemeColors.primaryColor,
+          unselectedItemColor: AppThemeColors.muted,
+          type: BottomNavigationBarType.fixed,
+          onTap: _onTabChanged, // 👈 controller-based handler
+          items: [
+            BottomNavigationBarItem(icon: const Icon(Icons.home_outlined), label: 'Home'.tr),
+            BottomNavigationBarItem(icon: const Icon(Icons.timeline_outlined), label: 'Activity'.tr),
+            BottomNavigationBarItem(icon: const Icon(Icons.group_outlined), label: 'Employees'.tr),
+            BottomNavigationBarItem(icon: const Icon(Icons.beach_access_outlined), label: 'Leaves'.tr),
+            BottomNavigationBarItem(icon: const Icon(Icons.person), label: 'Profile'.tr),
+          ],
+        ),
+      );
+    });
   }
 }
 

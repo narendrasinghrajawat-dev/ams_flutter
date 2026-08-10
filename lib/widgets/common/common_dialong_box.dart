@@ -1,21 +1,21 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
+import '../../core/constants/app_theme_colors.dart';
 
 void showCommonDialog({required BuildContext context, required Widget child, isOpenSimpleDialog = false,}) {
   showDialog(
     context: context,
     barrierDismissible: true,
-    barrierColor: Colors.black26,
+    barrierColor: Colors.black45,
     builder: (BuildContext context) {
       final screenSize = MediaQuery.of(context).size;
       return isOpenSimpleDialog ?
       Dialog(
         insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-        backgroundColor: Colors.white,
+        backgroundColor: AppThemeColors.popupBackgroundColor,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(5.0),
+          borderRadius: BorderRadius.circular(8.0),
         ),
         child: Container(
             constraints: BoxConstraints(
@@ -92,15 +92,17 @@ class _DraggableDialogState extends State<DraggableDialog> {
             child: Material(
               key: _dialogKey, // Add key to get actual size
               elevation: 24,
-              borderRadius: BorderRadius.circular(5.0),
+              color: AppThemeColors.popupBackgroundColor,
+              borderRadius: BorderRadius.circular(8.0),
               child: Container(
                 width: dialogWidth,
                 constraints: BoxConstraints(
                   maxHeight: maxDialogHeight,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(5.0),
+                  color: AppThemeColors.popupBackgroundColor,
+                  borderRadius: BorderRadius.circular(8.0),
+                  border: Border.all(color: AppThemeColors.borderColor),
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,

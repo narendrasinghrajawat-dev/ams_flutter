@@ -64,14 +64,30 @@ class _UserFormState extends State<UserForm> {
     super.initState();
     editUser = widget.initialData;
     masterData = _commonController.masterData.value;
-    genderList = masterData?.gender.map((item) => item.toJson()).toList() ?? [];
-    roleList = masterData?.role.map((item) => item.toJson()).toList() ?? [];
 
-    if(widget.initialData == null){
-      roleId = roleList[0]['id'];
+    final defaultGenders = [
+      {'id': '1', 'name': 'Male'},
+      {'id': '2', 'name': 'Female'},
+      {'id': '3', 'name': 'Other'},
+    ];
+    final defaultRoles = [
+      {'id': '1', 'name': 'Employee'},
+      {'id': '2', 'name': 'Admin'},
+    ];
+
+    genderList = (masterData != null && masterData!.gender.isNotEmpty)
+        ? masterData!.gender.map((item) => item.toJson()).toList()
+        : defaultGenders;
+
+    roleList = (masterData != null && masterData!.role.isNotEmpty)
+        ? masterData!.role.map((item) => item.toJson()).toList()
+        : defaultRoles;
+
+    if (widget.initialData == null) {
+      roleId = roleList.isNotEmpty ? roleList[0]['id'] : '1';
     }
 
-    if(widget.initialData != null){
+    if (widget.initialData != null) {
       setEditData();
     }
   }

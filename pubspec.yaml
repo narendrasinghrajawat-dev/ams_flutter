@@ -81,6 +81,7 @@ flutter:
     - env/.env.prod
     - assets/
     - assets/app_icons/
+    - assets/icon/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

@@ -80,40 +80,41 @@ class _UserDashboardScreenState
 
   @override
   Widget build(BuildContext context) {
-
-    return Scaffold(
-      appBar: PreferredSize(
-        preferredSize:
-        const Size.fromHeight(80.0),
-        child: UserAppBar(user: user),
-      ),
-      drawer: AppDrawer(user: user, onTabSelected: _onTabChanged),
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _pages,
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: AppThemeColors.whiteColor,
-        currentIndex: _currentIndex,
-        selectedItemColor: AppThemeColors.primaryColor,
-        unselectedItemColor: AppThemeColors.muted,
-        onTap: _onTabChanged,
-        items: [
-          BottomNavigationBarItem(
-              icon: const Icon(Icons.home_outlined),
-              label: 'Home'.tr),
-          BottomNavigationBarItem(
-              icon: const Icon(Icons.beach_access_outlined),
-              label: 'Leaves'.tr),
-          BottomNavigationBarItem(
-              icon: const Icon(Icons.timeline_outlined),
-              label: 'Activity'.tr),
-          BottomNavigationBarItem(
-              icon: const Icon(Icons.person_outline),
-              label: 'Profile'.tr),
-        ],
-        type: BottomNavigationBarType.fixed,
-      ),
-    );
+    return Obx(() {
+      return Scaffold(
+        backgroundColor: AppThemeColors.scaffoldBackgroundColor,
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(80.0),
+          child: UserAppBar(user: user),
+        ),
+        drawer: AppDrawer(user: user, onTabSelected: _onTabChanged),
+        body: IndexedStack(
+          index: _currentIndex,
+          children: _pages,
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          backgroundColor: AppThemeColors.popupBackgroundColor,
+          currentIndex: _currentIndex,
+          selectedItemColor: AppThemeColors.primaryColor,
+          unselectedItemColor: AppThemeColors.muted,
+          onTap: _onTabChanged,
+          items: [
+            BottomNavigationBarItem(
+                icon: const Icon(Icons.home_outlined),
+                label: 'Home'.tr),
+            BottomNavigationBarItem(
+                icon: const Icon(Icons.beach_access_outlined),
+                label: 'Leaves'.tr),
+            BottomNavigationBarItem(
+                icon: const Icon(Icons.timeline_outlined),
+                label: 'Activity'.tr),
+            BottomNavigationBarItem(
+                icon: const Icon(Icons.person_outline),
+                label: 'Profile'.tr),
+          ],
+          type: BottomNavigationBarType.fixed,
+        ),
+      );
+    });
   }
 }

@@ -30,144 +30,142 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     final auth = authRegistered ? Get.find<AuthController>() : null;
     final user = AppHelper.getProfileUser();
 
-    return  SingleChildScrollView(
-      child: Column(
-        children: [
+    return Obx(() {
+      return SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(height: 20),
 
-          SizedBox(height: 20,),
-
-          CircleAvatar(
-            radius: 50,
-            backgroundColor: AppThemeColors.primaryColor.withOpacity(0.1),
-            child: Text(
-              (user?.firstName != null && user!.firstName!.isNotEmpty)
-                  ? user.firstName![0].toUpperCase()
-                  : "U",
-              style: TextStyle(
-                fontSize: 40,
-                fontWeight: FontWeight.bold,
-                color: AppThemeColors.primaryColor,
+            CircleAvatar(
+              radius: 50,
+              backgroundColor: AppThemeColors.primaryColor.withOpacity(0.1),
+              child: Text(
+                (user?.firstName != null && user!.firstName!.isNotEmpty)
+                    ? user.firstName![0].toUpperCase()
+                    : "U",
+                style: TextStyle(
+                  fontSize: 40,
+                  fontWeight: FontWeight.bold,
+                  color: AppThemeColors.primaryColor,
+                ),
               ),
             ),
-          ),
 
-
-
-          // Basic Information Section
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 12),
-                CommonCardWidget(
-                  child: Column(
-                    children:  [
-                      ResponsiveInfoGrid(
-                        children: [
-                          _InfoRow(
-                            icon: Icons.person,
-                            iconColor: Colors.blue.shade600,
-                            label: 'Name',
-                            value: "${user?.firstName ?? ""} ${user?.middleName ?? ""} ${user?.lastName ?? ""}",
-                          ),
-                          _InfoRow(
-                            icon: Icons.email_rounded,
-                            iconColor: Colors.orange.shade600,
-                            label: 'Email',
-                            value: user?.email ?? 'michael@example.com',
-                          ),
-                          _InfoRow(
-                            icon: Icons.phone_rounded,
-                            iconColor: Colors.green.shade600,
-                            label: 'Phone',
-                            value: user?.phoneNo ?? '+91 98765 43210',
-                          ),
-                          _InfoRow(
-                            icon: Icons.location_on_rounded,
-                            iconColor: Colors.red.shade600,
-                            label: 'Address',
-                            value: user.address ?? "",
-                          ),
-                          _InfoRow(
-                            icon: Icons.badge_rounded,
-                            iconColor: Colors.purple.shade600,
-                            label: 'Employee ID',
-                            value: user.employeeId ?? "",
-                          ),
-                        ],
-                      ),
-                    ]
-                  )
-                ),
-              ],
+            // Basic Information Section
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 12),
+                  CommonCardWidget(
+                    child: Column(
+                      children:  [
+                        ResponsiveInfoGrid(
+                          children: [
+                            _InfoRow(
+                              icon: Icons.person,
+                              iconColor: Colors.blue.shade600,
+                              label: 'Name',
+                              value: "${user?.firstName ?? ""} ${user?.middleName ?? ""} ${user?.lastName ?? ""}",
+                            ),
+                            _InfoRow(
+                              icon: Icons.email_rounded,
+                              iconColor: Colors.orange.shade600,
+                              label: 'Email',
+                              value: user?.email ?? 'michael@example.com',
+                            ),
+                            _InfoRow(
+                              icon: Icons.phone_rounded,
+                              iconColor: Colors.green.shade600,
+                              label: 'Phone',
+                              value: user?.phoneNo ?? '+91 98765 43210',
+                            ),
+                            _InfoRow(
+                              icon: Icons.location_on_rounded,
+                              iconColor: Colors.red.shade600,
+                              label: 'Address',
+                              value: user?.address ?? "",
+                            ),
+                            _InfoRow(
+                              icon: Icons.badge_rounded,
+                              iconColor: Colors.purple.shade600,
+                              label: 'Employee ID',
+                              value: user?.employeeId ?? "",
+                            ),
+                          ],
+                        ),
+                      ]
+                    )
+                  ),
+                ],
+              ),
             ),
-          ),
 
-          const SizedBox(height: 20),
+            const SizedBox(height: 20),
 
-          // Settings Section
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _SectionHeader(title: 'Settings'),
-                const SizedBox(height: 12),
-                _SettingsTile(
-                  icon: Icons.description_rounded,
-                  iconColor: Colors.indigo.shade400,
-                  title: 'Terms & Conditions',
-                  onTap: () => Get.toNamed('/terms'),
-                ),
-                const SizedBox(height: 10),
-                _SettingsTile(
-                  icon: Icons.privacy_tip_rounded,
-                  iconColor: Colors.teal.shade400,
-                  title: 'Privacy Policy',
-                  onTap: () => Get.toNamed('/privacy'),
-                ),
-                const SizedBox(height: 10),
-                _SettingsTile(
-                  icon: Icons.notifications_rounded,
-                  iconColor: Colors.amber.shade600,
-                  title: 'Notifications',
-                  onTap: () => Get.toNamed('/notifications'),
-                ),
-              ],
+            // Settings Section
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _SectionHeader(title: 'Settings'),
+                  const SizedBox(height: 12),
+                  _SettingsTile(
+                    icon: Icons.description_rounded,
+                    iconColor: Colors.indigo.shade400,
+                    title: 'Terms & Conditions',
+                    onTap: () => Get.toNamed('/terms'),
+                  ),
+                  const SizedBox(height: 10),
+                  _SettingsTile(
+                    icon: Icons.privacy_tip_rounded,
+                    iconColor: Colors.teal.shade400,
+                    title: 'Privacy Policy',
+                    onTap: () => Get.toNamed('/privacy'),
+                  ),
+                  const SizedBox(height: 10),
+                  _SettingsTile(
+                    icon: Icons.notifications_rounded,
+                    iconColor: Colors.amber.shade600,
+                    title: 'Notifications',
+                    onTap: () => Get.toNamed('/notifications'),
+                  ),
+                ],
+              ),
             ),
-          ),
 
-          const SizedBox(height: 20),
+            const SizedBox(height: 20),
 
-
-          // Logout Button
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: _ForgotPasswordButton(
-              onTap: () => _showChangePasswordDialog(context, _userProfileController),
+            // Forgot Password Button
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: _ForgotPasswordButton(
+                onTap: () => _showChangePasswordDialog(context, _userProfileController),
+              ),
             ),
-          ),
 
-          SizedBox(height: 10,),
-          // Logout Button
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: _LogoutButton(
-              onTap: () {
-                if (authRegistered) {
-                  auth!.logout();
-                } else {
-                  Get.offAllNamed('/login');
-                }
-              },
+            const SizedBox(height: 10),
+            // Logout Button
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: _LogoutButton(
+                onTap: () {
+                  if (authRegistered) {
+                    auth!.logout();
+                  } else {
+                    Get.offAllNamed('/login');
+                  }
+                },
+              ),
             ),
-          ),
 
-          const SizedBox(height: 30),
-        ],
-      ),
-    );
+            const SizedBox(height: 30),
+          ],
+        ),
+      );
+    });
   }
 
 

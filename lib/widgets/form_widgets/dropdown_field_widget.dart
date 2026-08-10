@@ -48,6 +48,10 @@ class _DropdownFieldWidgetState extends State<DropdownFieldWidget> {
   Widget build(BuildContext context) {
     final Color currentBorderColor = _getBorderColor();
 
+    final bool hasValueInItems = widget.items != null &&
+        widget.items!.any((item) => item['id']?.toString() == widget.value?.toString());
+    final String? safeValue = hasValueInItems ? widget.value : null;
+
     return DropdownButtonFormField<String>(
       isExpanded: true,
       validator: widget.validator,
@@ -56,11 +60,11 @@ class _DropdownFieldWidgetState extends State<DropdownFieldWidget> {
       // --- ALWAYS provide items list ---
       items: widget.items?.map<DropdownMenuItem<String>>((valueMap) {
         return DropdownMenuItem<String>(
-          value: valueMap['id'],
+          value: valueMap['id']?.toString(),
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxHeight: 50),
             child: AppTextWidget.medium(
-                valueMap['name'],
+                valueMap['name']?.toString() ?? '',
                 maxLines: 2,
                 color: !widget.enabled ? AppThemeColors.disableLabelColor : AppThemeColors.textPrimaryColor
             ),
@@ -69,10 +73,10 @@ class _DropdownFieldWidgetState extends State<DropdownFieldWidget> {
       }).toList(), // No longer conditional based on widget.enabled
       // --- END of items change ---
 
-      dropdownColor: AppThemeColors.dropDownBackgroundColor,
-      value: widget.value,
+      dropdownColor: AppThemeColors.popupBackgroundColor,
+      value: safeValue,
       elevation: 16,
-      style: AppStyles.medium,
+      style: AppStyles.medium.copyWith(color: AppThemeColors.textPrimaryColor),
       decoration: InputDecoration(
         prefix: widget.prefix,
         labelStyle: !widget.enabled ? TextStyle(color: Colors.grey, fontSize: 14) : AppStyles.medium,
