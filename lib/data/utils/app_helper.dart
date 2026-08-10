@@ -40,7 +40,7 @@ class AppHelper {
         return User.fromJson(map);
       }
     } catch (_) {}
-    return User();
+    return User.empty();
   }
 
   static String formatUserName(User user) {

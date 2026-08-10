@@ -48,6 +48,8 @@ class User {
     this.employeeId,
   });
 
+  factory User.empty() => User.fromJson({});
+
   /// Factory method to create a [User] object from a JSON map.
   factory User.fromJson(Map<String, dynamic> json) {
 
