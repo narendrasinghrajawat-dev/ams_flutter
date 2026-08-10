@@ -181,26 +181,30 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       }
 
       final currentDevice = await DeviceService.getDeviceInformation();
-      final storedDevice = _storageService.readMap(AppStrings.deviceInformation);
+      var storedDevice = _storageService.readMap(AppStrings.deviceInformation);
 
-      if (storedDevice == null || !_isSameDevice(currentDevice, storedDevice)) {
-        UIHelper.showSnackbar("Device Mismatch", 'Attendance allowed only from login device',type: SnackbarType.error);
+      if (storedDevice == null) {
+        _storageService.saveMap(AppStrings.deviceInformation, currentDevice);
+        storedDevice = currentDevice;
+      } else if (!_isSameDevice(currentDevice, storedDevice)) {
+        UIHelper.showSnackbar("Device Mismatch", 'Attendance allowed only from login device', type: SnackbarType.error);
         return null;
       }
 
       final now = DateTime.now();
 
       return AttendanceActivity.fromJson({
-        "userKey": AppHelper.getProfileUser().key,
+        "userKey": AppHelper.getProfileUser().key ?? AppHelper.getProfileUser().id,
         "punchType": punchType,
         "punchTime": now.toIso8601String(),
         "punchDate": now.toIso8601String(),
-        "lat": locRes.position!.latitude.toString(),
-        "long": locRes.position!.longitude.toString(),
+        "lat": locRes.position?.latitude.toString() ?? "0.0",
+        "long": locRes.position?.longitude.toString() ?? "0.0",
         "deviceInformation": currentDevice,
         "isWFH" : _activityCtrl.isWorkFromHome.value,
       });
-    } catch (_) {
+    } catch (e) {
+      print('Punch activity build error: $e');
       return null;
     }
   }
@@ -209,19 +213,15 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       Map<String, dynamic> current,
       Map<String, dynamic> stored,
       ) {
-    const keys = [
-      'os',
-      'version',
-      'sdkInt',
-      'model',
-      'brand',
-      'androidId',
-      'fingerprint',
-      'uniqueId',
-    ];
-    return keys.every(
-          (k) => current[k]?.toString() == stored[k]?.toString(),
-    );
+    if (kIsWeb) {
+      return current['os']?.toString() == stored['os']?.toString();
+    }
+    final currentId = current['androidId'] ?? current['uniqueId'];
+    final storedId = stored['androidId'] ?? stored['uniqueId'];
+    if (currentId != null && storedId != null && currentId.toString().isNotEmpty) {
+      return currentId.toString() == storedId.toString();
+    }
+    return true;
   }
 
   // ===========================================================
@@ -234,41 +234,47 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     if (UserHomeHelper.todayCheckIn(activities) != null) return;
 
     setState(() => _busy = true);
-    LoadingController().start();
+    final loading = Get.isRegistered<LoadingController>() ? Get.find<LoadingController>() : null;
+    loading?.start();
 
-    if(_activityCtrl.isWorkFromHome.value == true){
+    if (_activityCtrl.isWorkFromHome.value == true) {
       _activityCtrl.totalTakenWFH.value++;
     }
 
-
-    final activity = await _buildPunchActivity("1");
-    LoadingController().hide();
-
-    if (activity != null) {
-      await _activityCtrl.punch(activity);
+    try {
+      final activity = await _buildPunchActivity("1");
+      if (activity != null) {
+        await _activityCtrl.punch(activity);
+      }
+    } catch (e) {
+      print('CheckIn error: $e');
+    } finally {
+      loading?.hide();
+      if (mounted) setState(() => _busy = false);
     }
-
-    setState(() => _busy = false);
   }
 
   Future<void> _onCheckOut() async {
     if (_busy) return;
 
     final activities = _activityCtrl.activitiesByDate;
-    if (UserHomeHelper.todayCheckIn(activities) == null) return;
     if (UserHomeHelper.todayCheckOut(activities) != null) return;
 
     setState(() => _busy = true);
-    LoadingController().start();
+    final loading = Get.isRegistered<LoadingController>() ? Get.find<LoadingController>() : null;
+    loading?.start();
 
-    final activity = await _buildPunchActivity("2");
-    LoadingController().hide();
-
-    if (activity != null) {
-      await _activityCtrl.punch(activity);
+    try {
+      final activity = await _buildPunchActivity("2");
+      if (activity != null) {
+        await _activityCtrl.punch(activity);
+      }
+    } catch (e) {
+      print('CheckOut error: $e');
+    } finally {
+      loading?.hide();
+      if (mounted) setState(() => _busy = false);
     }
-
-    setState(() => _busy = false);
   }
 
   // ===========================================================

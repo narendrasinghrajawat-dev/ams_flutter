@@ -33,8 +33,14 @@ class AppHelper {
     return false;
   }
 
-  static User getProfileUser(){
-    return User.fromJson(storageService.readMap(AppStrings.profileJson)!);
+  static User getProfileUser() {
+    try {
+      final map = storageService.readMap(AppStrings.profileJson);
+      if (map != null && map.isNotEmpty) {
+        return User.fromJson(map);
+      }
+    } catch (_) {}
+    return User();
   }
 
   static String formatUserName(User user) {

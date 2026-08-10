@@ -199,14 +199,16 @@ class _UserFormState extends State<UserForm> {
       successMessage = 'User updated successfully';
     }
 
-    // FIX 2: Check the 'result' variable instead of the out-of-scope 'created' variable.
     if (result != null) {
-      Get.back(); // close sheet
+      if (mounted) {
+        Navigator.of(context, rootNavigator: true).pop();
+      } else {
+        Get.back(closeOverlays: true);
+      }
       UIHelper.showSnackbar("Success", successMessage);
     } else {
-      // Determine the action that failed for a clearer error message
       final action = widget.initialData == null ? 'create' : 'update';
-      UIHelper.showSnackbar("Error", 'Failed to $action user',type: SnackbarType.error);
+      UIHelper.showSnackbar("Error", 'Failed to $action user', type: SnackbarType.error);
     }
   }
   String? _validateName(String? v) {

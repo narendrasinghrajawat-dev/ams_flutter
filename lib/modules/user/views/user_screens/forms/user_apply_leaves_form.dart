@@ -368,10 +368,15 @@ class _UserApplyLeavesFormState extends State<UserApplyLeavesForm> {
     final ok = await _userLeavesController.applyLeave(req);
 
     if (ok) {
-      Get.back();
-      UIHelper.showSnackbar("Success", widget.editForm == null ? 'Leave applied successfully' : 'Leave updated successfully',);
+      if (mounted) {
+        Navigator.of(context, rootNavigator: true).pop();
+      } else {
+        Get.back(closeOverlays: true);
+      }
+      _userLeavesController.refreshLeaves();
+      UIHelper.showSnackbar("Success", widget.editForm == null ? 'Leave applied successfully' : 'Leave updated successfully');
     } else {
-      UIHelper.showSnackbar("Error", "Failed to submit leave. Try again.",type: SnackbarType.error);
+      UIHelper.showSnackbar("Error", "Failed to submit leave. Try again.", type: SnackbarType.error);
     }
   }
 

@@ -17,10 +17,11 @@ class ThemeService {
   ThemeData get lightTheme => ThemeData(
     brightness: Brightness.light,
     textTheme: GoogleFonts.openSansTextTheme(ThemeData.light().textTheme),
-    primaryColor: AppThemeColors.primaryLightProdColor,
-    scaffoldBackgroundColor: Colors.white,
+    primaryColor: AppThemeColors.primaryColor,
+    scaffoldBackgroundColor: const Color(0xFFF8FAFC),
+    cardColor: Colors.white,
     appBarTheme: AppBarTheme(
-      backgroundColor: AppThemeColors.primaryLightColor,
+      backgroundColor: AppThemeColors.primaryColor,
       elevation: 0,
       iconTheme: const IconThemeData(color: Colors.white),
       titleTextStyle: GoogleFonts.openSans(
@@ -34,10 +35,11 @@ class ThemeService {
   ThemeData get darkTheme => ThemeData(
     brightness: Brightness.dark,
     textTheme: GoogleFonts.openSansTextTheme(ThemeData.dark().textTheme),
-    primaryColor: AppThemeColors.primaryDarkProdColor,
-    scaffoldBackgroundColor: Colors.black,
+    primaryColor: AppThemeColors.primaryColor,
+    scaffoldBackgroundColor: const Color(0xFF0F172A),
+    cardColor: const Color(0xFF1E293B),
     appBarTheme: AppBarTheme(
-      backgroundColor: AppThemeColors.primaryDarkColor,
+      backgroundColor: const Color(0xFF1E293B),
       elevation: 0,
       iconTheme: const IconThemeData(color: Colors.white),
       titleTextStyle: GoogleFonts.openSans(
