@@ -1,4 +1,5 @@
 
+import 'package:attedance_management_system/core/constants/app_theme_colors.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../../widgets/card/common_card.dart';
@@ -15,25 +16,28 @@ class StatCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  CommonCardWidget(
-        color: color.withOpacity(0.05),
-        child: Row(
-          children: [
-            CircleAvatar(
-              backgroundColor: color.withOpacity(0.2),
-              child: Icon(icon, color: color),
-            ),
-            const SizedBox(width: 12),
-            Column(
+    return CommonCardWidget(
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 20,
+            backgroundColor: color.withOpacity(0.12),
+            child: Icon(icon, color: color, size: 20),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                AppTextWidget.verySmall(title),
-                AppTextWidget.large(value),
+                AppTextWidget.verySmall(title, color: AppThemeColors.textSecondaryColor),
+                const SizedBox(height: 2),
+                AppTextWidget.large(value, color: AppThemeColors.textPrimaryColor),
               ],
             ),
-          ],
-        ),
+          ),
+        ],
+      ),
     );
   }
 }

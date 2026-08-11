@@ -1,3 +1,4 @@
+import 'package:attedance_management_system/core/constants/app_theme_colors.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -26,26 +27,26 @@ class AdminStatsGrid extends StatelessWidget {
           StatCardWidget(
             "Total Employees",
             c.totalEmployees.toString(),
-            Icons.people,
-            Colors.blue,
+            Icons.people_alt_rounded,
+            AppThemeColors.primaryColor,
           ),
           StatCardWidget(
             "Present",
             c.presentToday.toString(),
-            Icons.check_circle,
-            Colors.green,
+            Icons.check_circle_rounded,
+            AppThemeColors.successColor,
           ),
           StatCardWidget(
             "On Leave",
             c.onLeaveToday.toString(),
-            Icons.beach_access,
-            Colors.orange,
+            Icons.beach_access_rounded,
+            AppThemeColors.warningColor,
           ),
           StatCardWidget(
             "Late Arrivals",
             c.lateArrivalsToday.toString(),
-            Icons.schedule,
-            Colors.red,
+            Icons.schedule_rounded,
+            AppThemeColors.errorColor,
           ),
         ],
       );

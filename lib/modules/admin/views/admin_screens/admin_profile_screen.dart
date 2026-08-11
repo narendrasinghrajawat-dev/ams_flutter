@@ -62,26 +62,26 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
                     children: [
                       _InfoRow(
                         icon: Icons.person,
-                        iconColor: Colors.blue.shade600,
+                        iconColor: AppThemeColors.primaryColor,
                         label: 'Name',
                         value:
                         "${user.firstName ?? ""} ${user.middleName ?? ""} ${user.lastName ?? ""}",
                       ),
                       _InfoRow(
                         icon: Icons.email_rounded,
-                        iconColor: Colors.orange.shade600,
+                        iconColor: AppThemeColors.primaryColor,
                         label: 'Email',
                         value: user.email ?? 'michael@example.com',
                       ),
                       _InfoRow(
                         icon: Icons.phone_rounded,
-                        iconColor: Colors.green.shade600,
+                        iconColor: AppThemeColors.primaryColor,
                         label: 'Phone',
                         value: user.phoneNo ?? '+91 98765 43210',
                       ),
                       _InfoRow(
                         icon: Icons.location_on_rounded,
-                        iconColor: Colors.red.shade600,
+                        iconColor: AppThemeColors.primaryColor,
                         label: 'Address',
                         value: user.address ?? "",
                       ),
@@ -101,21 +101,21 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
                 const SizedBox(height: 12),
                 _SettingsTile(
                   icon: Icons.description_rounded,
-                  iconColor: Colors.indigo.shade400,
+                  iconColor: AppThemeColors.primaryColor,
                   title: 'Terms & Conditions',
                   onTap: () => Get.toNamed('/terms'),
                 ),
                 const SizedBox(height: 10),
                 _SettingsTile(
                   icon: Icons.privacy_tip_rounded,
-                  iconColor: Colors.teal.shade400,
+                  iconColor: AppThemeColors.primaryColor,
                   title: 'Privacy Policy',
                   onTap: () => Get.toNamed('/privacy'),
                 ),
                 const SizedBox(height: 10),
                 _SettingsTile(
                   icon: Icons.notifications_rounded,
-                  iconColor: Colors.amber.shade600,
+                  iconColor: AppThemeColors.primaryColor,
                   title: 'Notifications',
                   onTap: () => Get.toNamed('/notifications'),
                 ),
@@ -378,14 +378,14 @@ class _ForgotPasswordButton extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
-                  Icons.password,
-                  color: Colors.orange.shade600,
+                  Icons.lock_reset_rounded,
+                  color: AppThemeColors.primaryColor,
                   size: 22,
                 ),
                 const SizedBox(width: 10),
                 AppTextWidget.large(
                   'Forgot Password',
-                  color: Colors.orange.shade600,
+                  color: AppThemeColors.primaryColor,
                 ),
               ],
             ),

@@ -108,7 +108,6 @@ class _ActivityItem extends StatelessWidget {
     }
 
     return CommonCardWidget(
-      color: color.withOpacity(0.06),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

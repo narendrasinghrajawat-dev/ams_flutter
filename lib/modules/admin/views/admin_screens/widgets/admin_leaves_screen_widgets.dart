@@ -50,13 +50,12 @@ class LeaveRequestListItem extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.1),
+                  color: AppThemeColors.primaryColor.withOpacity(0.12),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: AppTextWidget.small(
                   AppHelper.getLeaveType(leaveRequest.leaveType) ?? "",
-                  // leaveRequest.leaveType.capitalizeFirst ?? leaveRequest.leaveType,
-                  color: statusColor,
+                  color: AppThemeColors.primaryColor,
                 ),
               ),
             ],
