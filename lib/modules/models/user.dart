@@ -57,9 +57,9 @@ class User {
 
     return User(
       // Database fields (using original JSON keys for mapping)
-      key: json['_key'] ?? "",
-      rev: json['_rev'] ?? "",
-      id: json['id'] ?? "",
+      key: (json['_key'] ?? json['key'] ?? json['_id'] ?? json['id'] ?? "").toString(),
+      rev: (json['_rev'] ?? json['rev'] ?? "").toString(),
+      id: (json['id'] ?? json['_id'] ?? json['_key'] ?? json['key'] ?? "").toString(),
 
       firstName: json['firstName'] ?? "",
       middleName: json['middleName'] ?? "",

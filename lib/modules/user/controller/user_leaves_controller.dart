@@ -2,8 +2,12 @@ import 'package:attedance_management_system/core/constants/app_theme_colors.dart
 import 'package:attedance_management_system/data/utils/app_helper.dart';
 import 'package:attedance_management_system/modules/models/leave_balance.dart';
 import 'package:attedance_management_system/widgets/common/ui_helper_widgets.dart';
-import 'package:flutter/painting.dart';
+import 'package:flutter/material.dart';
+import 'package:attedance_management_system/widgets/text_and_icon_widgets/app_text_type.dart';
 import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_rx/src/rx_types/rx_types.dart';
+import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 
 import '../../common/controller/loading_controller.dart';
 import '../../models/apply_leave_request.dart';
@@ -104,15 +108,27 @@ class UserLeavesController extends GetxController {
 
   Future<void> onCancelLeave(ApplyLeaveRequest leave) async {
 
-    final confirm = await Get.defaultDialog<bool>(
-      contentPadding: EdgeInsets.all(10),
-      backgroundColor: AppThemeColors.whiteColor,
-      title: 'Cancel Leave',
-      middleText: 'Do you really want to cancel this leave request?',
-      textConfirm: 'Yes',
-      textCancel: 'No',
-      onConfirm: () => Get.back(result: true),
-      onCancel: () => Get.back(result: false),
+    final confirm = await Get.dialog<bool>(
+      AlertDialog(
+        backgroundColor: AppThemeColors.cardBackgroundColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: AppTextWidget.large('Cancel Leave'),
+        content: AppTextWidget.medium('Do you really want to cancel this leave request?'),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(result: false),
+            child: AppTextWidget.medium('No', color: AppThemeColors.textSecondaryColor),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppThemeColors.errorColor,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            onPressed: () => Get.back(result: true),
+            child: AppTextWidget.medium('Yes', color: Colors.white),
+          ),
+        ],
+      ),
     );
 
     if (confirm != true) return;

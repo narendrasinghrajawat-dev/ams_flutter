@@ -135,17 +135,18 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       final locRes = await LocationService.instance.getCurrentLocation();
 
       if (!locRes.ok || locRes.position == null) {
-        Get.snackbar(
-          'Location',
-          locRes.message ?? 'Unable to get location',
-          backgroundColor: AppThemeColors.errorColor.withOpacity(0.1),
+        UIHelper.showSnackbar(
+          'Location Required',
+          locRes.message ?? 'Unable to get location. Enable GPS or turn on WFH toggle.',
+          type: SnackbarType.warning,
+          duration: const Duration(seconds: 5),
         );
         return null;
       }
 
-      final masterData = _commonController.masterData.value;
+      final masterData = _commonController.masterData.value ?? _commonController.getMasterData.value;
       if (masterData == null) {
-        UIHelper.showSnackbar("Master Data Error", 'Master data is not loaded. Try restarting the app.', type: SnackbarType.error);
+        UIHelper.showSnackbar("Master Data Error", 'Master data is loading. Please try again in a moment.', type: SnackbarType.error);
         return null;
       }
 
@@ -154,10 +155,9 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       final officeRadius = masterData.officeRadius?.toDouble() ?? 100;
 
       if (officeLat == null || officeLng == null) {
-        UIHelper.showSnackbar("Master Data Error", 'Office location coordinates are invalid or unconfigured.', type: SnackbarType.error);
+        UIHelper.showSnackbar("Configuration Error", 'Office location coordinates are not configured in Master Data.', type: SnackbarType.error);
         return null;
       }
-
 
       final isWFH = _activityCtrl.isWorkFromHome.value;
 
@@ -172,9 +172,10 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
         if (!isInside) {
           UIHelper.showSnackbar(
-            "Outside Office",
-            'You must be inside office radius',
-            type: SnackbarType.error,
+            "Outside Office Radius",
+            'You are outside the office radius (100m). Please switch on the "WFH" toggle at the top to punch in from home.',
+            type: SnackbarType.warning,
+            duration: const Duration(seconds: 6),
           );
           return null;
         }
@@ -187,14 +188,24 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         _storageService.saveMap(AppStrings.deviceInformation, currentDevice);
         storedDevice = currentDevice;
       } else if (!_isSameDevice(currentDevice, storedDevice)) {
-        UIHelper.showSnackbar("Device Mismatch", 'Attendance allowed only from login device', type: SnackbarType.error);
+        UIHelper.showSnackbar("Device Mismatch", 'Attendance allowed only from your login device', type: SnackbarType.error);
+        return null;
+      }
+
+      final user = AppHelper.getProfileUser();
+      final userKey = (user.key != null && user.key!.isNotEmpty)
+          ? user.key!
+          : (user.id != null && user.id!.isNotEmpty ? user.id! : "");
+
+      if (userKey.isEmpty) {
+        UIHelper.showSnackbar("Session Expired", 'Please log in again to record attendance.', type: SnackbarType.error);
         return null;
       }
 
       final now = DateTime.now();
 
       return AttendanceActivity.fromJson({
-        "userKey": AppHelper.getProfileUser().key ?? AppHelper.getProfileUser().id,
+        "userKey": userKey,
         "punchType": punchType,
         "punchTime": now.toIso8601String(),
         "punchDate": now.toIso8601String(),
@@ -205,6 +216,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       });
     } catch (e) {
       print('Punch activity build error: $e');
+      UIHelper.showSnackbar("Error", 'Failed to initialize punch activity: $e', type: SnackbarType.error);
       return null;
     }
   }
@@ -380,7 +392,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                       _actionBtn(
                         'check_in',
                         Icons.login_rounded,
-                        AppThemeColors.successColor,
+                        AppThemeColors.primaryColor,
                         _onCheckIn,
                       )
                     else if (canCheckOut)
