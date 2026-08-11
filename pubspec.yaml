@@ -79,7 +79,6 @@ flutter:
     - env/.env.dev
     - env/.env.test
     - env/.env.prod
-    - assets/
     - assets/app_icons/
     - assets/icon/
 
