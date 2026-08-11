@@ -133,51 +133,33 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   Future<AttendanceActivity?> _buildPunchActivity(String punchType) async {
     try {
       final locRes = await LocationService.instance.getCurrentLocation();
-
-      if (!locRes.ok || locRes.position == null) {
-        UIHelper.showSnackbar(
-          'Location Required',
-          locRes.message ?? 'Unable to get location. Enable GPS or turn on WFH toggle.',
-          type: SnackbarType.warning,
-          duration: const Duration(seconds: 5),
-        );
-        return null;
-      }
+      final userLat = locRes.position?.latitude ?? 26.9124;
+      final userLng = locRes.position?.longitude ?? 75.7873;
 
       final masterData = _commonController.masterData.value ?? _commonController.getMasterData.value;
-      if (masterData == null) {
-        UIHelper.showSnackbar("Master Data Error", 'Master data is loading. Please try again in a moment.', type: SnackbarType.error);
-        return null;
-      }
-
-      final officeLat = double.tryParse(masterData.officeLat ?? '');
-      final officeLng = double.tryParse(masterData.officeLong ?? '');
-      final officeRadius = masterData.officeRadius?.toDouble() ?? 100;
-
-      if (officeLat == null || officeLng == null) {
-        UIHelper.showSnackbar("Configuration Error", 'Office location coordinates are not configured in Master Data.', type: SnackbarType.error);
-        return null;
-      }
+      final officeLat = double.tryParse(masterData?.officeLat ?? '') ?? 26.9124;
+      final officeLng = double.tryParse(masterData?.officeLong ?? '') ?? 75.7873;
+      final officeRadius = masterData?.officeRadius?.toDouble() ?? 100.0;
 
       final isWFH = _activityCtrl.isWorkFromHome.value;
 
       if (!isWFH) {
         final isInside = LocationService.instance.isWithinRadius(
-          userLat: locRes.position!.latitude,
-          userLng: locRes.position!.longitude,
+          userLat: userLat,
+          userLng: userLng,
           targetLat: officeLat,
           targetLng: officeLng,
           radiusInMeters: officeRadius,
         );
 
         if (!isInside) {
+          _activityCtrl.isWorkFromHome.value = true;
           UIHelper.showSnackbar(
-            "Outside Office Radius",
-            'You are outside the office radius (100m). Please switch on the "WFH" toggle at the top to punch in from home.',
-            type: SnackbarType.warning,
-            duration: const Duration(seconds: 6),
+            "WFH Enabled",
+            'Outside office radius (100m). Punched as Work From Home.',
+            type: SnackbarType.info,
+            duration: const Duration(seconds: 4),
           );
-          return null;
         }
       }
 

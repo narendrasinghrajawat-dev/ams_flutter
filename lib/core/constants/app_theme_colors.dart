@@ -39,29 +39,41 @@ class AppThemeColors {
 
 
   static const Color primaryProdColor = Color(0xFF009688);
-  static const Color primaryTestColor = Color(0xFF009688);
-  static const Color primaryDevColor = Color(0xFF009688);
+  static const Color primaryTestColor = Color(0xFF7E57C2);
+  static const Color primaryDevColor = Color(0xFF42A5F5);
 
 
   static const Color primaryLightProdColor = Color(0xFF009688);
-  static const Color primaryLightTestColor = Color(0xFF009688);
-  static const Color primaryLightDevColor = Color(0xFF009688);
+  static const Color primaryLightTestColor = Color(0xFF7E57C2);
+  static const Color primaryLightDevColor = Color(0xFF42A5F5);
 
 
 
   static const Color primaryDarkProdColor = Color(0xFF002171);
-  static const Color primaryDarkTestColor = Color(0xFF002171);
-  static const Color primaryDarkDevColor = Color(0xFF002171);
+  static const Color primaryDarkTestColor = Color(0xFF0B3A87);
+  static const Color primaryDarkDevColor = Color(0xFF141414);
 
   // ============================================================
   // ENVIRONMENT-BASED PRIMARY COLORS
   // ============================================================
 
-  static Color get primaryColor => primaryProdColor;
+  static Color get primaryColor {
+    if (EnvConfig.isProd) return primaryProdColor;
+    if (EnvConfig.isTest) return primaryTestColor;
+    return primaryDevColor;
+  }
 
-  static Color get primaryDarkColor => primaryDarkProdColor;
+  static Color get primaryDarkColor {
+    if (EnvConfig.isProd) return primaryDarkProdColor;
+    if (EnvConfig.isTest) return primaryDarkTestColor;
+    return primaryDarkDevColor;
+  }
 
-  static Color get primaryLightColor => primaryLightProdColor;
+  static Color get primaryLightColor {
+    if (EnvConfig.isProd) return primaryLightProdColor;
+    if (EnvConfig.isTest) return primaryLightTestColor;
+    return primaryLightDevColor;
+  }
 
 
 
