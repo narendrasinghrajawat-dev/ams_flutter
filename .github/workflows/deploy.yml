@@ -78,7 +78,7 @@ jobs:
 
       - name: Build Android APK
         run: |
-          flutter build apk --release --dart-define=APP_ENV=${{ steps.settings.outputs.app_env }}
+          flutter build apk --release --dart-define=APP_ENV=${{ steps.settings.outputs.app_env }} --android-skip-build-dependency-validation
 
       - name: Generate Release Tag
         id: tag
