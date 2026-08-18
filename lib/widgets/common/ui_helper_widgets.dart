@@ -44,21 +44,26 @@ class UIHelper {
         break;
     }
 
-    // Call the Get.snackbar method
-    Get.snackbar(
-      title,
-      message,
-      titleText: AppTextWidget.large(title, color: AppThemeColors.whiteColor,),
-      messageText: AppTextWidget.medium(message, color: AppThemeColors.whiteColor,),
-      icon: Icon(icon, color: Colors.white, size: 28),
-      snackPosition: snackPos, // Use a consistent position
-      backgroundColor: backgroundColor,
-      colorText: Colors.white,
-      margin: const EdgeInsets.all(10),
-      borderRadius: 8.0,
-      duration: duration,
-      isDismissible: true,
-      forwardAnimationCurve: Curves.easeOut,
+    Get.closeCurrentSnackbar();
+
+    Get.showSnackbar(
+      GetSnackBar(
+        titleText: Text(
+          title.tr,
+          style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        messageText: Text(
+          message.tr,
+          style: const TextStyle(color: Colors.white, fontSize: 14),
+        ),
+        icon: Icon(icon, color: Colors.white, size: 28),
+        snackPosition: snackPos,
+        backgroundColor: backgroundColor,
+        margin: const EdgeInsets.all(10),
+        borderRadius: 8.0,
+        duration: duration,
+        isDismissible: true,
+      ),
     );
   }
 
