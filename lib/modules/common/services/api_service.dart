@@ -184,25 +184,35 @@ class ApiService {
 
     switch (status) {
       case 400:
-        throw Exception(body?['message'] ?? 'Bad Request');
+        throw ApiException(400, body?['message'] ?? 'Bad Request');
 
       case 401:
-        throw Exception('Unauthorized');
+        throw ApiException(401, body?['message'] ?? 'Unauthorized');
 
       case 403:
-        throw Exception('Forbidden');
+        throw ApiException(403, body?['message'] ?? 'Forbidden');
 
       case 404:
-        throw Exception('Not Found');
+        throw ApiException(404, body?['message'] ?? 'Not Found');
 
       case 500:
-        throw Exception('Server Error');
+        throw ApiException(500, body?['message'] ?? 'Server Error');
 
       default:
-        throw Exception(
-          'Error $status: ${response.body}',
+        throw ApiException(
+          status,
+          body?['message'] ?? 'Error $status: ${response.body}',
         );
     }
   }
+}
 
+class ApiException implements Exception {
+  final int statusCode;
+  final String message;
+
+  ApiException(this.statusCode, this.message);
+
+  @override
+  String toString() => message;
 }

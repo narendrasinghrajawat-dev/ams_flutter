@@ -153,13 +153,13 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         );
 
         if (!isInside) {
-          _activityCtrl.isWorkFromHome.value = true;
           UIHelper.showSnackbar(
-            "WFH Enabled",
-            'Outside office radius (100m). Punched as Work From Home.',
-            type: SnackbarType.info,
-            duration: const Duration(seconds: 4),
+            "Outside Office Radius",
+            'You are outside the office radius (100m). Please enable the "WFH" toggle at the top to punch in.',
+            type: SnackbarType.warning,
+            duration: const Duration(seconds: 5),
           );
+          return null;
         }
       }
 

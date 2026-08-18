@@ -6,6 +6,7 @@ import '../../common/controller/loading_controller.dart';
 import '../../models/attendance_activity.dart';
 import '../services/user_activity_service.dart';
 import '../services/user_home_service.dart';
+import '../../common/services/api_service.dart';
 
 class UserActivityController extends GetxController {
   final UserActivityService _service = UserActivityService();
@@ -142,7 +143,22 @@ class UserActivityController extends GetxController {
         return false;
       }
     } catch (e) {
-      Get.snackbar('Error', e.toString(), snackPosition: SnackPosition.BOTTOM);
+      if (e is ApiException) {
+        // Already handled and shown by ApiService._handleResponse
+        print('Punch API error (handled by ApiService): $e');
+      } else {
+        // Network offline, timeout or local error
+        String errMsg = e.toString();
+        if (errMsg.startsWith('Exception: ')) {
+          errMsg = errMsg.substring('Exception: '.length);
+        }
+        UIHelper.showSnackbar(
+          'Error',
+          errMsg,
+          type: SnackbarType.error,
+          duration: const Duration(seconds: 7),
+        );
+      }
       return false;
     } finally {
       _loadingController.hide();
