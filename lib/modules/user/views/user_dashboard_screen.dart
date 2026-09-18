@@ -15,6 +15,7 @@ import 'package:attedance_management_system/modules/user/views/user_screens/user
 // Controllers
 
 import '../../models/user.dart';
+import '../../common/controller/loading_controller.dart';
 import '../controller/user_activity_controller.dart';
 import '../controller/user_home_controller.dart';
 import '../controller/user_leaves_controller.dart';

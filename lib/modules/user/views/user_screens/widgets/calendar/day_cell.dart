@@ -67,15 +67,15 @@ class DayCellWidget extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    calendarDay!.punch!.punchIn,
+                    calendarDay?.punch?.punchIn ?? '',
                     style: const TextStyle(fontSize: 9),
                   ),
                   Text(
-                    calendarDay!.punch!.punchOut,
+                    calendarDay?.punch?.punchOut ?? '',
                     style: const TextStyle(fontSize: 9),
                   ),
                   Text(
-                    calendarDay!.punch!.duration,
+                    calendarDay?.punch?.duration ?? '',
                     style: const TextStyle(
                       fontSize: 9,
                       fontWeight: FontWeight.w600,
