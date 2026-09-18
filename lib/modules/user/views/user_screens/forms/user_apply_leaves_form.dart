@@ -165,7 +165,7 @@ class _UserApplyLeavesFormState extends State<UserApplyLeavesForm> {
 
       _startDateController.text = UserApplyLeaveHelper.formatDateForUi(picked);
 
-      if (_endDateTime != null && _endDateTime!.isBefore(picked)) {
+      if (_endDateTime == null || _endDateTime!.isBefore(picked)) {
         _endDateTime = picked;
         _endDate = picked.toIso8601String();
 

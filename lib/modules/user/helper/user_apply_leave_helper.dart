@@ -12,7 +12,7 @@ class UserApplyLeaveHelper {
         '${d.month.toString().padLeft(2, '0')}/${d.year}';
   }
 
-  /// 🔹 Calculate days BETWEEN start & end
+  /// 🔹 Calculate days BETWEEN start & end (inclusive)
   static num calculateDaysBetween({
     required DateTime start,
     required DateTime end,
@@ -23,10 +23,9 @@ class UserApplyLeaveHelper {
 
     if (isHalfDay) return 0.5;
 
-    final diff = e.difference(s).inDays;
+    final diff = e.difference(s).inDays + 1;
 
-    // Same day full leave = 1 day
-    return diff;
+    return diff > 0 ? diff : 1;
   }
 
 

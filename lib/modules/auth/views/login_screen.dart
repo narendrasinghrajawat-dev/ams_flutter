@@ -221,6 +221,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                             Obx(() => TextFieldWidget(
                               controller: passC,
+                              obscureText: obscure.value,
                               labelText: 'Password',
                               hintText: "••••••••",
                               prefix: const Icon(Icons.lock_outline, size: 20),

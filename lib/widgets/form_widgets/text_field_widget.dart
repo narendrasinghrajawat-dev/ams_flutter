@@ -17,6 +17,7 @@ class TextFieldWidget extends StatefulWidget {
     this.onChanged,
     this.enabled = true,
     this.prefix,
+    this.obscureText = false,
   });
 
   final String? labelText;
@@ -31,6 +32,7 @@ class TextFieldWidget extends StatefulWidget {
   final ValueChanged<String>? onChanged;
   final bool enabled;
   final Widget? prefix;
+  final bool obscureText;
 
   @override
   State<TextFieldWidget> createState() => _TextFieldWidgetState();
@@ -52,6 +54,7 @@ class _TextFieldWidgetState extends State<TextFieldWidget> {
           }
         },
         enabled: widget.enabled,
+        obscureText: widget.obscureText,
         autovalidateMode: AutovalidateMode.onUserInteraction,
         controller: widget.controller,
         style: !widget.enabled
