@@ -20,6 +20,8 @@ import '../../controller/user_leaves_controller.dart';
 import '../../../models/apply_leave_request.dart';
 import 'forms/user_apply_leaves_form.dart';
 
+import '../../../common/controller/settings_controller.dart';
+
 class UserLeavesScreen extends StatefulWidget {
   const UserLeavesScreen({Key? key}) : super(key: key);
 
@@ -32,22 +34,25 @@ class _UserLeavesScreenState extends State<UserLeavesScreen> {
   int _activeTab = 0;
 
   final UserLeavesController _controller = Get.find<UserLeavesController>();
+  final SettingsController _settings = Get.find<SettingsController>();
 
   @override
   Widget build(BuildContext context) {
+    return Obx(() {
+      final isDark = _settings.isDark.value;
 
-    return Stack(
-      children: [
-        SafeArea(
-          child: Padding(
-            padding:
-            const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
-            child: Column(
-              children: [
-                UIHelpers.responsive(
-                  context: context,
-                  children: [
-                    _buildBalancesList(),
+      return Stack(
+        children: [
+          SafeArea(
+            child: Padding(
+              padding:
+              const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+              child: Column(
+                children: [
+                  UIHelpers.responsive(
+                    context: context,
+                    children: [
+                      _buildBalancesList(),
                     Obx(() {
                       final all = _controller.filteredAppliedLeavesList;
 
@@ -124,8 +129,9 @@ class _UserLeavesScreenState extends State<UserLeavesScreen> {
               ),
             ),
           ),
-      ],
-    );
+        ],
+      );
+    });
   }
 
   // ---------------------------------------------------------------------------

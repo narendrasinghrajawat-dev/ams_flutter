@@ -6,6 +6,7 @@ import '../../../../../widgets/card/common_card.dart';
 import '../../../../../widgets/text_and_icon_widgets/app_text_type.dart';
 import '../../../admin/views/admin_screens/widgets/profile/responsive_info_grid.dart';
 import '../../../auth/controller/auth_controller.dart';
+import '../../../common/controller/settings_controller.dart';
 import '../../controller/user_profile_controller.dart';
 
 class UserProfileScreen extends StatefulWidget {
@@ -17,161 +18,167 @@ class UserProfileScreen extends StatefulWidget {
 
 class _UserProfileScreenState extends State<UserProfileScreen> {
   final UserProfileController _userProfileController = Get.put(UserProfileController());
+  final SettingsController _settings = Get.find<SettingsController>();
 
   @override
   Widget build(BuildContext context) {
     final authRegistered = Get.isRegistered<AuthController>();
     final auth = authRegistered ? Get.find<AuthController>() : null;
     final user = AppHelper.getProfileUser();
-    final isDark = AppThemeColors.isDark;
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      child: Column(
-        children: [
-          // Profile Avatar Banner
-          Center(
-            child: Container(
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: AppThemeColors.primaryColor, width: 2.5),
-              ),
-              child: CircleAvatar(
-                radius: 46,
-                backgroundColor: AppThemeColors.primaryColor.withOpacity(0.12),
-                child: Text(
-                  (user.firstName.isNotEmpty)
-                      ? user.firstName[0].toUpperCase()
-                      : "U",
-                  style: TextStyle(
-                    fontSize: 36,
-                    fontWeight: FontWeight.bold,
-                    color: AppThemeColors.primaryColor,
+    return Obx(() {
+      // Observe isDark so any theme switch immediately re-renders profile
+      final isDark = _settings.isDark.value;
+
+      return SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        child: Column(
+          children: [
+            // Profile Avatar Banner
+            Center(
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppThemeColors.primaryColor, width: 2.5),
+                ),
+                child: CircleAvatar(
+                  radius: 46,
+                  backgroundColor: AppThemeColors.primaryColor.withOpacity(0.12),
+                  child: Text(
+                    (user.firstName.isNotEmpty)
+                        ? user.firstName[0].toUpperCase()
+                        : "U",
+                    style: TextStyle(
+                      fontSize: 36,
+                      fontWeight: FontWeight.bold,
+                      color: AppThemeColors.primaryColor,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
 
-          const SizedBox(height: 12),
+            const SizedBox(height: 12),
 
-          Text(
-            '${user.firstName} ${user.lastName}',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: AppThemeColors.textPrimaryColor,
+            Text(
+              '${user.firstName} ${user.lastName}',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: AppThemeColors.textPrimaryColor,
+              ),
             ),
-          ),
 
-          const SizedBox(height: 4),
+            const SizedBox(height: 4),
 
-          Text(
-            user.email,
-            style: TextStyle(
-              fontSize: 13,
-              color: AppThemeColors.textSecondaryColor,
+            Text(
+              user.email,
+              style: TextStyle(
+                fontSize: 13,
+                color: AppThemeColors.textSecondaryColor,
+              ),
             ),
-          ),
 
-          const SizedBox(height: 20),
+            const SizedBox(height: 20),
 
-          // Basic Information Section
-          CommonCardWidget(
-            padding: 16,
-            borderRadius: 16,
-            child: ResponsiveInfoGrid(
+            // Basic Information Section
+            CommonCardWidget(
+              padding: 16,
+              borderRadius: 16,
+              child: ResponsiveInfoGrid(
+                children: [
+                  _InfoRow(
+                    icon: Icons.person_outline_rounded,
+                    iconColor: AppThemeColors.primaryColor,
+                    label: 'Name',
+                    value: "${user.firstName} ${user.middleName ?? ''} ${user.lastName}".trim(),
+                  ),
+                  _InfoRow(
+                    icon: Icons.email_outlined,
+                    iconColor: AppThemeColors.secondaryColor,
+                    label: 'Email',
+                    value: user.email.isNotEmpty ? user.email : 'N/A',
+                  ),
+                  _InfoRow(
+                    icon: Icons.phone_outlined,
+                    iconColor: AppThemeColors.successColor,
+                    label: 'Phone',
+                    value: user.phoneNo != null && user.phoneNo!.isNotEmpty ? user.phoneNo! : 'N/A',
+                  ),
+                  _InfoRow(
+                    icon: Icons.location_on_outlined,
+                    iconColor: AppThemeColors.warningColor,
+                    label: 'Address',
+                    value: user.address != null && user.address!.isNotEmpty ? user.address! : "N/A",
+                  ),
+                  _InfoRow(
+                    icon: Icons.badge_outlined,
+                    iconColor: AppThemeColors.primaryColor,
+                    label: 'Employee ID',
+                    value: user.employeeId != null && user.employeeId!.isNotEmpty ? user.employeeId! : "N/A",
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // Settings Section
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _InfoRow(
-                  icon: Icons.person_outline_rounded,
+                _SectionHeader(title: 'Settings'),
+                const SizedBox(height: 10),
+                _SettingsTile(
+                  icon: Icons.description_outlined,
                   iconColor: AppThemeColors.primaryColor,
-                  label: 'Name',
-                  value: "${user.firstName} ${user.middleName ?? ''} ${user.lastName}".trim(),
+                  title: 'Terms & Conditions',
+                  onTap: () => Get.toNamed('/terms'),
                 ),
-                _InfoRow(
-                  icon: Icons.email_outlined,
+                const SizedBox(height: 8),
+                _SettingsTile(
+                  icon: Icons.privacy_tip_outlined,
                   iconColor: AppThemeColors.secondaryColor,
-                  label: 'Email',
-                  value: user.email.isNotEmpty ? user.email : 'N/A',
+                  title: 'Privacy Policy',
+                  onTap: () => Get.toNamed('/privacy'),
                 ),
-                _InfoRow(
-                  icon: Icons.phone_outlined,
-                  iconColor: AppThemeColors.successColor,
-                  label: 'Phone',
-                  value: user.phoneNo != null && user.phoneNo!.isNotEmpty ? user.phoneNo! : 'N/A',
-                ),
-                _InfoRow(
-                  icon: Icons.location_on_outlined,
+                const SizedBox(height: 8),
+                _SettingsTile(
+                  icon: Icons.notifications_outlined,
                   iconColor: AppThemeColors.warningColor,
-                  label: 'Address',
-                  value: user.address != null && user.address!.isNotEmpty ? user.address! : "N/A",
-                ),
-                _InfoRow(
-                  icon: Icons.badge_outlined,
-                  iconColor: AppThemeColors.primaryColor,
-                  label: 'Employee ID',
-                  value: user.employeeId != null && user.employeeId!.isNotEmpty ? user.employeeId! : "N/A",
+                  title: 'Notifications',
+                  onTap: () => Get.toNamed('/notifications'),
                 ),
               ],
             ),
-          ),
 
-          const SizedBox(height: 20),
+            const SizedBox(height: 20),
 
-          // Settings Section
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _SectionHeader(title: 'Settings'),
-              const SizedBox(height: 10),
-              _SettingsTile(
-                icon: Icons.description_outlined,
-                iconColor: AppThemeColors.primaryColor,
-                title: 'Terms & Conditions',
-                onTap: () => Get.toNamed('/terms'),
-              ),
-              const SizedBox(height: 8),
-              _SettingsTile(
-                icon: Icons.privacy_tip_outlined,
-                iconColor: AppThemeColors.secondaryColor,
-                title: 'Privacy Policy',
-                onTap: () => Get.toNamed('/privacy'),
-              ),
-              const SizedBox(height: 8),
-              _SettingsTile(
-                icon: Icons.notifications_outlined,
-                iconColor: AppThemeColors.warningColor,
-                title: 'Notifications',
-                onTap: () => Get.toNamed('/notifications'),
-              ),
-            ],
-          ),
+            // Change Password Button
+            _ForgotPasswordButton(
+              onTap: () => _showChangePasswordDialog(context, _userProfileController),
+            ),
 
-          const SizedBox(height: 20),
+            const SizedBox(height: 10),
 
-          // Change Password Button
-          _ForgotPasswordButton(
-            onTap: () => _showChangePasswordDialog(context, _userProfileController),
-          ),
+            // Logout Button
+            _LogoutButton(
+              onTap: () {
+                if (authRegistered) {
+                  auth!.logout();
+                } else {
+                  Get.offAllNamed('/login');
+                }
+              },
+            ),
 
-          const SizedBox(height: 10),
-
-          // Logout Button
-          _LogoutButton(
-            onTap: () {
-              if (authRegistered) {
-                auth!.logout();
-              } else {
-                Get.offAllNamed('/login');
-              }
-            },
-          ),
-
-          const SizedBox(height: 24),
-        ],
-      ),
-    );
+            const SizedBox(height: 24),
+          ],
+        ),
+      );
+    });
   }
 
   Future<void> _showChangePasswordDialog(BuildContext context, UserProfileController ctrl) async {

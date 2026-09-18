@@ -21,12 +21,16 @@ class CommonContainerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = AppThemeColors.isDark;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final bgColor = color ?? (isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9));
+    final borderColor = isDark ? const Color(0xFF273548) : const Color(0xFFE2E8F0);
+
     return Container(
       padding: EdgeInsets.all(padding),
       decoration: BoxDecoration(
-        color: color ?? AppThemeColors.containerBgColor,
-        border: border ?? Border.all(color: AppThemeColors.borderColor, width: 1),
+        color: bgColor,
+        border: border ?? Border.all(color: borderColor, width: 1),
         borderRadius: BorderRadius.circular(borderRadius),
         boxShadow: isShowBoxShadow
             ? [

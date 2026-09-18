@@ -310,11 +310,36 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     const SizedBox(height: 24),
 
-                    // Version footer
-                    AppTextWidget.verySmall(
-                      'Version ${AppStrings.appVersion}',
-                      color: AppThemeColors.textSecondaryColor,
-                      align: TextAlign.center,
+                    // Version & Environment Badge Footer
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        AppTextWidget.verySmall(
+                          'Version ${AppStrings.appVersion}',
+                          color: AppThemeColors.textSecondaryColor,
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: AppThemeColors.primaryColor.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(
+                              color: AppThemeColors.primaryColor.withOpacity(0.35),
+                              width: 0.8,
+                            ),
+                          ),
+                          child: Text(
+                            EnvConfig.envName,
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              color: AppThemeColors.primaryColor,
+                              letterSpacing: 0.8,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

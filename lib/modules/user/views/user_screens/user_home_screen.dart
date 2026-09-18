@@ -13,6 +13,7 @@ import '../../../../widgets/text_and_icon_widgets/app_text_type.dart';
 
 import '../../../common/controller/common_controller.dart';
 import '../../../common/controller/loading_controller.dart';
+import '../../../common/controller/settings_controller.dart';
 import '../../../common/services/device_information_service.dart';
 import '../../../common/services/location_service.dart';
 import '../../../common/services/storage_service.dart';
@@ -38,6 +39,7 @@ class UserHomeScreen extends StatefulWidget {
 class _UserHomeScreenState extends State<UserHomeScreen> {
   final CommonController _commonController = Get.find();
   final UserActivityController _activityCtrl = Get.find();
+  final SettingsController _settings = Get.find();
   final StorageService _storageService = StorageService();
 
   Timer? _timer;
@@ -276,6 +278,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
+      final isDark = _settings.isDark.value;
       final activities = _activityCtrl.activitiesByDate;
 
       final checkIn = UserHomeHelper.todayCheckIn(activities);

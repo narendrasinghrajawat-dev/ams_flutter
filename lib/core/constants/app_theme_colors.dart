@@ -23,12 +23,21 @@ class EnvConfig {
   static bool get isProd => _env == AppEnvironment.production;
   static bool get isTest => _env == AppEnvironment.test;
   static bool get isDev => _env == AppEnvironment.development;
+
+  static String get envName {
+    if (isProd) return 'PROD';
+    if (isTest) return 'TEST';
+    return 'DEV';
+  }
 }
-
-
 
 class AppThemeColors {
   static bool get isDark {
+    try {
+      if (Get.context != null) {
+        return Theme.of(Get.context!).brightness == Brightness.dark;
+      }
+    } catch (_) {}
     try {
       if (Get.isRegistered<SettingsController>()) {
         return Get.find<SettingsController>().isDark.value;

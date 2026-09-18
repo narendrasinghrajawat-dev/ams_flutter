@@ -21,12 +21,16 @@ class CommonCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = AppThemeColors.isDark;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final cardBg = color ?? theme.cardColor;
+    final borderColor = isDark ? const Color(0xFF273548) : const Color(0xFFE2E8F0);
+
     return Container(
       padding: EdgeInsets.all(padding),
       decoration: BoxDecoration(
-        color: color ?? AppThemeColors.cardBackgroundColor,
-        border: border ?? Border.all(width: 1, color: AppThemeColors.cardBorderColor),
+        color: cardBg,
+        border: border ?? Border.all(width: 1, color: borderColor),
         borderRadius: BorderRadius.circular(borderRadius),
         boxShadow: isShowBoxShadow
             ? [
