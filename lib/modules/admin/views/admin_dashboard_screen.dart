@@ -62,15 +62,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   ];
 
   void _openAddUser() {
-
-    showCommonDialog(context: context, child:  UserForm());
-
-    // showModalBottomSheet(
-    //   context: context,
-    //   isScrollControlled: true,
-    //   backgroundColor: Colors.transparent,
-    //   builder: (_) => const UserForm(),
-    // );
+    showCommonDialog(
+      context: context,
+      barrierDismissible: false,
+      child: const UserForm(),
+    );
   }
 
   /// 🔹 Called whenever bottom nav tab is changed

@@ -18,7 +18,13 @@ class UIHelper {
    * @param type Determines the icon and background color.
    * @param duration How long the snackbar remains visible.
    */
-  static void showSnackbar(String title, String message, {SnackbarType type = SnackbarType.info, Duration duration = const Duration(seconds: 3), SnackPosition snackPosition = SnackPosition.BOTTOM,}) {
+  static void showSnackbar(
+    String title,
+    String message, {
+    SnackbarType type = SnackbarType.info,
+    Duration duration = const Duration(seconds: 3),
+    SnackPosition snackPosition = SnackPosition.TOP,
+  }) {
     Color backgroundColor;
     IconData icon;
     SnackPosition snackPos = snackPosition;
@@ -38,7 +44,6 @@ class UIHelper {
         icon = Icons.warning_amber_outlined;
         break;
       case SnackbarType.info:
-      default:
         backgroundColor = AppThemeColors.snackBarInfoColor;
         icon = Icons.info_outline;
         break;
@@ -59,10 +64,17 @@ class UIHelper {
         icon: Icon(icon, color: Colors.white, size: 28),
         snackPosition: snackPos,
         backgroundColor: backgroundColor,
-        margin: const EdgeInsets.all(10),
-        borderRadius: 8.0,
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        borderRadius: 12.0,
         duration: duration,
         isDismissible: true,
+        boxShadows: const [
+          BoxShadow(
+            color: Color(0x40000000),
+            blurRadius: 16,
+            offset: Offset(0, 4),
+          ),
+        ],
       ),
     );
   }

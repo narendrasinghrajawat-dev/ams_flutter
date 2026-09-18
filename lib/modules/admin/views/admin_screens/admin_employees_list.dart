@@ -134,6 +134,7 @@ class _UserTile extends StatelessWidget {
       onEdit: () {
         showCommonDialog(
           context: context,
+          barrierDismissible: false,
           child: UserForm(initialData: user),
         );
       },

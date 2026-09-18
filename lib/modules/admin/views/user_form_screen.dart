@@ -85,6 +85,7 @@ class _UserFormState extends State<UserForm> {
 
     if (widget.initialData == null) {
       roleId = roleList.isNotEmpty ? roleList[0]['id'] : '1';
+      genderId = genderList.isNotEmpty ? genderList[0]['id'] : '1';
     }
 
     if (widget.initialData != null) {
@@ -164,7 +165,19 @@ class _UserFormState extends State<UserForm> {
 
   Future<void> _save() async {
 
-    if (_formKey.currentState?.validate() != true) return;
+    if (_formKey.currentState?.validate() != true) {
+      UIHelper.showSnackbar(
+        "Validation Required",
+        "Please fill in all required fields properly",
+        type: SnackbarType.warning,
+      );
+      return;
+    }
+
+    final cleanEmail = emailC.text.trim().toLowerCase();
+    final cleanUsername = usernameC.text.trim().isNotEmpty
+        ? usernameC.text.trim()
+        : cleanEmail.split('@')[0];
 
     // Create typed User object instead of raw Map
     final user = User(
@@ -174,19 +187,18 @@ class _UserFormState extends State<UserForm> {
       firstName: firstNameC.text.trim(),
       middleName: middleNameC.text.trim(),
       lastName: lastNameC.text.trim(),
-      email: emailC.text.trim(),
+      email: cleanEmail,
       countryCode: '+91',
       phoneNo: phoneC.text.trim(),
-      username: usernameC.text.trim(),
-      password: widget.initialData?.password ?? passwordC.text, // keep secure handling in real app
-      genderId: genderId,
+      username: cleanUsername,
+      password: widget.initialData?.password ?? passwordC.text,
+      genderId: genderId ?? '1',
       departmentId: null,
-      dob: dateOfBirth ?? "", // DateTime or null
-      address: addressC.text,
-      roleId: roleId,
+      dob: dateOfBirth ?? "",
+      address: addressC.text.trim(),
+      roleId: roleId ?? '1',
     );
 
-    // FIX 1: Declare a single nullable variable outside the blocks to hold the result
     dynamic result;
     String successMessage = "";
 
@@ -205,10 +217,14 @@ class _UserFormState extends State<UserForm> {
       } else {
         Get.back(closeOverlays: true);
       }
-      UIHelper.showSnackbar("Success", successMessage);
+      UIHelper.showSnackbar("Success", successMessage, type: SnackbarType.success);
     } else {
       final action = widget.initialData == null ? 'create' : 'update';
-      UIHelper.showSnackbar("Error", 'Failed to $action user', type: SnackbarType.error);
+      UIHelper.showSnackbar(
+        "Error",
+        'Failed to $action user. Please check the entered details.',
+        type: SnackbarType.error,
+      );
     }
   }
   String? _validateName(String? v) {
@@ -234,18 +250,19 @@ class _UserFormState extends State<UserForm> {
   }
 
   String? _validateUsername(String? v) {
-    if (v == null || v.trim().isEmpty) return 'Enter username';
-    if (!RegExp(r'^[a-zA-Z0-9._\-]{3,}$').hasMatch(v.trim())) return 'Invalid username';
+    if (v == null || v.trim().isEmpty) return null; // Optional: fallback to email prefix
+    if (!RegExp(r'^[a-zA-Z0-9._\-]{3,}$').hasMatch(v.trim())) return 'Invalid username (min 3 chars)';
     return null;
   }
 
 
   String? _validatePassword(String? v) {
+    if (widget.initialData != null) return null; // not required when editing
     if (v == null || v.trim().isEmpty) {
       return 'Please enter a password';
     }
-    if (v.length < 6) {
-      return 'Password must be at least 6 characters long';
+    if (v.length < 4) {
+      return 'Password must be at least 4 characters long';
     }
 
     return null;
@@ -262,9 +279,18 @@ class _UserFormState extends State<UserForm> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                AppIconButtonWidget.large(icon: AppConstIcons.backIcon, onPressed:  () => Get.back()),
+                AppIconButtonWidget.large(
+                  icon: AppConstIcons.backIcon,
+                  onPressed: () {
+                    if (mounted) {
+                      Navigator.of(context, rootNavigator: true).pop();
+                    } else {
+                      Get.back(closeOverlays: true);
+                    }
+                  },
+                ),
                 AppTextWidget.large(widget.initialData == null ? 'Add' : 'Edit', color: AppThemeColors.textPrimaryColor),
-                AppIconButtonWidget.large(icon: AppConstIcons.saveIcon, onPressed:  () => _save()),
+                AppIconButtonWidget.large(icon: AppConstIcons.saveIcon, onPressed: () => _save()),
               ],
             ),
 
@@ -371,9 +397,10 @@ class _UserFormState extends State<UserForm> {
                         TextFieldWidget(
                           controller: passwordC,
                           labelText: 'Password',
-                          keyboardInputType: TextInputType.multiline,
+                          keyboardInputType: TextInputType.visiblePassword,
+                          obscureText: true,
                           onChanged: (_) {},
-                          validator: _validatePassword
+                          validator: _validatePassword,
                         ),
 
                         const SizedBox(height: 5),

@@ -6,10 +6,11 @@ void showCommonDialog({
   required BuildContext context,
   required Widget child,
   bool isOpenSimpleDialog = false,
+  bool barrierDismissible = true,
 }) {
   showDialog(
     context: context,
-    barrierDismissible: true,
+    barrierDismissible: barrierDismissible,
     barrierColor: Colors.black54,
     builder: (BuildContext context) {
       final screenSize = MediaQuery.of(context).size;
@@ -29,15 +30,23 @@ void showCommonDialog({
                 child: child,
               ),
             )
-          : DraggableDialog(child: child);
+          : DraggableDialog(
+              barrierDismissible: barrierDismissible,
+              child: child,
+            );
     },
   );
 }
 
 class DraggableDialog extends StatefulWidget {
   final Widget child;
+  final bool barrierDismissible;
 
-  const DraggableDialog({Key? key, required this.child}) : super(key: key);
+  const DraggableDialog({
+    Key? key,
+    required this.child,
+    this.barrierDismissible = true,
+  }) : super(key: key);
 
   @override
   _DraggableDialogState createState() => _DraggableDialogState();
@@ -56,15 +65,16 @@ class _DraggableDialogState extends State<DraggableDialog> {
 
     return Stack(
       children: [
-        // Barrier for dismissing dialog
-        GestureDetector(
-          onTap: () => Navigator.of(context).pop(),
-          child: Container(
-            width: double.infinity,
-            height: double.infinity,
-            color: Colors.transparent,
+        // Barrier for dismissing dialog (only if dismissible)
+        if (widget.barrierDismissible)
+          GestureDetector(
+            onTap: () => Navigator.of(context, rootNavigator: true).pop(),
+            child: Container(
+              width: double.infinity,
+              height: double.infinity,
+              color: Colors.transparent,
+            ),
           ),
-        ),
         // Draggable dialog
         Positioned(
           left: (screenSize.width - dialogWidth) / 2 + position.dx,
