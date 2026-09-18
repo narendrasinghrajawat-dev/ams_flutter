@@ -307,7 +307,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                   Row(
                     children: [
                       // WFH Toggle
-                      Obx(() {
+                      Builder(builder: (_) {
                         final master = _commonController.getMasterData.value;
                         final maxWFH = master?.maxWFHInSingleMonth;
 

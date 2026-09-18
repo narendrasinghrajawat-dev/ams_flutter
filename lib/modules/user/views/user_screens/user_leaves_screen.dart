@@ -38,68 +38,22 @@ class _UserLeavesScreenState extends State<UserLeavesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() {
-      final isDark = _settings.isDark.value;
-
-      return Stack(
-        children: [
-          SafeArea(
-            child: Padding(
-              padding:
-              const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
-              child: Column(
-                children: [
-                  UIHelpers.responsive(
-                    context: context,
-                    children: [
-                      _buildBalancesList(),
-                    Obx(() {
-                      final all = _controller.filteredAppliedLeavesList;
-
-                      // 🔹 Status-wise count map
-                      final Map<String, int> statusCount = {
-                        AppStrings.approvedLeavesStatusKey: 0,
-                        AppStrings.pendingLeavesStatusKey: 0,
-                        AppStrings.rejectedLeavesStatusKey: 0,
-                        AppStrings.cancelledLeavesStatusKey: 0,
-                      };
-
-                      for (final e in all) {
-                        final status = (e.leaveStatus ?? '').toLowerCase();
-                        if (statusCount.containsKey(status)) {
-                          statusCount[status] = statusCount[status]! + 1;
-                        }
-                      }
-
-                      // 🔹 UI config list
-                      final items = [
-                        ('Total Applied', all.length, ''),
-                        ('Approved', statusCount[AppStrings.approvedLeavesStatusKey]!, AppStrings.approvedLeavesStatusKey),
-                        ('Pending', statusCount[AppStrings.pendingLeavesStatusKey]!, AppStrings.pendingLeavesStatusKey),
-                        ('Rejected', statusCount[AppStrings.rejectedLeavesStatusKey]!, AppStrings.rejectedLeavesStatusKey),
-                        ('Cancelled', statusCount[AppStrings.cancelledLeavesStatusKey]!, AppStrings.cancelledLeavesStatusKey),
-                      ];
-
-                      return CommonCardWidget(
-                        padding: 5,
-                        child: Column(
-                          children: items
-                              .map(
-                                (e) => _SummaryItem(
-                              title: e.$1,
-                              value: e.$2,
-                              color: AppHelper.getLeavesStatusColor(e.$3),
-                              vertical: false,
-                            ),
-                          )
-                              .toList(),
-                        ),
-                      );
-                    }),
+    return Stack(
+      children: [
+        SafeArea(
+          child: Padding(
+            padding:
+            const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+            child: Column(
+              children: [
+                UIHelpers.responsive(
+                  context: context,
+                  children: [
+                    _buildBalancesList(),
+                    _buildSummaryCards(),
                   ],
                 ),
-
-                const SizedBox(height: 10),
+                const SizedBox(height: 12),
                 _buildSummaryAndList(),
               ],
             ),
@@ -107,29 +61,95 @@ class _UserLeavesScreenState extends State<UserLeavesScreen> {
         ),
 
         /// ➕ FAB (APP ONLY)
-          Positioned(
-            bottom: 20,
-            right: 20,
-            child: GestureDetector(
-              onTap: () => showCommonDialog(
-                context: context,
-                child: const UserApplyLeavesForm(),
+        Positioned(
+          bottom: 20,
+          right: 20,
+          child: InkWell(
+            onTap: () => showCommonDialog(
+              context: context,
+              child: const UserApplyLeavesForm(),
+            ),
+            borderRadius: BorderRadius.circular(28),
+            child: Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                color: AppThemeColors.primaryColor,
+                shape: BoxShape.circle,
               ),
-              child: Container(
-                width: 56,
-                height: 56,
-                decoration: BoxDecoration(
-                  color: AppThemeColors.primaryColor,
-                  shape: BoxShape.circle,
-                ),
-                child: AppIconWidget.veryLarge(
-                  AppConstIcons.addIcon,
-                  color: AppThemeColors.whiteColor,
-                ),
+              child: AppIconWidget.veryLarge(
+                AppConstIcons.addIcon,
+                color: AppThemeColors.whiteColor,
               ),
             ),
           ),
-        ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSummaryCards() {
+    return Obx(() {
+      final all = _controller.filteredAppliedLeavesList;
+
+      // 🔹 Status-wise count map
+      final Map<String, int> statusCount = {
+        AppStrings.approvedLeavesStatusKey: 0,
+        AppStrings.pendingLeavesStatusKey: 0,
+        AppStrings.rejectedLeavesStatusKey: 0,
+        AppStrings.cancelledLeavesStatusKey: 0,
+      };
+
+      for (final e in all) {
+        final status = (e.leaveStatus ?? '').toLowerCase();
+        if (statusCount.containsKey(status)) {
+          statusCount[status] = statusCount[status]! + 1;
+        }
+      }
+
+      // 🔹 UI config list
+      final items = [
+        ('Total Applied', all.length, ''),
+        ('Approved', statusCount[AppStrings.approvedLeavesStatusKey]!, AppStrings.approvedLeavesStatusKey),
+        ('Pending', statusCount[AppStrings.pendingLeavesStatusKey]!, AppStrings.pendingLeavesStatusKey),
+        ('Rejected', statusCount[AppStrings.rejectedLeavesStatusKey]!, AppStrings.rejectedLeavesStatusKey),
+        ('Cancelled', statusCount[AppStrings.cancelledLeavesStatusKey]!, AppStrings.cancelledLeavesStatusKey),
+      ];
+
+      return CommonCardWidget(
+        padding: 5,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              child: Row(
+                children: [
+                  AppIconWidget.medium(
+                    AppConstIcons.pendingLeavesIcon,
+                    color: AppThemeColors.textPrimaryColor,
+                  ),
+                  const SizedBox(width: 8),
+                  AppTextWidget.medium(
+                    'Leave Status',
+                    color: AppThemeColors.textPrimaryColor,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: items.map((e) {
+                return Expanded(
+                  child: SummaryCard(
+                    title: e.$1,
+                    value: e.$2.toString(),
+                    color: AppHelper.getLeavesStatusColor(e.$3),
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
+        ),
       );
     });
   }

@@ -34,8 +34,7 @@ class AdminDashboardScreen extends StatefulWidget {
 
 class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   int _currentIndex = 0;
-
-  final User user = AppHelper.getProfileUser();
+  late User user;
 
   final List<Widget> _pages = [
     AdminHomePage(),
@@ -44,6 +43,15 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     AdminLeavesScreen(),
     const AdminProfileScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    user = AppHelper.getProfileUser();
+    if (Get.isRegistered<LoadingController>()) {
+      Get.find<LoadingController>().reset();
+    }
+  }
 
   final List<String> _titles = [
     'Home',

@@ -125,6 +125,260 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  void _showDemoCredentialsDialog() {
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog(
+        backgroundColor: AppThemeColors.cardBackgroundColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 420),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppThemeColors.primaryColor.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(
+                        Icons.key_rounded,
+                        color: AppThemeColors.primaryColor,
+                        size: 22,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Demo / Testing Credentials',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: AppThemeColors.textPrimaryColor,
+                            ),
+                          ),
+                          Text(
+                            'Portfolio & Resume Evaluation',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: AppThemeColors.textSecondaryColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close_rounded, size: 20),
+                      onPressed: () => Navigator.pop(ctx),
+                      color: AppThemeColors.textSecondaryColor,
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 14),
+
+                // Portfolio info note
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: AppThemeColors.primaryColor.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: AppThemeColors.primaryColor.withOpacity(0.25),
+                      width: 0.8,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.info_outline_rounded,
+                        size: 16,
+                        color: AppThemeColors.primaryColor,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'This is a testing/demo build. Tap auto-fill below to quickly sign in and test features.',
+                          style: TextStyle(
+                            fontSize: 11.5,
+                            color: AppThemeColors.textSecondaryColor,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // Admin Credential Card
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppThemeColors.scaffoldBackgroundColor,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppThemeColors.borderColor, width: 0.8),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(Icons.admin_panel_settings_outlined, size: 16, color: AppThemeColors.primaryColor),
+                              const SizedBox(width: 6),
+                              Text(
+                                'Admin Profile',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppThemeColors.textPrimaryColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: AppThemeColors.primaryColor.withOpacity(0.12),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              'Full Access',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                color: AppThemeColors.primaryColor,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Text('Email: admin@gmail.com', style: TextStyle(fontSize: 11.5, color: AppThemeColors.textSecondaryColor)),
+                      Text('Password: admin@gmail.com', style: TextStyle(fontSize: 11.5, color: AppThemeColors.textSecondaryColor)),
+                      const SizedBox(height: 8),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 34,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              emailC.text = 'admin@gmail.com';
+                              passC.text = 'admin@gmail.com';
+                            });
+                            Navigator.pop(ctx);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppThemeColors.primaryColor,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            elevation: 0,
+                            padding: EdgeInsets.zero,
+                          ),
+                          child: const Text('⚡ Auto-Fill Admin', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 10),
+
+                // User Credential Card
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppThemeColors.scaffoldBackgroundColor,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppThemeColors.borderColor, width: 0.8),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(Icons.person_outline_rounded, size: 16, color: Colors.orange),
+                              const SizedBox(width: 6),
+                              Text(
+                                'User / Employee Profile',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppThemeColors.textPrimaryColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: Colors.orange.withOpacity(0.12),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: const Text(
+                              'Self-Service',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.orange,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Text('Email: user@gmail.com', style: TextStyle(fontSize: 11.5, color: AppThemeColors.textSecondaryColor)),
+                      Text('Password: user@gmail.com', style: TextStyle(fontSize: 11.5, color: AppThemeColors.textSecondaryColor)),
+                      const SizedBox(height: 8),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 34,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              emailC.text = 'user@gmail.com';
+                              passC.text = 'user@gmail.com';
+                            });
+                            Navigator.pop(ctx);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orange,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            elevation: 0,
+                            padding: EdgeInsets.zero,
+                          ),
+                          child: const Text('⚡ Auto-Fill User', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = AppThemeColors.isDark;
@@ -193,7 +447,22 @@ class _LoginScreenState extends State<LoginScreen> {
                       color: AppThemeColors.textSecondaryColor,
                     ),
 
-                    const SizedBox(height: 28),
+                    const SizedBox(height: 12),
+
+                    // Quick Demo Credentials Trigger
+                    OutlinedButton.icon(
+                      onPressed: _showDemoCredentialsDialog,
+                      icon: const Icon(Icons.key_rounded, size: 16),
+                      label: const Text('Testing / Demo Credentials 🔑'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppThemeColors.primaryColor,
+                        side: BorderSide(color: AppThemeColors.primaryColor.withOpacity(0.5)),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
 
                     // Card with form
                     CommonCardWidget(

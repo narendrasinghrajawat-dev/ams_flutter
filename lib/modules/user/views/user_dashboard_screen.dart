@@ -30,7 +30,7 @@ class UserDashboardScreen extends StatefulWidget {
 class _UserDashboardScreenState
     extends State<UserDashboardScreen> {
   int _currentIndex = 0;
-  final User user = AppHelper.getProfileUser();
+  late User user;
 
   final List<Widget> _pages = const [
     UserHomeScreen(),
@@ -38,6 +38,15 @@ class _UserDashboardScreenState
     UserActivityScreen(),
     UserProfileScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    user = AppHelper.getProfileUser();
+    if (Get.isRegistered<LoadingController>()) {
+      Get.find<LoadingController>().reset();
+    }
+  }
 
   // optional: avoid double-calling when coming back to same tab
   final Set<int> _initializedTabs = {0}; // home already loaded by onInit

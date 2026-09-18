@@ -6,14 +6,21 @@ class LoadingController extends GetxController {
   /// observable used by UI
   RxBool isLoading = false.obs;
 
-  // Optional manual control
-  void show() => isLoading.value = true;
-  void hide() => isLoading.value = false;
+  void show() {
+    _activeRequests.value++;
+    isLoading.value = true;
+  }
 
-  // Call these in your API wrapper
+  void hide() {
+    if (_activeRequests.value > 0) {
+      _activeRequests.value--;
+    }
+    isLoading.value = _activeRequests.value > 0;
+  }
+
   void start() {
     _activeRequests.value++;
-    isLoading.value = _activeRequests.value > 0;
+    isLoading.value = true;
   }
 
   void stop() {

@@ -47,6 +47,9 @@ class AuthController extends GetxController {
           _storage.saveString(AppStrings.token, res['token']);
         }
 
+        // Reset loader completely before dashboard transition
+        _loadingController.reset();
+
         // Redirect user based on role
         if (isAdmin) {
           Get.offAllNamed(AppRoutes.adminDashboard);
@@ -55,7 +58,7 @@ class AuthController extends GetxController {
         }
       } else {
         // If server returned error structure or empty map
-        // Get.snackbar('Error', res['message'] ?? 'Login failed');
+        Get.snackbar('Error', 'Invalid login response. Please check credentials.');
       }
 
     } catch (e) {
@@ -63,8 +66,8 @@ class AuthController extends GetxController {
       Get.snackbar('Error', e.toString());
 
     } finally {
-      // ALWAYS hide loader even when errors happen
-      _loadingController.hide();
+      // ALWAYS reset loader completely
+      _loadingController.reset();
     }
   }
 
