@@ -23,21 +23,24 @@ class EmployeeTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return CommonCardWidget(
       padding: 14,
+      borderRadius: 14,
       child: Column(
         children: [
           /// 🔹 TOP ROW (Avatar + Name + Menu)
           Row(
             children: [
               CircleAvatar(
-                radius: 24,
-                backgroundColor:
-                AppThemeColors.primaryLightColor.withOpacity(.3),
-                child: AppTextWidget.medium(
-                  user.firstName.isNotEmpty ? AppHelper.formatUserName(user)[0] : 'U',
-                  color: AppThemeColors.primaryColor,
+                radius: 22,
+                backgroundColor: AppThemeColors.primaryColor.withOpacity(0.12),
+                child: Text(
+                  user.firstName.isNotEmpty ? user.firstName[0].toUpperCase() : 'U',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppThemeColors.primaryColor,
+                  ),
                 ),
               ),
               const SizedBox(width: 12),
@@ -68,7 +71,7 @@ class EmployeeTile extends StatelessWidget {
           ),
 
           const SizedBox(height: 12),
-          const Divider(height: 1),
+          Divider(height: 1, color: AppThemeColors.dividerColor),
           const SizedBox(height: 10),
 
           /// 🔹 META INFO ROW
@@ -95,7 +98,6 @@ class EmployeeTile extends StatelessWidget {
                 label: 'EMP ID',
                 value: user.employeeId ?? "",
               ),
-
             ],
           ),
         ],

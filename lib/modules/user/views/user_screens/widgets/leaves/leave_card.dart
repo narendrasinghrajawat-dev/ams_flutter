@@ -1,8 +1,8 @@
-// leave_card.dart
 import 'package:attedance_management_system/widgets/card/common_card.dart';
 import 'package:attedance_management_system/widgets/text_and_icon_widgets/app_icons_type.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../../../../core/constants/app_theme_colors.dart';
 import '../../../../../../data/utils/app_helper.dart';
 import '../../../../../../core/constants/const_strings.dart';
 import '../../../../../models/apply_leave_request.dart';
@@ -13,31 +13,37 @@ class LeaveCard extends StatelessWidget {
   final ApplyLeaveRequest leave;
   const LeaveCard({super.key, required this.leave});
 
-  bool _isWide(BuildContext context) =>
-      MediaQuery.of(context).size.width >= 700;
-
   @override
   Widget build(BuildContext context) {
-
     final statusColor = AppHelper.getLeavesStatusColor(leave.leaveStatus);
     final isPending =
         (leave.leaveStatus ?? '').toLowerCase() ==
             AppStrings.pendingLeavesStatusKey;
 
     return CommonCardWidget(
-      child:  Column(
+      padding: 14,
+      borderRadius: 14,
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ================= HEADER =================
-          Wrap(
-            spacing: 12,
-            runSpacing: 8,
-            crossAxisAlignment: WrapCrossAlignment.center,
+          // Header: Date range + Status Chip
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _StatusDot(color: statusColor),
-              AppTextWidget.medium(
-                '${AppHelper.formatDateString(leave.startDate)}'
+              Row(
+                children: [
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(color: statusColor, shape: BoxShape.circle),
+                  ),
+                  const SizedBox(width: 8),
+                  AppTextWidget.medium(
+                    '${AppHelper.formatDateString(leave.startDate)}'
                     ' - ${AppHelper.formatDateString(leave.endDate)}',
+                    color: AppThemeColors.textPrimaryColor,
+                  ),
+                ],
               ),
               _StatusChip(
                 label: AppHelper.getLeavesStatusValue(leave.leaveStatus),
@@ -48,78 +54,65 @@ class LeaveCard extends StatelessWidget {
 
           const SizedBox(height: 10),
 
-          // ================= META =================
+          // Chips: Duration & Days
           Wrap(
-            spacing: 10,
-            runSpacing: 8,
+            spacing: 8,
+            runSpacing: 6,
             children: [
               _Chip(
                 '${leave.numberOfLeaves} Day${leave.numberOfLeaves > 1 ? 's' : ''}',
-                Colors.blue,
+                AppThemeColors.secondaryColor,
               ),
               _Chip(
                 leave.leaveDurationsType == AppStrings.halfDayKey
                     ? 'Half Day'
                     : 'Full Day',
-                Colors.orange,
+                AppThemeColors.warningColor,
               ),
-              if (!AppHelper.isEmptyOrNull(leave.halfDayShiftType ))
-                _Chip(leave.halfDayShiftType!, Colors.purple),
+              if (!AppHelper.isEmptyOrNull(leave.halfDayShiftType))
+                _Chip(
+                  leave.halfDayShiftType!,
+                  AppThemeColors.primaryColor,
+                ),
             ],
           ),
 
-          const SizedBox(height: 14),
+          const SizedBox(height: 12),
 
-          // ================= DETAILS =================
+          // Details
           if ((leave.reason ?? '').isNotEmpty)
             _DetailRow('Reason', leave.reason!, Icons.note_outlined),
 
-          if (leave.approverByName != null)
-            _DetailRow('Approved by', leave.approverByName!, Icons.person),
+          if (leave.approverByName != null && leave.approverByName!.isNotEmpty)
+            _DetailRow('Approved by', leave.approverByName!, Icons.person_outline),
 
-          if (leave.actionDate != null)
+          if (leave.actionDate != null && leave.actionDate!.isNotEmpty)
             _DetailRow(
               'Action date',
               AppHelper.formatDateString(leave.actionDate!),
-              Icons.calendar_today,
+              Icons.calendar_today_outlined,
             ),
 
-          // ================= BUTTON =================
+          // Cancel Button for Pending
           if (isPending) ...[
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             SizedBox(
               width: double.infinity,
+              height: 40,
               child: OutlinedButton.icon(
-                onPressed: () => Get.find<UserLeavesController>()
-                    .onCancelLeave(leave),
-                icon: const Icon(Icons.close, size: 18),
-                label: const Text('Cancel Request'),
+                onPressed: () => Get.find<UserLeavesController>().onCancelLeave(leave),
+                icon: const Icon(Icons.close_rounded, size: 16),
+                label: const Text('Cancel Request', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.red.shade700,
-                  side: BorderSide(color: Colors.red.shade300),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  foregroundColor: AppThemeColors.errorColor,
+                  side: BorderSide(color: AppThemeColors.errorColor.withOpacity(0.4)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 ),
               ),
             ),
           ],
         ],
       ),
-    );
-  }
-}
-
-// ================= SMALL WIDGETS =================
-
-class _StatusDot extends StatelessWidget {
-  final Color color;
-  const _StatusDot({required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 10,
-      height: 10,
-      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
     );
   }
 }
@@ -132,13 +125,19 @@ class _Chip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withOpacity(0.12),
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: color.withOpacity(0.3)),
       ),
-      child: AppTextWidget.verySmall(label, color: color),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          color: color,
+        ),
+      ),
     );
   }
 }
@@ -151,12 +150,19 @@ class _StatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: color.withOpacity(0.12),
         borderRadius: BorderRadius.circular(20),
       ),
-      child: AppTextWidget.verySmall(label, color: color),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          color: color,
+        ),
+      ),
     );
   }
 }
@@ -171,17 +177,29 @@ class _DetailRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: 6),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Icon(icon, size: 15, color: AppThemeColors.textSecondaryColor),
+          const SizedBox(width: 6),
+          Text(
+            '$label: ',
+            style: TextStyle(
+              fontSize: 12,
+              color: AppThemeColors.textSecondaryColor,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
           Expanded(
-              child: Row(
-                children: [
-                  AppIconWidget.medium(icon),
-                  const SizedBox(width: 6),
-                  AppTextWidget.small(label, color: Colors.grey.shade600),],)),
-          AppTextWidget.small(
-            value,
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: 12,
+                color: AppThemeColors.textPrimaryColor,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ),
         ],
       ),

@@ -20,16 +20,18 @@ class AdminRecentActivity extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        AppTextWidget.medium("Recent Activity"),
-        const SizedBox(height: 8),
+        AppTextWidget.medium(
+          "Recent Activity",
+          color: AppThemeColors.textPrimaryColor,
+        ),
+        const SizedBox(height: 10),
 
-        /// 🔥 ONLY THIS PART IS REACTIVE
         Obx(() {
           final activities = c.recentActivityList;
 
           if (activities.isEmpty) {
             return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20),
+              padding: const EdgeInsets.symmetric(vertical: 24),
               child: Center(
                 child: AppTextWidget.small(
                   "No activity found for selected date",
@@ -41,18 +43,13 @@ class AdminRecentActivity extends StatelessWidget {
 
           return LayoutBuilder(
             builder: (context, constraints) {
-              /// 🧠 Responsive columns
-              return GridView.builder(
+              final bool isWide = constraints.maxWidth >= 700;
+
+              return ListView.separated(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: activities.length,
-                gridDelegate:
-                SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: kIsWeb ? 2: 1,
-                  crossAxisSpacing: 8,
-                  mainAxisSpacing: 8,
-                  childAspectRatio:kIsWeb ? 11 : 5.5,
-                ),
+                separatorBuilder: (_, __) => const SizedBox(height: 8),
                 itemBuilder: (_, index) {
                   final item = activities[index];
                   return _ActivityItem(item: item);
@@ -85,13 +82,11 @@ class _ActivityItem extends StatelessWidget {
       final bool isCheckIn = item.punchType == "1";
 
       icon = isCheckIn ? Icons.login_rounded : Icons.logout_rounded;
-      color = AppHelper.getPunchTypeColor(item.punchType);
+      color = isCheckIn ? AppThemeColors.successColor : AppThemeColors.errorColor;
 
       title = item.userName ?? 'Employee';
-
       time = AppHelper.formatTimeString(item.punchTime) ?? '--';
       date = AppHelper.formatDateString(item.punchDate) ?? '--';
-
       subtitle = 'Checked ${isCheckIn ? "in" : "out"}';
     }
 
@@ -102,32 +97,30 @@ class _ActivityItem extends StatelessWidget {
 
       title = item.userName ?? 'Employee';
       subtitle = 'Leave request (${item.leaveStatus})';
-
       time = AppHelper.formatTimeString(item.createdDate) ?? '--';
       date = AppHelper.formatDateString(item.createdDate) ?? '--';
     }
 
     return CommonCardWidget(
+      padding: 12,
+      borderRadius: 14,
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          /// 🔹 ICON
           Container(
-            width: 38,
-            height: 38,
+            width: 42,
+            height: 42,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.15),
-              shape: BoxShape.circle,
+              color: color.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, color: color, size: 18),
+            child: Icon(icon, color: color, size: 20),
           ),
-
           const SizedBox(width: 12),
-
-          /// 🔹 CONTENT
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 AppTextWidget.small(
                   title,
@@ -138,32 +131,33 @@ class _ActivityItem extends StatelessWidget {
                   subtitle,
                   color: AppThemeColors.textSecondaryColor,
                 ),
-                const SizedBox(height: 6),
-
-                /// 📅 DATE CHIP
-
               ],
             ),
           ),
-
-          /// ⏰ TIME
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              AppTextWidget.verySmall(
+              Text(
                 time,
-                color: AppThemeColors.textPrimaryColor,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: AppThemeColors.textPrimaryColor,
+                ),
               ),
-              AppTextWidget.small(
+              const SizedBox(height: 2),
+              Text(
                 date,
+                style: TextStyle(
+                  fontSize: 11,
+                  color: AppThemeColors.muted,
+                ),
               ),
             ],
-          )
-
+          ),
         ],
       ),
     );
   }
 }
-
-

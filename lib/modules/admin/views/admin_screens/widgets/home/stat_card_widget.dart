@@ -1,10 +1,7 @@
-
 import 'package:attedance_management_system/core/constants/app_theme_colors.dart';
 import 'package:flutter/material.dart';
-
 import '../../../../../../widgets/card/common_card.dart';
 import '../../../../../../widgets/text_and_icon_widgets/app_text_type.dart';
-
 
 class StatCardWidget extends StatelessWidget {
   final String title;
@@ -17,11 +14,17 @@ class StatCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CommonCardWidget(
+      padding: 12,
+      borderRadius: 14,
       child: Row(
         children: [
-          CircleAvatar(
-            radius: 20,
-            backgroundColor: color.withOpacity(0.12),
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(12),
+            ),
             child: Icon(icon, color: color, size: 20),
           ),
           const SizedBox(width: 12),
@@ -30,7 +33,7 @@ class StatCardWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                AppTextWidget.verySmall(title, color: AppThemeColors.textSecondaryColor),
+                AppTextWidget.verySmall(title, color: AppThemeColors.textSecondaryColor, maxLines: 1),
                 const SizedBox(height: 2),
                 AppTextWidget.large(value, color: AppThemeColors.textPrimaryColor),
               ],

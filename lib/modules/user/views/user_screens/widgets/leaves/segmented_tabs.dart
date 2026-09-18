@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:attedance_management_system/core/constants/app_theme_colors.dart';
 
@@ -7,36 +6,59 @@ class SegmentedTabs extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int> onTap;
 
-  const SegmentedTabs({Key? key, required this.labels, required this.selectedIndex, required this.onTap}) : super(key: key);
+  const SegmentedTabs({
+    Key? key,
+    required this.labels,
+    required this.selectedIndex,
+    required this.onTap,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final isDark = AppThemeColors.isDark;
+
     return Container(
       decoration: BoxDecoration(
-        color: AppThemeColors.cardBackgroundColor,
-        border: Border.all(color: AppThemeColors.cardBorderColor),
-        borderRadius: BorderRadius.circular(10),
+        color: isDark ? const Color(0xFF111827) : const Color(0xFFF1F5F9),
+        border: Border.all(color: AppThemeColors.borderColor, width: 1),
+        borderRadius: BorderRadius.circular(12),
       ),
-      padding: const EdgeInsets.all(3),
+      padding: const EdgeInsets.all(4),
       child: Row(
         children: List.generate(labels.length, (i) {
           final selected = i == selectedIndex;
           return Expanded(
             child: GestureDetector(
               onTap: () => onTap(i),
-              child: Container(
-                height: 35,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeInOut,
+                height: 36,
                 margin: const EdgeInsets.symmetric(horizontal: 2),
                 decoration: BoxDecoration(
-                  color: selected ? AppThemeColors.primaryColor : Colors.transparent,
-                  borderRadius: BorderRadius.circular(8),
+                  color: selected
+                      ? AppThemeColors.primaryColor
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(9),
+                  boxShadow: selected
+                      ? [
+                          BoxShadow(
+                            color: AppThemeColors.primaryColor.withOpacity(0.3),
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ]
+                      : null,
                 ),
                 alignment: Alignment.center,
                 child: Text(
                   labels[i],
                   style: TextStyle(
-                    color: selected ? Colors.white : AppThemeColors.textSecondaryColor,
-                    fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                    color: selected
+                        ? Colors.white
+                        : AppThemeColors.textSecondaryColor,
+                    fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+                    fontSize: 13,
                   ),
                 ),
               ),

@@ -68,7 +68,7 @@ class AdminEmployeesList extends StatelessWidget {
                       Get.bottomSheet(
                         const AddLeavesByAdminSheet(),
                         isScrollControlled: true,
-                        backgroundColor: Colors.white,
+                        backgroundColor: AppThemeColors.cardBackgroundColor,
                         shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.vertical(
                             top: Radius.circular(16),
@@ -177,8 +177,8 @@ class _UserTile extends StatelessWidget {
 
       builder: (_) => AlertDialog(
         backgroundColor: AppThemeColors.popupBackgroundColor,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(5))
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(16)),
         ),
         title: AppTextWidget.medium('Change Password'),
         content: SingleChildScrollView(

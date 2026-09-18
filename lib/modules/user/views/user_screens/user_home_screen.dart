@@ -53,7 +53,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     /// 🔁 Recalculate whenever attendance list changes
     _worker = ever<List<AttendanceActivity>>(
       _activityCtrl.activitiesByDate,
-          (_) => _recalculateTimer(),
+      (_) => _recalculateTimer(),
     );
 
     _recalculateTimer();
@@ -78,7 +78,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     final checkIn = UserHomeHelper.todayCheckIn(activities);
     final checkOut = UserHomeHelper.todayCheckOut(activities);
 
-    // ❌ No check-in → reset
+    // No check-in → reset
     if (checkIn == null) {
       if (mounted) {
         setState(() => _elapsed = Duration.zero);
@@ -94,7 +94,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       return;
     }
 
-    // ✅ Checked out → STOP timer & set final duration
+    // Checked out → STOP timer & set final duration
     if (checkOut != null) {
       if (mounted) {
         setState(() {
@@ -104,17 +104,17 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       return;
     }
 
-    // ✅ Checked in only → SHOW elapsed immediately (🔥 FIX)
+    // Checked in only → SHOW elapsed immediately
     if (mounted) {
       setState(() {
         _elapsed = DateTime.now().difference(inTime);
       });
     }
 
-    // ✅ Live timer
+    // Live timer
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       final latestCheckOut =
-      UserHomeHelper.todayCheckOut(_activityCtrl.activitiesByDate);
+          UserHomeHelper.todayCheckOut(_activityCtrl.activitiesByDate);
 
       if (latestCheckOut != null || !mounted) {
         timer.cancel();
@@ -197,7 +197,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         "isWFH" : _activityCtrl.isWorkFromHome.value,
       });
     } catch (e) {
-      print('Punch activity build error: $e');
       UIHelper.showSnackbar("Error", 'Failed to initialize punch activity: $e', type: SnackbarType.error);
       return null;
     }
@@ -276,8 +275,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   // ===========================================================
   @override
   Widget build(BuildContext context) {
-    print('_elapsed is the $_elapsed');
-
     return Obx(() {
       final activities = _activityCtrl.activitiesByDate;
 
@@ -293,17 +290,20 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
       return SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           child: Column(
             children: [
+              // Top Bar: Greeting & WFH switch & Status badge
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                 kIsWeb ? AppTextWidget.large('good_${AppHelper.getGreeting().toLowerCase()}') : AppTextWidget.medium('good_${AppHelper.getGreeting().toLowerCase()}'),
+                  AppTextWidget.medium(
+                    'good_${AppHelper.getGreeting().toLowerCase()}',
+                    color: AppThemeColors.textPrimaryColor,
+                  ),
                   Row(
                     children: [
-
-                      /// 🔹 WFH Radio
+                      // WFH Toggle
                       Obx(() {
                         final master = _commonController.getMasterData.value;
                         final maxWFH = master?.maxWFHInSingleMonth;
@@ -314,26 +314,22 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
                         return Row(
                           children: [
-                            AppTextWidget.medium("WFH"),
-                            const SizedBox(width: 8),
-                            Switch(
-                              padding: EdgeInsets.all(0),
-                              splashRadius: 1,
+                            AppTextWidget.small("WFH", color: AppThemeColors.textSecondaryColor),
+                            const SizedBox(width: 4),
+                            Switch.adaptive(
                               value: _activityCtrl.isWorkFromHome.value,
-                              activeColor: Colors.white,
-                              activeTrackColor: AppThemeColors.primaryColor,
-                              inactiveTrackColor: AppThemeColors.buttonDisabledColor,
+                              activeColor: AppThemeColors.primaryColor,
                               onChanged: canCheckIn == false && _activityCtrl.isWorkFromHome.value == true
                                   ? null
                                   : (value) {
-                                _activityCtrl.isWorkFromHome.value = value;
-                              },
+                                      _activityCtrl.isWorkFromHome.value = value;
+                                    },
                             ),
                           ],
                         );
                       }),
 
-                      SizedBox(width: 5,),
+                      const SizedBox(width: 6),
 
                       AttendanceStatusBadge(
                         status: completed
@@ -348,24 +344,49 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                             : AppThemeColors.warningColor,
                       ),
                     ],
-                  )
+                  ),
                 ],
               ),
 
               const SizedBox(height: 14),
 
+              // Today's Work Time Card with live timer and Action Button
               CommonCardWidget(
+                padding: 16,
+                borderRadius: 16,
                 child: Row(
                   children: [
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: AppThemeColors.primaryColor.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        Icons.timer_outlined,
+                        color: AppThemeColors.primaryColor,
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 14),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          AppTextWidget.small("today_work_time"),
-                          const SizedBox(height: 6),
-                          AppTextWidget.large(
+                          AppTextWidget.verySmall(
+                            "today_work_time",
+                            color: AppThemeColors.textSecondaryColor,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
                             AppHelper.formatDuration(_elapsed),
-                            color: AppThemeColors.primaryColor,
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: AppThemeColors.primaryColor,
+                              fontFeatures: const [FontFeature.tabularFigures()],
+                            ),
                           ),
                         ],
                       ),
@@ -388,21 +409,25 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 ),
               ),
 
-              const SizedBox(height: 14),
+              const SizedBox(height: 12),
 
               StatsCard(
                 title: 'today_hours',
                 value: '${todayHours.toStringAsFixed(1)}h',
-                icon: Icons.access_time,
-                color: AppThemeColors.primaryColor,
+                icon: Icons.access_time_rounded,
+                color: AppThemeColors.secondaryColor,
               ),
 
-              const SizedBox(height: 18),
+              const SizedBox(height: 16),
 
+              // Recent activities header
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  AppTextWidget.medium('recent_activities'),
+                  AppTextWidget.medium(
+                    'recent_activities',
+                    color: AppThemeColors.textPrimaryColor,
+                  ),
                   AppTextWidget.verySmall(
                     'Last ${recent.length}',
                     color: AppThemeColors.muted,
@@ -412,40 +437,37 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
               const SizedBox(height: 10),
 
+              // Activities List
               Expanded(
                 child: recent.isEmpty
                     ? const EmptyActivityState()
                     : LayoutBuilder(
-                  builder: (context, constraints) {
-                    final bool isWideScreen = constraints.maxWidth >= 700;
+                        builder: (context, constraints) {
+                          final bool isWideScreen = constraints.maxWidth >= 700;
 
-                    // 📱 Mobile → Single column list
-                    if (!isWideScreen) {
-                      return ListView.separated(
-                        itemCount: recent.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 10),
-                        itemBuilder: (_, i) =>
-                            UserActivityTile(activity: recent[i]),
-                      );
-                    }
+                          if (!isWideScreen) {
+                            return ListView.separated(
+                              itemCount: recent.length,
+                              separatorBuilder: (_, __) => const SizedBox(height: 8),
+                              itemBuilder: (_, i) =>
+                                  UserActivityTile(activity: recent[i]),
+                            );
+                          }
 
-                    // 🌐 Web / Desktop → 2 items per row
-                    return GridView.builder(
-                      itemCount: recent.length,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,          // 👈 2 tiles per row
-                        crossAxisSpacing: 12,
-                        mainAxisSpacing: 12,
-                        childAspectRatio: isWideScreen ? 9 : 3.5,      // 👈 adjust for tile height
+                          return GridView.builder(
+                            itemCount: recent.length,
+                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 12,
+                              mainAxisSpacing: 10,
+                              childAspectRatio: isWideScreen ? 7.5 : 3.5,
+                            ),
+                            itemBuilder: (_, i) =>
+                                UserActivityTile(activity: recent[i]),
+                          );
+                        },
                       ),
-                      itemBuilder: (_, i) =>
-                          UserActivityTile(activity: recent[i]),
-                    );
-                  },
-                ),
               ),
-
-
             ],
           ),
         ),
@@ -460,14 +482,15 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       VoidCallback onTap,
       ) {
     return SizedBox(
-      height: 44,
-      width: 150,
+      height: 42,
       child: ElevatedButton.icon(
         onPressed: _busy ? null : onTap,
-        icon: AppIconWidget.medium(icon, color: Colors.white),
+        icon: Icon(icon, color: Colors.white, size: 18),
         label: AppTextWidget.medium(label, color: Colors.white),
         style: ElevatedButton.styleFrom(
           backgroundColor: color,
+          elevation: 2,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),

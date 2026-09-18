@@ -1,44 +1,46 @@
-
-
 import 'package:flutter/material.dart';
+import '../../core/constants/app_theme_colors.dart';
 
-class CommonContainerWidget extends StatefulWidget {
-  CommonContainerWidget({super.key, required this.child, this.borderRadius = 7, this.padding = 10, this.isShowBoxShadow = true, this.color = Colors.white, this.border});
-
-  Widget child;
-  double borderRadius;
-  double padding;
-  bool isShowBoxShadow;
-  Color color;
+class CommonContainerWidget extends StatelessWidget {
+  final Widget child;
+  final double borderRadius;
+  final double padding;
+  final bool isShowBoxShadow;
+  final Color? color;
   final Border? border;
 
+  const CommonContainerWidget({
+    super.key,
+    required this.child,
+    this.borderRadius = 12,
+    this.padding = 10,
+    this.isShowBoxShadow = false,
+    this.color,
+    this.border,
+  });
 
-
-  @override
-  State<CommonContainerWidget> createState() => _CommonContainerWidgetState();
-}
-
-class _CommonContainerWidgetState extends State<CommonContainerWidget> {
   @override
   Widget build(BuildContext context) {
+    final isDark = AppThemeColors.isDark;
     return Container(
-      padding: EdgeInsets.all(widget.padding),
+      padding: EdgeInsets.all(padding),
       decoration: BoxDecoration(
-        color: widget.color,
-        border: widget.border,
-        borderRadius: BorderRadius.circular(widget.borderRadius),
-        boxShadow:  [
-          widget.isShowBoxShadow == true ?
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: Offset(0.1, 0.1),
-          )
-              :
-          BoxShadow(),
-        ],
+        color: color ?? AppThemeColors.containerBgColor,
+        border: border ?? Border.all(color: AppThemeColors.borderColor, width: 1),
+        borderRadius: BorderRadius.circular(borderRadius),
+        boxShadow: isShowBoxShadow
+            ? [
+                BoxShadow(
+                  color: isDark
+                      ? const Color(0x33000000)
+                      : const Color(0x08000000),
+                  blurRadius: 10,
+                  offset: const Offset(0, 2),
+                ),
+              ]
+            : null,
       ),
-      child: widget.child,
+      child: child,
     );
   }
 }

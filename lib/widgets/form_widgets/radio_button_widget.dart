@@ -38,7 +38,7 @@ class AppRadioListTileFieldWidget extends StatelessWidget {
             groupValue: radioId,
             title: AppTextWidget.medium(
               itemName,
-              color: enabled ? Colors.black : Colors.grey,
+              color: enabled ? AppThemeColors.textPrimaryColor : AppThemeColors.muted,
               maxLines: 2,
             ),
             // ✅ Control onChanged based on the isEnabled property
@@ -48,7 +48,7 @@ class AppRadioListTileFieldWidget extends StatelessWidget {
               field.didChange(value); // Update form field state
             }
                 : null, // If isEnabled is false, onChanged is null, disabling the radio
-            activeColor: AppThemeColors.iconActiveColor,
+            activeColor: AppThemeColors.primaryColor,
           );
         }).toList();
 

@@ -26,6 +26,7 @@ class AppDrawer extends StatelessWidget {
     Get.dialog(
       AlertDialog(
         backgroundColor: AppThemeColors.popupBackgroundColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: AppTextWidget.large('Logout'.tr, color: AppThemeColors.textPrimaryColor),
         content: AppTextWidget.medium('Are you sure you want to logout?'.tr, color: AppThemeColors.textSecondaryColor),
         actions: [
@@ -34,7 +35,10 @@ class AppDrawer extends StatelessWidget {
             child: AppTextWidget.medium('Cancel'.tr, color: AppThemeColors.textSecondaryColor),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppThemeColors.errorColor,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
             onPressed: () {
               Get.back(); // close dialog
               Get.offAllNamed(AppRoutes.login);
@@ -49,29 +53,36 @@ class AppDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isAdmin = user.roleId == AppStrings.appRoleAdminId;
+    final isDark = AppThemeColors.isDark;
 
     return Drawer(
       backgroundColor: AppThemeColors.popupBackgroundColor,
       child: Column(
         children: [
-          // Beautiful Custom Drawer Header
+          // Drawer Header
           Container(
             width: double.infinity,
             padding: const EdgeInsets.only(top: 50, bottom: 20, left: 20, right: 20),
-            color: AppThemeColors.appbarBackgroundColor,
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1E293B) : AppThemeColors.primaryColor,
+              border: Border(bottom: BorderSide(color: AppThemeColors.borderColor, width: 1)),
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  width: 64,
-                  height: 64,
+                  width: 58,
+                  height: 58,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 2),
+                    border: Border.all(color: Colors.white.withOpacity(0.8), width: 2),
                   ),
-                  child: const CircleAvatar(
-                    backgroundColor: Colors.white,
-                    child: Icon(Icons.person, size: 36, color: Colors.grey),
+                  child: CircleAvatar(
+                    backgroundColor: Colors.white.withOpacity(0.2),
+                    child: Text(
+                      user.firstName.isNotEmpty ? user.firstName[0].toUpperCase() : 'U',
+                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -91,14 +102,16 @@ class AppDrawer extends StatelessWidget {
                     fontSize: 13,
                   ),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  '${user.countryCode} ${user.phoneNo}',
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 13,
+                if (user.phoneNo != null && user.phoneNo!.isNotEmpty) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    '${user.countryCode ?? "+91"} ${user.phoneNo}',
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      fontSize: 13,
+                    ),
                   ),
-                ),
+                ],
               ],
             ),
           ),
@@ -106,7 +119,7 @@ class AppDrawer extends StatelessWidget {
           // Drawer Navigation Items
           Expanded(
             child: ListView(
-              padding: EdgeInsets.zero,
+              padding: const EdgeInsets.symmetric(vertical: 8),
               children: [
                 ListTile(
                   leading: Icon(Icons.home_outlined, color: AppThemeColors.iconColor),
@@ -140,7 +153,7 @@ class AppDrawer extends StatelessWidget {
                     if (onTabSelected != null) onTabSelected!(isAdmin ? 4 : 3);
                   },
                 ),
-                const Divider(),
+                Divider(color: AppThemeColors.dividerColor),
                 ListTile(
                   leading: Icon(Icons.settings_outlined, color: AppThemeColors.iconColor),
                   title: AppTextWidget.medium('Settings'.tr, color: AppThemeColors.textPrimaryColor),
@@ -156,8 +169,8 @@ class AppDrawer extends StatelessWidget {
           // Logout Item at the bottom
           SafeArea(
             child: ListTile(
-              leading: const Icon(Icons.logout, color: Colors.red),
-              title: AppTextWidget.medium('Logout'.tr, color: Colors.red),
+              leading: Icon(Icons.logout, color: AppThemeColors.errorColor),
+              title: AppTextWidget.medium('Logout'.tr, color: AppThemeColors.errorColor),
               onTap: _logout,
             ),
           ),

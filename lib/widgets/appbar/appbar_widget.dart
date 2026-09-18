@@ -1,11 +1,5 @@
-
-import 'package:attedance_management_system/modules/user/views/user_screens/widgets/calendar/year_calendar_screen.dart';
-import 'package:attedance_management_system/widgets/common/common_dialong_box.dart';
-import 'package:attedance_management_system/widgets/text_and_icon_widgets/app_icons_type.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-
 import '../../core/constants/app_icons.dart';
 import '../../core/constants/app_theme_colors.dart';
 import '../../modules/models/user.dart';
@@ -16,37 +10,39 @@ import '../text_and_icon_widgets/app_text_type.dart';
 class UserAppBar extends StatelessWidget implements PreferredSizeWidget {
   final User user;
 
-  UserAppBar({
+  const UserAppBar({
     required this.user,
     super.key,
   });
 
-// Define the preferred height for the AppBar
   @override
-  Size get preferredSize => const Size.fromHeight(80.0);
+  Size get preferredSize => const Size.fromHeight(74.0);
 
-// Helper method to construct the full name
   String get _fullName {
-    final middle = user.middleName == null ? '' : ' ${user.middleName}';
+    final middle = user.middleName == null || user.middleName!.isEmpty ? '' : ' ${user.middleName}';
     return '${user.firstName}$middle ${user.lastName}';
   }
 
-  String networkImage = 'https://t4.ftcdn.net/jpg/03/26/98/51/360_F_326985142_1aaKcEjMQW6ULp6oI9MYuv8lN9f8sFmj.jpg';
-    
   @override
   Widget build(BuildContext context) {
+    final isDark = AppThemeColors.isDark;
 
     return AppBar(
       backgroundColor: AppThemeColors.appbarBackgroundColor,
       elevation: 0,
       automaticallyImplyLeading: false,
-      actionsPadding: EdgeInsets.all(0),
+      actionsPadding: EdgeInsets.zero,
+      shape: Border(
+        bottom: BorderSide(
+          color: isDark ? AppThemeColors.borderColor : Colors.transparent,
+          width: 1,
+        ),
+      ),
       flexibleSpace: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
           child: Row(
             children: [
-
               GestureDetector(
                 onTap: () {
                   Scaffold.of(context).openDrawer();
@@ -54,17 +50,25 @@ class UserAppBar extends StatelessWidget implements PreferredSizeWidget {
                 child: Container(
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: AppThemeColors.primaryLightColor, width: 2.5),
+                    border: Border.all(
+                      color: isDark ? AppThemeColors.primaryColor : Colors.white.withOpacity(0.8),
+                      width: 2,
+                    ),
                   ),
                   child: CircleAvatar(
-                    backgroundColor: AppThemeColors.circleAvatarBackgroundColor,
-                    radius: 22,
-                    child: AppIconWidget.veryLarge(AppConstIcons.personIcon), // Specify the radius of the avatar, which controls its size
+                    backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white.withOpacity(0.2),
+                    radius: 20,
+                    child: Text(
+                      user.firstName.isNotEmpty ? user.firstName[0].toUpperCase() : 'U',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
                 ),
               ),
-
-
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -73,32 +77,27 @@ class UserAppBar extends StatelessWidget implements PreferredSizeWidget {
                   children: [
                     AppTextWidget.medium(
                       _fullName,
-                      maxLines: 2,
-                      color: AppThemeColors.whiteColor,
+                      maxLines: 1,
+                      color: Colors.white,
                     ),
-
-                    AppTextWidget.small(
+                    const SizedBox(height: 2),
+                    AppTextWidget.verySmall(
                       user.email,
-                      maxLines: 2,
-                      color: AppThemeColors.whiteColor,
+                      maxLines: 1,
+                      color: Colors.white.withOpacity(0.8),
                     ),
-
                   ],
                 ),
               ),
-              //
-              // AppIconButtonWidget.large(icon: AppConstIcons.dateIcon, color: Colors.white, onPressed: (){
-              //   WidgetsBinding.instance.addPostFrameCallback((_) {
-              //     Get.toNamed(AppRoutes.userCalenderScreen);
-              //   });
-              // }).marginOnly(right: 10),
-
-              AppIconButtonWidget.large(icon: AppConstIcons.settingsIcon, color: Colors.white, onPressed: (){
+              AppIconButtonWidget.large(
+                icon: AppConstIcons.settingsIcon,
+                color: Colors.white,
+                onPressed: () {
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     Get.toNamed(AppRoutes.settingsScreen);
                   });
-                }).marginOnly(right: 10),
-
+                },
+              ),
             ],
           ),
         ),

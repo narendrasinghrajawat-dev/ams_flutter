@@ -28,7 +28,6 @@ class SettingsController extends GetxController {
     if (sDark != null) isDark.value = sDark == 'true';
 
     final lang = _storage.readString(_kLanguage);
-    print('land is teh $lang');
 
     if (lang != null && lang.isNotEmpty) language.value = lang;
 

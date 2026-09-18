@@ -39,19 +39,21 @@ class AppThemeColors {
 
 
   static const Color primaryProdColor = Color(0xFF009688);
-  static const Color primaryTestColor = Color(0xFF7E57C2);
+  static const Color primaryTestColor = Color(0xFF0D9488); // Teal 600 (React matched)
   static const Color primaryDevColor = Color(0xFF42A5F5);
 
+  static const Color primaryLightProdColor = Color(0xFF80CBC4);
+  static const Color primaryLightTestColor = Color(0xFFCCFBF1); // Teal 100 (React matched)
+  static const Color primaryLightDevColor = Color(0xFFBBDEFB);
 
-  static const Color primaryLightProdColor = Color(0xFF009688);
-  static const Color primaryLightTestColor = Color(0xFF7E57C2);
-  static const Color primaryLightDevColor = Color(0xFF42A5F5);
+  static const Color primaryDarkProdColor = Color(0xFF004D40);
+  static const Color primaryDarkTestColor = Color(0xFF0F766E); // Teal 700 (React matched)
+  static const Color primaryDarkDevColor = Color(0xFF1565C0);
 
-
-
-  static const Color primaryDarkProdColor = Color(0xFF002171);
-  static const Color primaryDarkTestColor = Color(0xFF0B3A87);
-  static const Color primaryDarkDevColor = Color(0xFF141414);
+  // Secondary & Accent colors (React matched)
+  static const Color secondaryColor = Color(0xFF6366F1); // Indigo 500
+  static const Color secondaryLightColor = Color(0xFFE0E7FF);
+  static const Color accentColor = Color(0xFFF59E0B); // Amber 500
 
   // ============================================================
   // ENVIRONMENT-BASED PRIMARY COLORS
@@ -75,14 +77,10 @@ class AppThemeColors {
     return primaryLightDevColor;
   }
 
+  // Dependent colors on primary colors list
+  static Color get scaffoldBackgroundColor => isDark ? const Color(0xFF0B0F19) : const Color(0xFFF8FAFC);
 
-
-
-  // dependent colors on primary colors list
-
-  static Color get scaffoldBackgroundColor => isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC);
-
-  static Color get appbarBackgroundColor => isDark ? const Color(0xFF1E293B) : primaryColor;
+  static Color get appbarBackgroundColor => isDark ? const Color(0xFF111827) : primaryColor;
 
   static Color get buttonBgColor => primaryColor;
 
@@ -94,7 +92,7 @@ class AppThemeColors {
   // APPBAR
   // ============================================================
 
-  static Color get appBarColor => isDark ? const Color(0xFF1E293B) : primaryColor;
+  static Color get appBarColor => isDark ? const Color(0xFF111827) : primaryColor;
 
   static Color get appBarTextColor => Colors.white;
 
@@ -127,14 +125,14 @@ class AppThemeColors {
   // ============================================================
   // CARD COLORS
   // ============================================================
-  static Color get dashboardCardBackgroundColor => isDark ? const Color(0xFF1E293B) : Colors.white;
+  static Color get dashboardCardBackgroundColor => isDark ? const Color(0xFF111827) : Colors.white;
 
-  static Color get cardBackgroundColor => isDark ? const Color(0xFF1E293B) : Colors.white;
+  static Color get cardBackgroundColor => isDark ? const Color(0xFF111827) : Colors.white;
 
-  static Color get cardBorderColor => isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
+  static Color get cardBorderColor => isDark ? const Color(0xFF273548) : const Color(0xFFE2E8F0);
 
   // ============================================================
-  // Container COLORS
+  // CONTAINER COLORS
   // ============================================================
   static Color get containerBgColor => isDark ? const Color(0xFF1E293B) : Colors.white;
 
@@ -153,9 +151,9 @@ class AppThemeColors {
   // DIVIDER / BORDER COLORS
   // ============================================================
 
-  static Color get dividerColor => isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
+  static Color get dividerColor => isDark ? const Color(0xFF273548) : const Color(0xFFE2E8F0);
 
-  static Color get borderColor => isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1);
+  static Color get borderColor => isDark ? const Color(0xFF273548) : const Color(0xFFE2E8F0);
 
   // ============================================================
   // STATUS COLORS (SUCCESS / ERROR / WARNING)
@@ -164,6 +162,7 @@ class AppThemeColors {
   static const Color successColor = Color(0xFF10B981);
   static const Color errorColor = Color(0xFFEF4444);
   static const Color warningColor = Color(0xFFF59E0B);
+  static const Color infoColor = Color(0xFF3B82F6);
 
   // ============================================================
   // WALKTHROUGH / DOTS COLORS
@@ -185,17 +184,17 @@ class AppThemeColors {
   static Color get prefixIconColor => isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
   static Color get focusBorderColor => primaryColor;
   static Color get errorBorderColor => errorColor;
-  static Color get disableBorderColor => isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1);
+  static Color get disableBorderColor => isDark ? const Color(0xFF273548) : const Color(0xFFCBD5E1);
   static Color get disableLabelColor => isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8);
-  static Color get enableBorderColor => isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1);
+  static Color get enableBorderColor => isDark ? const Color(0xFF273548) : const Color(0xFFE2E8F0);
 
-  static Color get datePickerBackgroundColor => isDark ? const Color(0xFF1E293B) : Colors.white;
-  static Color get dropDownBackgroundColor => isDark ? const Color(0xFF1E293B) : Colors.white;
+  static Color get datePickerBackgroundColor => isDark ? const Color(0xFF111827) : Colors.white;
+  static Color get dropDownBackgroundColor => isDark ? const Color(0xFF111827) : Colors.white;
   static Color get sliderActiveColor => primaryColor;
-  static Color get sliderInActiveColor => isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
-  static Color get inactiveTrackColor => isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
+  static Color get sliderInActiveColor => isDark ? const Color(0xFF273548) : const Color(0xFFE2E8F0);
+  static Color get inactiveTrackColor => isDark ? const Color(0xFF273548) : const Color(0xFFE2E8F0);
 
-  static List<Color> get splashGradientColors => isDark ? [const Color(0xFF0F172A), const Color(0xFF1E293B)] : [primaryColor, primaryColor];
+  static List<Color> get splashGradientColors => isDark ? [const Color(0xFF0B0F19), const Color(0xFF111827)] : [primaryColor, primaryColor];
 
   static Color get splashIconBg => isDark ? Colors.white12 : Colors.black12;
   static Color get splashTextColor => Colors.white;
@@ -203,7 +202,7 @@ class AppThemeColors {
   static Color get whiteColor => Colors.white;
 
   // Other common widgets
-  static Color get popupBackgroundColor => isDark ? const Color(0xFF1E293B) : Colors.white;
+  static Color get popupBackgroundColor => isDark ? const Color(0xFF111827) : Colors.white;
   static Color get editIconColors => primaryColor;
   static Color get deleteIconColor => errorColor;
 
@@ -223,5 +222,4 @@ class AppThemeColors {
   static const Color totalColor = Color(0xFF6366F1);
   static const Color availableColor = Color(0xFF10B981);
   static const Color usedColor = Color(0xFFEF4444);
-
 }

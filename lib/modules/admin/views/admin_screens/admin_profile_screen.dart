@@ -1,10 +1,6 @@
-// lib/views/user/user_profile_screen.dart
-import 'package:attedance_management_system/core/constants/app_icons.dart';
 import 'package:attedance_management_system/data/utils/app_helper.dart';
 import 'package:attedance_management_system/modules/admin/controller/admin_profile_controller.dart';
 import 'package:attedance_management_system/modules/admin/views/admin_screens/widgets/profile/responsive_info_grid.dart';
-import 'package:attedance_management_system/widgets/common/ui_helper_widgets.dart';
-import 'package:attedance_management_system/widgets/text_and_icon_widgets/app_icons_type.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../../core/constants/app_theme_colors.dart';
@@ -20,9 +16,7 @@ class AdminProfileScreen extends StatefulWidget {
 }
 
 class _AdminProfileScreenState extends State<AdminProfileScreen> {
-  final AdminProfileController _adminProfileController = Get.put(AdminProfileController()); // or Get.find if already registered
-
-  static const String networkImage = 'https://t4.ftcdn.net/jpg/03/26/98/51/360_F_326985142_1aaKcEjMQW6ULp6oI9MYuv8lN9f8sFmj.jpg';
+  final AdminProfileController _adminProfileController = Get.put(AdminProfileController());
 
   @override
   Widget build(BuildContext context) {
@@ -30,123 +24,148 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
     final auth = authRegistered ? Get.find<AuthController>() : null;
     final user = AppHelper.getProfileUser();
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            const SizedBox(height: 20),
-
-            CircleAvatar(
-              radius: 50,
-              backgroundColor: AppThemeColors.primaryColor.withOpacity(0.1),
-              child: Text(
-                (user.firstName != null && user.firstName!.isNotEmpty)
-                    ? user.firstName![0].toUpperCase()
-                    : "U",
-                style: TextStyle(
-                  fontSize: 40,
-                  fontWeight: FontWeight.bold,
-                  color: AppThemeColors.primaryColor,
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      child: Column(
+        children: [
+          // Avatar Banner
+          Center(
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: AppThemeColors.primaryColor, width: 2.5),
+              ),
+              child: CircleAvatar(
+                radius: 46,
+                backgroundColor: AppThemeColors.primaryColor.withOpacity(0.12),
+                child: Text(
+                  (user.firstName.isNotEmpty)
+                      ? user.firstName[0].toUpperCase()
+                      : "A",
+                  style: TextStyle(
+                    fontSize: 36,
+                    fontWeight: FontWeight.bold,
+                    color: AppThemeColors.primaryColor,
+                  ),
                 ),
               ),
             ),
+          ),
 
-            // Basic Information Section
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          const SizedBox(height: 12),
+
+          Text(
+            '${user.firstName} ${user.lastName}',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppThemeColors.textPrimaryColor,
+            ),
+          ),
+
+          const SizedBox(height: 4),
+
+          Text(
+            user.email,
+            style: TextStyle(
+              fontSize: 13,
+              color: AppThemeColors.textSecondaryColor,
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          // Basic Information Section
+          CommonCardWidget(
+            padding: 16,
+            borderRadius: 16,
+            child: ResponsiveInfoGrid(
               children: [
-                const SizedBox(height: 12),
-                CommonCardWidget(
-                  child: ResponsiveInfoGrid(
-                    children: [
-                      _InfoRow(
-                        icon: Icons.person,
-                        iconColor: AppThemeColors.primaryColor,
-                        label: 'Name',
-                        value:
-                        "${user.firstName ?? ""} ${user.middleName ?? ""} ${user.lastName ?? ""}",
-                      ),
-                      _InfoRow(
-                        icon: Icons.email_rounded,
-                        iconColor: AppThemeColors.primaryColor,
-                        label: 'Email',
-                        value: user.email ?? 'michael@example.com',
-                      ),
-                      _InfoRow(
-                        icon: Icons.phone_rounded,
-                        iconColor: AppThemeColors.primaryColor,
-                        label: 'Phone',
-                        value: user.phoneNo ?? '+91 98765 43210',
-                      ),
-                      _InfoRow(
-                        icon: Icons.location_on_rounded,
-                        iconColor: AppThemeColors.primaryColor,
-                        label: 'Address',
-                        value: user.address ?? "",
-                      ),
-                    ],
-                  ),
+                _InfoRow(
+                  icon: Icons.person_outline_rounded,
+                  iconColor: AppThemeColors.primaryColor,
+                  label: 'Name',
+                  value: "${user.firstName} ${user.middleName ?? ''} ${user.lastName}".trim(),
+                ),
+                _InfoRow(
+                  icon: Icons.email_outlined,
+                  iconColor: AppThemeColors.secondaryColor,
+                  label: 'Email',
+                  value: user.email.isNotEmpty ? user.email : 'N/A',
+                ),
+                _InfoRow(
+                  icon: Icons.phone_outlined,
+                  iconColor: AppThemeColors.successColor,
+                  label: 'Phone',
+                  value: user.phoneNo != null && user.phoneNo!.isNotEmpty ? user.phoneNo! : 'N/A',
+                ),
+                _InfoRow(
+                  icon: Icons.location_on_outlined,
+                  iconColor: AppThemeColors.warningColor,
+                  label: 'Address',
+                  value: user.address != null && user.address!.isNotEmpty ? user.address! : "N/A",
                 ),
               ],
             ),
+          ),
 
-            const SizedBox(height: 20),
+          const SizedBox(height: 20),
 
-            // Settings Section
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _SectionHeader(title: 'Settings'),
-                const SizedBox(height: 12),
-                _SettingsTile(
-                  icon: Icons.description_rounded,
-                  iconColor: AppThemeColors.primaryColor,
-                  title: 'Terms & Conditions',
-                  onTap: () => Get.toNamed('/terms'),
-                ),
-                const SizedBox(height: 10),
-                _SettingsTile(
-                  icon: Icons.privacy_tip_rounded,
-                  iconColor: AppThemeColors.primaryColor,
-                  title: 'Privacy Policy',
-                  onTap: () => Get.toNamed('/privacy'),
-                ),
-                const SizedBox(height: 10),
-                _SettingsTile(
-                  icon: Icons.notifications_rounded,
-                  iconColor: AppThemeColors.primaryColor,
-                  title: 'Notifications',
-                  onTap: () => Get.toNamed('/notifications'),
-                ),
-              ],
-            ),
+          // Settings Section
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _SectionHeader(title: 'Settings'),
+              const SizedBox(height: 10),
+              _SettingsTile(
+                icon: Icons.description_outlined,
+                iconColor: AppThemeColors.primaryColor,
+                title: 'Terms & Conditions',
+                onTap: () => Get.toNamed('/terms'),
+              ),
+              const SizedBox(height: 8),
+              _SettingsTile(
+                icon: Icons.privacy_tip_outlined,
+                iconColor: AppThemeColors.secondaryColor,
+                title: 'Privacy Policy',
+                onTap: () => Get.toNamed('/privacy'),
+              ),
+              const SizedBox(height: 8),
+              _SettingsTile(
+                icon: Icons.notifications_outlined,
+                iconColor: AppThemeColors.warningColor,
+                title: 'Notifications',
+                onTap: () => Get.toNamed('/notifications'),
+              ),
+            ],
+          ),
 
-            const SizedBox(height: 20),
+          const SizedBox(height: 20),
 
-            _ForgotPasswordButton(
-              onTap: () => _showChangePasswordDialog(context, _adminProfileController),
-            ),
+          // Change Password Button
+          _ForgotPasswordButton(
+            onTap: () => _showChangePasswordDialog(context, _adminProfileController),
+          ),
 
-            const SizedBox(height: 10),
+          const SizedBox(height: 10),
 
-            _LogoutButton(
-              onTap: () {
-                if (authRegistered) {
-                  auth!.logout();
-                } else {
-                  Get.offAllNamed('/login');
-                }
-              },
-            ),
+          // Logout Button
+          _LogoutButton(
+            onTap: () {
+              if (authRegistered) {
+                auth!.logout();
+              } else {
+                Get.offAllNamed('/login');
+              }
+            },
+          ),
 
-            const SizedBox(height: 30),
-          ],
-        ),
+          const SizedBox(height: 24),
+        ],
       ),
     );
   }
-
 
   Future<void> _showChangePasswordDialog(BuildContext context, AdminProfileController ctrl) async {
     final TextEditingController newPassCtrl = TextEditingController();
@@ -156,8 +175,11 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
     await showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: AppTextWidget.medium('Change Password'),
+        backgroundColor: AppThemeColors.popupBackgroundColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: AppTextWidget.medium('Change Password', color: AppThemeColors.textPrimaryColor),
         content: Form(
+          autovalidateMode: AutovalidateMode.onUserInteraction,
           key: formKey,
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -165,19 +187,26 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
               TextFormField(
                 controller: newPassCtrl,
                 obscureText: true,
+                style: TextStyle(color: AppThemeColors.textPrimaryColor),
                 decoration: const InputDecoration(labelText: 'New Password'),
                 validator: (v) {
                   if (v == null || v.trim().length < 6) return 'Minimum 6 characters';
                   return null;
                 },
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 10),
               TextFormField(
                 controller: confirmCtrl,
                 obscureText: true,
+                style: TextStyle(color: AppThemeColors.textPrimaryColor),
                 decoration: const InputDecoration(labelText: 'Confirm Password'),
                 validator: (v) {
-                  if (v == null || v.trim() != newPassCtrl.text.trim()) return 'Passwords do not match';
+                  final confirm = v?.trim() ?? '';
+                  final password = newPassCtrl.text.trim();
+
+                  if (confirm != password && confirm.isNotEmpty && password.isNotEmpty) {
+                    return 'Passwords do not match';
+                  }
                   return null;
                 },
               ),
@@ -187,32 +216,28 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
         actions: [
           TextButton(
             onPressed: Get.back,
-            child: AppTextWidget.small('Cancel'),
+            child: AppTextWidget.small('Cancel', color: AppThemeColors.textSecondaryColor),
           ),
           ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppThemeColors.primaryColor,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
             onPressed: () async {
               if (formKey.currentState?.validate() ?? false) {
+                final password = newPassCtrl.text.trim();
                 Get.back();
-                await ctrl.changePassword(newPassCtrl.text.trim());
+                await ctrl.changePassword(password);
               }
             },
-            child: AppTextWidget.small('Change'),
+            child: AppTextWidget.small('Change', color: Colors.white),
           ),
         ],
       ),
     );
-
-    // dispose controllers
-    newPassCtrl.dispose();
-    confirmCtrl.dispose();
   }
-
-
 }
 
-
-
-// Section Header Widget
 class _SectionHeader extends StatelessWidget {
   final String title;
   const _SectionHeader({required this.title});
@@ -223,12 +248,12 @@ class _SectionHeader extends StatelessWidget {
       padding: const EdgeInsets.only(left: 4),
       child: AppTextWidget.medium(
         title,
+        color: AppThemeColors.textPrimaryColor,
       ),
     );
   }
 }
 
-// Info Row Widget
 class _InfoRow extends StatelessWidget {
   final IconData icon;
   final Color iconColor;
@@ -245,28 +270,39 @@ class _InfoRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12),
+      padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            width: 38,
+            height: 38,
             decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.1),
+              color: iconColor.withOpacity(0.12),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, color: iconColor, size: 20),
           ),
-          const SizedBox(width: 14),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                AppTextWidget.small(
+                Text(
                   label,
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: AppThemeColors.textSecondaryColor,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-                const SizedBox(height: 4),
-                AppTextWidget.medium(
+                const SizedBox(height: 2),
+                Text(
                   value,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: AppThemeColors.textPrimaryColor,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ],
             ),
@@ -277,8 +313,6 @@ class _InfoRow extends StatelessWidget {
   }
 }
 
-
-// Settings Tile Widget
 class _SettingsTile extends StatelessWidget {
   final IconData icon;
   final Color iconColor;
@@ -296,31 +330,37 @@ class _SettingsTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return CommonCardWidget(
       padding: 0,
+      borderRadius: 14,
       child: ListTile(
         onTap: onTap,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
         leading: Container(
-          padding: const EdgeInsets.all(10),
+          width: 38,
+          height: 38,
           decoration: BoxDecoration(
             color: iconColor.withOpacity(0.12),
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(icon, color: iconColor, size: 22),
+          child: Icon(icon, color: iconColor, size: 20),
         ),
-        title: AppTextWidget.medium(
+        title: Text(
           title,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: AppThemeColors.textPrimaryColor,
+          ),
         ),
         trailing: Icon(
           Icons.chevron_right_rounded,
-          color: Colors.grey.shade400,
-          size: 24,
+          color: AppThemeColors.textSecondaryColor,
+          size: 22,
         ),
       ),
     );
   }
 }
 
-// Logout Button Widget
 class _LogoutButton extends StatelessWidget {
   final VoidCallback onTap;
   const _LogoutButton({required this.onTap});
@@ -329,25 +369,30 @@ class _LogoutButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return CommonCardWidget(
       padding: 0,
+      borderRadius: 14,
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(14),
           child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 16),
+            padding: const EdgeInsets.symmetric(vertical: 14),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
                   Icons.logout_rounded,
-                  color: Colors.red.shade600,
-                  size: 22,
+                  color: AppThemeColors.errorColor,
+                  size: 20,
                 ),
-                const SizedBox(width: 10),
-                AppTextWidget.large(
+                const SizedBox(width: 8),
+                Text(
                   'Logout',
-                  color: Colors.red.shade600,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: AppThemeColors.errorColor,
+                  ),
                 ),
               ],
             ),
@@ -358,7 +403,6 @@ class _LogoutButton extends StatelessWidget {
   }
 }
 
-
 class _ForgotPasswordButton extends StatelessWidget {
   final VoidCallback onTap;
   const _ForgotPasswordButton({required this.onTap});
@@ -367,25 +411,30 @@ class _ForgotPasswordButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return CommonCardWidget(
       padding: 0,
+      borderRadius: 14,
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(14),
           child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 16),
+            padding: const EdgeInsets.symmetric(vertical: 14),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
                   Icons.lock_reset_rounded,
                   color: AppThemeColors.primaryColor,
-                  size: 22,
+                  size: 20,
                 ),
-                const SizedBox(width: 10),
-                AppTextWidget.large(
-                  'Forgot Password',
-                  color: AppThemeColors.primaryColor,
+                const SizedBox(width: 8),
+                Text(
+                  'Change Password',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: AppThemeColors.primaryColor,
+                  ),
                 ),
               ],
             ),
