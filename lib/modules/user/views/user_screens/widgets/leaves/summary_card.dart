@@ -8,6 +8,7 @@ class SummaryCard extends StatelessWidget {
   final String? value;
   final Color? backgroundColor;
   final Color? accentColor;
+  final Color? color;
 
   const SummaryCard({
     Key? key,
@@ -15,10 +16,12 @@ class SummaryCard extends StatelessWidget {
     this.value,
     this.backgroundColor,
     this.accentColor,
+    this.color,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final effectiveAccent = color ?? accentColor ?? AppThemeColors.primaryColor;
     return CommonCardWidget(
       color: backgroundColor?.withOpacity(0.12) ?? AppThemeColors.cardBackgroundColor,
       child: Column(
@@ -32,7 +35,7 @@ class SummaryCard extends StatelessWidget {
           const SizedBox(height: 4),
           AppTextWidget.large(
             value ?? "",
-            color: accentColor ?? AppThemeColors.primaryColor,
+            color: effectiveAccent,
             maxLines: 1,
           ),
         ],

@@ -21,5 +21,8 @@ class AppConstIcons{
   static const backIcon = Icons.arrow_back;
   static const saveIcon = Icons.save;
 
-
+  static const pendingLeavesIcon = Icons.hourglass_top_rounded;
+  static const approvedLeavesIcon = Icons.check_circle_outline;
+  static const rejectedLeavesIcon = Icons.cancel_outlined;
+  static const leaveIcon = Icons.beach_access_outlined;
 }

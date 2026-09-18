@@ -4,6 +4,7 @@ import 'package:attedance_management_system/modules/user/views/user_screens/widg
 import 'package:attedance_management_system/modules/user/views/user_screens/widgets/leaves/leave_balance_card.dart';
 import 'package:attedance_management_system/modules/user/views/user_screens/widgets/leaves/leave_card.dart';
 import 'package:attedance_management_system/modules/user/views/user_screens/widgets/leaves/segmented_tabs.dart';
+import 'package:attedance_management_system/modules/user/views/user_screens/widgets/leaves/summary_card.dart';
 import 'package:attedance_management_system/widgets/card/common_card.dart';
 import 'package:attedance_management_system/widgets/common/common_dialong_box.dart';
 import 'package:attedance_management_system/widgets/text_and_icon_widgets/app_icons_type.dart';
